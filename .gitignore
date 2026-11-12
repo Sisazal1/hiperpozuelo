@@ -1,0 +1,21 @@
+.vercel
+.env*
+!.env.example
+
+# dependencies
+node_modules/
+.pnpm-store/
+
+# next.js
+.next/
+out/
+
+# build / tooling artefacts
+tsconfig.tsbuildinfo
+*.log
+.DS_Store
+Thumbs.db
+
+# local scratch
+work/
+outputs/

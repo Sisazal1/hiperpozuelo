@@ -1,0 +1,1669 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_name": "Hiper Pozuelo - catálogo inicial estimado",
+  "generated_on": "2026-11-11",
+  "currency": "EUR",
+  "language": [
+    "es-ES",
+    "en-GB"
+  ],
+  "catalog_status": "PROPOSAL_NOT_VERIFIED",
+  "important_notice": "Este catálogo es una propuesta de surtido para prototipado, construida a partir de surtidos y precios publicados por comercios comparables en España. No representa el inventario, coste de compra, margen, precio real ni disponibilidad de Hiper Pozuelo. No publicar como oferta real ni aceptar pedidos reales hasta validación manual.",
+  "pricing_methodology": {
+    "method": "Precios orientativos propuestos por unidad, redondeados a puntos de precio habituales. Se compararon referencias visibles en Action, TEDi, IKEA y bazares online españoles. En los productos sin referencia exacta comparable se marca confidence=low.",
+    "bundle_method": "Los totales orientativos de packs son la suma aritmética de los precios propuestos de sus componentes. No incluyen descuento de bundle, envío, impuestos adicionales ni margen calculado. No anunciar ahorro.",
+    "price_confidence_definitions": {
+      "medium": "Existe al menos una referencia online comparable de categoría o producto con precio visible.",
+      "low": "La categoría es habitual en bazares, pero el precio propuesto es una hipótesis o una comparación indirecta."
+    }
+  },
+  "sources": [
+    {
+      "id": "action_kitchen",
+      "name": "Action España - Menaje de cocina",
+      "url": "https://www.action.com/es-es/c/cocina/menaje-de-cocina/",
+      "evidence": "Sets de utensilios a 3,99 €, espátula de silicona a 0,82 €, organizadores y productos pequeños desde menos de 1 €."
+    },
+    {
+      "id": "action_food_storage",
+      "name": "Action España - Almacenar y transportar",
+      "url": "https://www.action.com/es-es/c/cocina/almacenar-y-transportar/",
+      "evidence": "Fiambreras, recipientes, tarros y botellas con referencias observadas aproximadamente entre 1,49 € y 7,95 €."
+    },
+    {
+      "id": "action_bath",
+      "name": "Action España - Accesorios de baño",
+      "url": "https://www.action.com/es-es/c/vivienda/accesorios-de-bano/",
+      "evidence": "Dispensador de jabón 1,69 €, escobilla 0,99 €, portacepillos 0,99-1,99 €, repisa de ducha 3,99 €, cortina 5,95 €, cestas de colada 3,99-14,95 €."
+    },
+    {
+      "id": "action_cleaning",
+      "name": "Action España - Artículos de limpieza",
+      "url": "https://www.action.com/es-es/c/hogar/articulos-de-limpieza/",
+      "evidence": "Cepillo lavaplatos 0,29 €, estropajos 0,49 €, esponjas 0,79-0,99 €, paños de microfibra 4 unidades 2,99 €, bolsas de basura 0,68-2,48 €, fregonas y cubos con precios superiores."
+    },
+    {
+      "id": "action_storage",
+      "name": "Action España - Almacenaje",
+      "url": "https://www.action.com/es-es/c/hogar/almacenaje/",
+      "evidence": "Cestas y cajas pequeñas aproximadamente 1,49-4,99 €, cajas medianas 4,98-8,95 € y soluciones de mayor capacidad con precios superiores."
+    },
+    {
+      "id": "action_stationery",
+      "name": "Action España - Papelería",
+      "url": "https://www.action.com/es-es/c/oficina-y-papeleria/papeleria/",
+      "evidence": "Bolígrafos y rotuladores desde 0,33 €, sets de escritura 1,49-2,99 €, cuadernos y estuches aproximadamente 0,78-3,49 €."
+    },
+    {
+      "id": "tedi_home",
+      "name": "TEDi España - Hogar",
+      "url": "https://www.tedi.com/es/surtido/hogar/utensilios-de-cocina",
+      "evidence": "Fiambrera 2 €, jarra medidora 1 €, cucharas medidoras 1 €, utensilios de cocina, organizadores, vajilla, baño y limpieza."
+    },
+    {
+      "id": "tedi_stationery",
+      "name": "TEDi España - Papelería",
+      "url": "https://www.tedi.com/es/surtido/papeleria/pintar",
+      "evidence": "Libreta de espiral A4 1 €, bloc A4 2 €, rotuladores 18 unidades 1 €, acuarelas 24 colores 5 €."
+    },
+    {
+      "id": "bazaar_chinatown",
+      "name": "Bazar Chinatown - Bazar online",
+      "url": "https://www.bazarchinatown.com/",
+      "evidence": "Surtido de bricolaje, droguería, hogar, decoración, fiesta, manualidades y papelería; ejemplos publicados: botella 0,88 €, cinta 1,08 € y bolígrafos 4 unidades 2,98 €."
+    },
+    {
+      "id": "bazar_corona",
+      "name": "Bazar Corona Todo Hogar",
+      "url": "https://www.coronatodohogar.es/",
+      "evidence": "Taxonomía de bazar con cocina, baño, limpieza, ambientadores, iluminación, bricolaje, jardinería, fiesta, papelería, textil y decoración."
+    },
+    {
+      "id": "hiper_pozuelo_public_context",
+      "name": "Pozuelo Virtual - ficha y opiniones de Hiper Pozuelo",
+      "url": "https://pozuelovirtual.es/empresa/comercio/hiper-pozuelo/",
+      "evidence": "Opiniones públicas describen un establecimiento amplio y mencionan zonas de fiesta/Navidad, papelería, ferretería, menaje, limpieza y jardinería. Son testimonios, no un inventario oficial."
+    }
+  ],
+  "categories": [
+    {
+      "id": "kitchen",
+      "name_es": "Cocina y menaje",
+      "name_en": "Kitchen & tableware",
+      "description_es": "Utensilios, recipientes, preparación y organización de cocina.",
+      "show_in_primary_navigation": true
+    },
+    {
+      "id": "bathroom",
+      "name_es": "Baño",
+      "name_en": "Bathroom",
+      "description_es": "Accesorios, almacenaje y básicos de baño.",
+      "show_in_primary_navigation": true
+    },
+    {
+      "id": "cleaning",
+      "name_es": "Limpieza",
+      "name_en": "Cleaning",
+      "description_es": "Accesorios reutilizables, útiles y organización de limpieza.",
+      "show_in_primary_navigation": true
+    },
+    {
+      "id": "organization",
+      "name_es": "Orden y almacenaje",
+      "name_en": "Storage & organization",
+      "description_es": "Cestas, cajas, perchas y organizadores.",
+      "show_in_primary_navigation": true
+    },
+    {
+      "id": "stationery",
+      "name_es": "Papelería y estudio",
+      "name_en": "Stationery & study",
+      "description_es": "Cuadernos, escritura y accesorios de escritorio.",
+      "show_in_primary_navigation": true
+    },
+    {
+      "id": "decoration_party",
+      "name_es": "Decoración y temporada",
+      "name_en": "Decor & seasonal",
+      "description_es": "Decoración, envoltorio y artículos de fiesta/temporada.",
+      "show_in_primary_navigation": false
+    },
+    {
+      "id": "diy",
+      "name_es": "Bricolaje y pequeños arreglos",
+      "name_en": "DIY & home fixes",
+      "description_es": "Consumibles y pequeños accesorios de mantenimiento doméstico.",
+      "show_in_primary_navigation": false
+    },
+    {
+      "id": "textiles",
+      "name_es": "Textil de hogar",
+      "name_en": "Home textiles",
+      "description_es": "Paños, toallas y pequeños textiles de uso diario.",
+      "show_in_primary_navigation": false
+    },
+    {
+      "id": "garden",
+      "name_es": "Jardín y exterior",
+      "name_en": "Garden & outdoor",
+      "description_es": "Accesorios básicos para plantas, balcón y exterior.",
+      "show_in_primary_navigation": false
+    }
+  ],
+  "products": [
+    {
+      "id": "HP-KIT-001",
+      "slug": "espatula-silicona",
+      "name_es": "Espátula de silicona",
+      "name_en": "Silicone spatula",
+      "category_id": "kitchen",
+      "subcategory": "Utensilios",
+      "description_es": "Espátula multiuso para cocinar y mezclar.",
+      "proposed_price_eur": 0.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Referencia comparable Action: 0,82 €; TEDi también muestra utensilios pequeños alrededor de 1 €.",
+      "source_ids": [
+        "action_kitchen",
+        "tedi_home"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-small",
+        "kitchen-medium",
+        "kitchen-large"
+      ],
+      "cross_sell_ids": [
+        "HP-KIT-003",
+        "HP-KIT-006"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-KIT-002",
+      "slug": "jarra-medidora-1l",
+      "name_es": "Jarra medidora 1 L",
+      "name_en": "1 L measuring jug",
+      "category_id": "kitchen",
+      "subcategory": "Utensilios",
+      "description_es": "Jarra medidora ligera para preparar recetas.",
+      "proposed_price_eur": 1.49,
+      "price_confidence": "medium",
+      "benchmark_note": "TEDi publica una jarra medidora de 1 L por 1 €; el precio propuesto deja margen de ajuste.",
+      "source_ids": [
+        "tedi_home"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-small",
+        "kitchen-medium"
+      ],
+      "cross_sell_ids": [
+        "HP-KIT-004",
+        "HP-KIT-005"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-KIT-003",
+      "slug": "cucharas-medidoras-set-4",
+      "name_es": "Juego de cucharas medidoras (4 piezas)",
+      "name_en": "Measuring spoons (4-piece set)",
+      "category_id": "kitchen",
+      "subcategory": "Utensilios",
+      "description_es": "Juego básico para medir ingredientes.",
+      "proposed_price_eur": 1.49,
+      "price_confidence": "medium",
+      "benchmark_note": "TEDi publica un juego de 4 cucharas medidoras por 1 €.",
+      "source_ids": [
+        "tedi_home"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-small",
+        "kitchen-medium"
+      ],
+      "cross_sell_ids": [
+        "HP-KIT-002",
+        "HP-KIT-009"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-KIT-004",
+      "slug": "pinzas-cocina",
+      "name_es": "Pinzas de cocina",
+      "name_en": "Kitchen tongs",
+      "category_id": "kitchen",
+      "subcategory": "Utensilios",
+      "description_es": "Pinzas multiuso para cocinar y servir.",
+      "proposed_price_eur": 1.99,
+      "price_confidence": "medium",
+      "benchmark_note": "TEDi publica pinzas de barbacoa de acero inoxidable por 2 €.",
+      "source_ids": [
+        "tedi_home"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-small",
+        "kitchen-medium",
+        "kitchen-large"
+      ],
+      "cross_sell_ids": [
+        "HP-KIT-009",
+        "HP-KIT-006"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-KIT-005",
+      "slug": "fiambrera-clip",
+      "name_es": "Fiambrera con cierre de clip",
+      "name_en": "Clip-lock food container",
+      "category_id": "kitchen",
+      "subcategory": "Conservación",
+      "description_es": "Recipiente reutilizable para guardar o transportar alimentos.",
+      "proposed_price_eur": 2.49,
+      "price_confidence": "medium",
+      "benchmark_note": "TEDi publica una fiambrera básica por 2 €; Action muestra recipientes y sets entre 1,49 € y 5,95 €.",
+      "source_ids": [
+        "tedi_home",
+        "action_food_storage"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-small",
+        "kitchen-medium",
+        "kitchen-large"
+      ],
+      "cross_sell_ids": [
+        "HP-KIT-010",
+        "HP-KIT-011"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-KIT-006",
+      "slug": "set-utensilios-cocina-3",
+      "name_es": "Set de utensilios de cocina (3 piezas)",
+      "name_en": "Kitchen utensil set (3 pieces)",
+      "category_id": "kitchen",
+      "subcategory": "Utensilios",
+      "description_es": "Conjunto básico de utensilios para cocina.",
+      "proposed_price_eur": 3.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica un set MasterChef de 3 utensilios por 3,99 €.",
+      "source_ids": [
+        "action_kitchen"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-medium",
+        "kitchen-large"
+      ],
+      "cross_sell_ids": [
+        "HP-KIT-001",
+        "HP-KIT-004"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-KIT-007",
+      "slug": "tabla-cortar",
+      "name_es": "Tabla de cortar",
+      "name_en": "Cutting board",
+      "category_id": "kitchen",
+      "subcategory": "Preparación",
+      "description_es": "Tabla compacta para preparación de alimentos.",
+      "proposed_price_eur": 2.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action muestra tablas pequeñas desde 1,82 € y modelos mayores alrededor de 3,99-6,98 €.",
+      "source_ids": [
+        "action_kitchen"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-medium",
+        "kitchen-large"
+      ],
+      "cross_sell_ids": [
+        "HP-KIT-006",
+        "HP-KIT-008"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-KIT-008",
+      "slug": "set-tarros-especias-2",
+      "name_es": "Set de tarros para especias (2 piezas)",
+      "name_en": "Spice jars (2-piece set)",
+      "category_id": "kitchen",
+      "subcategory": "Almacenaje de cocina",
+      "description_es": "Dos tarros pequeños para organizar especias.",
+      "proposed_price_eur": 1.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica dos tarros de especias por 0,99 €; se propone un PVP ligeramente superior para validar.",
+      "source_ids": [
+        "action_kitchen"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-large"
+      ],
+      "cross_sell_ids": [
+        "HP-KIT-005",
+        "HP-KIT-010"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-KIT-009",
+      "slug": "pincel-silicona",
+      "name_es": "Pincel de silicona",
+      "name_en": "Silicone pastry brush",
+      "category_id": "kitchen",
+      "subcategory": "Utensilios",
+      "description_es": "Pincel de silicona para cocina y repostería.",
+      "proposed_price_eur": 0.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica un pincel de silicona por 0,82 €.",
+      "source_ids": [
+        "action_kitchen"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-small",
+        "kitchen-medium"
+      ],
+      "cross_sell_ids": [
+        "HP-KIT-003",
+        "HP-KIT-006"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-KIT-010",
+      "slug": "set-recipientes-almacenaje",
+      "name_es": "Set de recipientes de almacenaje",
+      "name_en": "Food storage container set",
+      "category_id": "kitchen",
+      "subcategory": "Conservación",
+      "description_es": "Conjunto de recipientes para organizar alimentos.",
+      "proposed_price_eur": 5.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica sets de fiambreras alrededor de 5,95 € y recipientes individuales desde 1,49 €.",
+      "source_ids": [
+        "action_food_storage"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-large"
+      ],
+      "cross_sell_ids": [
+        "HP-KIT-005",
+        "HP-KIT-008"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-KIT-011",
+      "slug": "botella-reutilizable-750ml",
+      "name_es": "Botella reutilizable 750 ml",
+      "name_en": "750 ml reusable bottle",
+      "category_id": "kitchen",
+      "subcategory": "Botellas y vasos",
+      "description_es": "Botella ligera para uso diario.",
+      "proposed_price_eur": 2.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica botellas de 750 ml alrededor de 1,99 € y botellas térmicas más caras.",
+      "source_ids": [
+        "action_food_storage",
+        "bazaar_chinatown"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-large",
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-KIT-005",
+        "HP-STU-001"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-KIT-012",
+      "slug": "paño-cocina",
+      "name_es": "Paño de cocina",
+      "name_en": "Kitchen towel",
+      "category_id": "textiles",
+      "subcategory": "Textil cocina",
+      "description_es": "Paño multiuso para cocina.",
+      "proposed_price_eur": 2.99,
+      "price_confidence": "low",
+      "benchmark_note": "La categoría de paños de cocina aparece en el surtido de bazares comparables; no se encontró una referencia de precio suficientemente directa.",
+      "source_ids": [
+        "bazar_corona"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-medium",
+        "kitchen-large"
+      ],
+      "cross_sell_ids": [
+        "HP-CLE-003",
+        "HP-KIT-006"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-BTH-001",
+      "slug": "dispensador-jabon",
+      "name_es": "Dispensador de jabón",
+      "name_en": "Soap dispenser",
+      "category_id": "bathroom",
+      "subcategory": "Accesorios de baño",
+      "description_es": "Dispensador de sobremesa para jabón líquido.",
+      "proposed_price_eur": 1.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica dispensadores desde 1,69 €; IKEA también ofrece accesorios de baño de precio bajo.",
+      "source_ids": [
+        "action_bath"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-small",
+        "bath-medium",
+        "bath-large"
+      ],
+      "cross_sell_ids": [
+        "HP-BTH-002",
+        "HP-BTH-005"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-BTH-002",
+      "slug": "portacepillos-dientes",
+      "name_es": "Portacepillos de dientes",
+      "name_en": "Toothbrush holder",
+      "category_id": "bathroom",
+      "subcategory": "Accesorios de baño",
+      "description_es": "Vaso organizador para cepillos de dientes.",
+      "proposed_price_eur": 1.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica portacepillos desde 0,99 € y otros modelos por 1,99 €.",
+      "source_ids": [
+        "action_bath"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-small",
+        "bath-medium"
+      ],
+      "cross_sell_ids": [
+        "HP-BTH-001",
+        "HP-BTH-003"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-BTH-003",
+      "slug": "escobilla-bano",
+      "name_es": "Escobilla de baño con soporte",
+      "name_en": "Toilet brush with holder",
+      "category_id": "bathroom",
+      "subcategory": "Accesorios de baño",
+      "description_es": "Escobilla básica con soporte.",
+      "proposed_price_eur": 1.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica escobillas con soporte desde 0,99 € y otros modelos por 2,72-4,95 €.",
+      "source_ids": [
+        "action_bath"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-small",
+        "bath-medium",
+        "bath-large"
+      ],
+      "cross_sell_ids": [
+        "HP-CLE-001",
+        "HP-BTH-006"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-BTH-004",
+      "slug": "jabonera",
+      "name_es": "Jabonera",
+      "name_en": "Soap dish",
+      "category_id": "bathroom",
+      "subcategory": "Accesorios de baño",
+      "description_es": "Jabonera compacta para lavabo o ducha.",
+      "proposed_price_eur": 1.29,
+      "price_confidence": "low",
+      "benchmark_note": "Precio orientativo inferido a partir de accesorios de baño básicos; validar contra referencias físicas.",
+      "source_ids": [
+        "action_bath",
+        "tedi_home"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-small",
+        "bath-medium"
+      ],
+      "cross_sell_ids": [
+        "HP-BTH-001",
+        "HP-BTH-002"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-BTH-005",
+      "slug": "bote-almacenaje-bano",
+      "name_es": "Bote de almacenaje para baño",
+      "name_en": "Bathroom storage jar",
+      "category_id": "bathroom",
+      "subcategory": "Organización de baño",
+      "description_es": "Bote para pequeños accesorios de baño.",
+      "proposed_price_eur": 1.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica botes de baño aproximadamente entre 1,29 € y 2,72 €.",
+      "source_ids": [
+        "action_bath"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-medium",
+        "bath-large"
+      ],
+      "cross_sell_ids": [
+        "HP-BTH-001",
+        "HP-ORG-003"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-BTH-006",
+      "slug": "repisa-ducha",
+      "name_es": "Repisa de ducha",
+      "name_en": "Shower shelf",
+      "category_id": "bathroom",
+      "subcategory": "Organización de baño",
+      "description_es": "Repisa compacta para organizar productos de ducha.",
+      "proposed_price_eur": 3.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica una repisa de ducha por 3,99 €.",
+      "source_ids": [
+        "action_bath"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-large"
+      ],
+      "cross_sell_ids": [
+        "HP-BTH-001",
+        "HP-BTH-005"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-BTH-007",
+      "slug": "cortina-ducha",
+      "name_es": "Cortina de ducha",
+      "name_en": "Shower curtain",
+      "category_id": "bathroom",
+      "subcategory": "Textil baño",
+      "description_es": "Cortina de ducha de tamaño estándar; dimensiones por confirmar.",
+      "proposed_price_eur": 5.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica una cortina de ducha de 180 x 200 cm por 5,95 €.",
+      "source_ids": [
+        "action_bath"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-large"
+      ],
+      "cross_sell_ids": [
+        "HP-BTH-006",
+        "HP-BTH-008"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-BTH-008",
+      "slug": "cesta-colada-compacta",
+      "name_es": "Cesta de colada compacta",
+      "name_en": "Compact laundry basket",
+      "category_id": "bathroom",
+      "subcategory": "Lavandería",
+      "description_es": "Cesta de colada de capacidad compacta; capacidad exacta por confirmar.",
+      "proposed_price_eur": 4.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica cestas de colada desde 3,99 € y tamaños de 40 L alrededor de 8,95 €.",
+      "source_ids": [
+        "action_bath"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-large"
+      ],
+      "cross_sell_ids": [
+    "HP-ORG-001"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-CLE-001",
+      "slug": "esponjas-limpieza-pack-3",
+      "name_es": "Esponjas de limpieza (3 unidades)",
+      "name_en": "Cleaning sponges (3 pack)",
+      "category_id": "cleaning",
+      "subcategory": "Fregado",
+      "description_es": "Pack de esponjas multiuso.",
+      "proposed_price_eur": 0.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica esponjas de limpieza de 3 unidades por 0,99 €.",
+      "source_ids": [
+        "action_cleaning"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "cleaning-small",
+        "cleaning-medium",
+        "cleaning-large"
+      ],
+      "cross_sell_ids": [
+        "HP-CLE-002",
+        "HP-CLE-003"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-CLE-002",
+      "slug": "cepillo-lavaplatos",
+      "name_es": "Cepillo lavaplatos",
+      "name_en": "Dishwashing brush",
+      "category_id": "cleaning",
+      "subcategory": "Fregado",
+      "description_es": "Cepillo manual para lavar vajilla.",
+      "proposed_price_eur": 0.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica cepillos lavaplatos por 0,29 €.",
+      "source_ids": [
+        "action_cleaning"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "cleaning-small",
+        "cleaning-medium"
+      ],
+      "cross_sell_ids": [
+        "HP-CLE-001",
+        "HP-KIT-006"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-CLE-003",
+      "slug": "bayetas-microfibra-pack-4",
+      "name_es": "Paños de microfibra (4 unidades)",
+      "name_en": "Microfiber cloths (4 pack)",
+      "category_id": "cleaning",
+      "subcategory": "Paños y bayetas",
+      "description_es": "Pack de cuatro paños de microfibra para superficies.",
+      "proposed_price_eur": 2.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica cuatro paños de microfibra por 2,99 €.",
+      "source_ids": [
+        "action_cleaning"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "cleaning-small",
+        "cleaning-medium",
+        "cleaning-large"
+      ],
+      "cross_sell_ids": [
+        "HP-CLE-001",
+        "HP-CLE-004"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-CLE-004",
+      "slug": "bolsas-basura-pack",
+      "name_es": "Bolsas de basura (rollo)",
+      "name_en": "Bin bags (roll)",
+      "category_id": "cleaning",
+      "subcategory": "Residuos",
+      "description_es": "Rollo de bolsas; capacidad y número de unidades pendientes de confirmar.",
+      "proposed_price_eur": 1.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica formatos de bolsas de basura aproximadamente entre 0,68 € y 2,48 €.",
+      "source_ids": [
+        "action_cleaning"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "cleaning-small",
+        "cleaning-medium",
+        "cleaning-large"
+      ],
+      "cross_sell_ids": [
+        "HP-CLE-005",
+        "HP-ORG-001"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-CLE-005",
+      "slug": "cubo-limpieza",
+      "name_es": "Cubo de limpieza",
+      "name_en": "Cleaning bucket",
+      "category_id": "cleaning",
+      "subcategory": "Útiles de limpieza",
+      "description_es": "Cubo doméstico multiuso; capacidad por confirmar.",
+      "proposed_price_eur": 2.99,
+      "price_confidence": "low",
+      "benchmark_note": "Estimación de gama básica; Action muestra útiles y cubos de diferentes tamaños a precios superiores para modelos más completos.",
+      "source_ids": [
+        "action_cleaning"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "cleaning-small",
+        "cleaning-medium"
+      ],
+      "cross_sell_ids": [
+        "HP-CLE-006",
+        "HP-CLE-007"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-CLE-006",
+      "slug": "recambio-fregona",
+      "name_es": "Recambio de fregona",
+      "name_en": "Mop replacement head",
+      "category_id": "cleaning",
+      "subcategory": "Útiles de limpieza",
+      "description_es": "Recambio universal; compatibilidad pendiente de confirmar.",
+      "proposed_price_eur": 1.99,
+      "price_confidence": "low",
+      "benchmark_note": "Precio propuesto para recambio genérico; la referencia Vileda de Action es 5,95 €, por lo que la calidad y compatibilidad cambiarían el precio.",
+      "source_ids": [
+        "action_cleaning"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "cleaning-medium",
+        "cleaning-large"
+      ],
+      "cross_sell_ids": [
+        "HP-CLE-005",
+        "HP-CLE-007"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-CLE-007",
+      "slug": "set-mopa-basico",
+      "name_es": "Set de mopa básico",
+      "name_en": "Basic mop set",
+      "category_id": "cleaning",
+      "subcategory": "Útiles de limpieza",
+      "description_es": "Set básico de limpieza de suelos; piezas incluidas por confirmar.",
+      "proposed_price_eur": 5.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica una mopa de 3 piezas por 5,95 €.",
+      "source_ids": [
+        "action_cleaning"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "cleaning-large"
+      ],
+      "cross_sell_ids": [
+        "HP-CLE-003",
+        "HP-CLE-006"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-CLE-008",
+      "slug": "papelera-compacta",
+      "name_es": "Papelera compacta",
+      "name_en": "Compact waste bin",
+      "category_id": "cleaning",
+      "subcategory": "Residuos",
+      "description_es": "Papelera doméstica pequeña; capacidad y material por confirmar.",
+      "proposed_price_eur": 5.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica cubos pequeños de baño y residuos desde 5 € aproximadamente; tamaños mayores alcanzan 8,95-9,95 €.",
+      "source_ids": [
+        "action_cleaning",
+        "tedi_home"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "cleaning-large"
+      ],
+      "cross_sell_ids": [
+        "HP-CLE-004",
+        "HP-ORG-001"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-ORG-001",
+      "slug": "cesta-almacenaje-pequena",
+      "name_es": "Cesta de almacenaje pequeña",
+      "name_en": "Small storage basket",
+      "category_id": "organization",
+      "subcategory": "Cestas",
+      "description_es": "Cesta compacta para baño, armario o escritorio.",
+      "proposed_price_eur": 1.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica cestas pequeñas entre 1,49 € y 2,29 €.",
+      "source_ids": [
+        "action_storage"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-medium",
+        "cleaning-medium",
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-ORG-002",
+        "HP-BTH-005"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-ORG-002",
+      "slug": "cesta-almacenaje-mediana",
+      "name_es": "Cesta de almacenaje mediana",
+      "name_en": "Medium storage basket",
+      "category_id": "organization",
+      "subcategory": "Cestas",
+      "description_es": "Cesta multiuso para armarios y estanterías.",
+      "proposed_price_eur": 3.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica cestas medianas aproximadamente entre 3,99 € y 4,99 €.",
+      "source_ids": [
+        "action_storage"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-large",
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-ORG-001",
+        "HP-ORG-003"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-ORG-003",
+      "slug": "organizador-cajon",
+      "name_es": "Organizador de cajón",
+      "name_en": "Drawer organizer",
+      "category_id": "organization",
+      "subcategory": "Organizadores",
+      "description_es": "Organizador compacto para ordenar cajones.",
+      "proposed_price_eur": 2.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica organizadores pequeños y cajas con cajones aproximadamente entre 1,99 € y 4,95 €.",
+      "source_ids": [
+        "action_storage",
+        "action_food_storage"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-medium",
+        "study-medium",
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-ORG-001",
+        "HP-STU-008"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-ORG-004",
+      "slug": "caja-almacenaje-tapa",
+      "name_es": "Caja de almacenaje con tapa",
+      "name_en": "Storage box with lid",
+      "category_id": "organization",
+      "subcategory": "Cajas",
+      "description_es": "Caja apilable con tapa; capacidad pendiente de confirmar.",
+      "proposed_price_eur": 4.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica cajas de 13 L aproximadamente por 4,98 € y otros formatos entre 1,99 € y 8,95 €.",
+      "source_ids": [
+        "action_storage"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "kitchen-large",
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-ORG-001",
+        "HP-ORG-002"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-ORG-005",
+      "slug": "perchas-pack-10",
+      "name_es": "Perchas (pack de 10)",
+      "name_en": "Hangers (10 pack)",
+      "category_id": "organization",
+      "subcategory": "Armario",
+      "description_es": "Pack de diez perchas; material y acabado por confirmar.",
+      "proposed_price_eur": 2.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica packs de 10 perchas aproximadamente entre 1,29 € y 3,99 €, según material.",
+      "source_ids": [
+        "action_storage"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-large"
+      ],
+      "cross_sell_ids": [
+        "HP-ORG-002",
+        "HP-ORG-006"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-ORG-006",
+      "slug": "organizador-colgante-armario",
+      "name_es": "Organizador colgante de armario",
+      "name_en": "Hanging wardrobe organizer",
+      "category_id": "organization",
+      "subcategory": "Armario",
+      "description_es": "Organizador textil colgante; número de compartimentos por confirmar.",
+      "proposed_price_eur": 6.99,
+      "price_confidence": "medium",
+      "benchmark_note": "TEDi publica organizadores colgantes y de armario entre 5 € y 7 €.",
+      "source_ids": [
+        "tedi_home",
+        "action_storage"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "bath-large"
+      ],
+      "cross_sell_ids": [
+        "HP-ORG-005",
+        "HP-ORG-004"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-ORG-007",
+      "slug": "bolsa-almacenaje-bajo-cama",
+      "name_es": "Bolsa de almacenaje bajo cama",
+      "name_en": "Under-bed storage bag",
+      "category_id": "organization",
+      "subcategory": "Almacenaje textil",
+      "description_es": "Bolsa textil con cremallera para guardar ropa u objetos.",
+      "proposed_price_eur": 4.99,
+      "price_confidence": "medium",
+      "benchmark_note": "TEDi publica bolsas de almacenaje bajo cama por 4 €.",
+      "source_ids": [
+        "tedi_home"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-ORG-004",
+        "HP-ORG-006"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-STU-001",
+      "slug": "libreta-a5",
+      "name_es": "Libreta A5",
+      "name_en": "A5 notebook",
+      "category_id": "stationery",
+      "subcategory": "Cuadernos",
+      "description_es": "Libreta básica para apuntes y listas.",
+      "proposed_price_eur": 1.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action muestra libretas y cuadernos desde 0,78 €; TEDi publica libretas A4 por 1 €.",
+      "source_ids": [
+        "action_stationery",
+        "tedi_stationery"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "study-small",
+        "study-medium",
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-STU-002",
+        "HP-STU-004"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-STU-002",
+      "slug": "boligrafos-pack-6",
+      "name_es": "Bolígrafos (pack de 6)",
+      "name_en": "Pens (6 pack)",
+      "category_id": "stationery",
+      "subcategory": "Escritura",
+      "description_es": "Pack de bolígrafos para uso diario.",
+      "proposed_price_eur": 0.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action muestra packs de 6 bolígrafos por 0,82 € y otros packs de 15 unidades por 1,69 €.",
+      "source_ids": [
+        "action_stationery",
+        "bazaar_chinatown"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "study-small",
+        "study-medium",
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-STU-001",
+        "HP-STU-003"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-STU-003",
+      "slug": "lapices-pack",
+      "name_es": "Set de lápices",
+      "name_en": "Pencil set",
+      "category_id": "stationery",
+      "subcategory": "Escritura",
+      "description_es": "Set básico de lápices; unidades pendientes de confirmar.",
+      "proposed_price_eur": 1.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica sets de lápices de 16 unidades por 0,69 € y sets de colores a precios superiores.",
+      "source_ids": [
+        "action_stationery"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "study-small",
+        "study-medium"
+      ],
+      "cross_sell_ids": [
+        "HP-STU-001",
+        "HP-STU-005"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-STU-004",
+      "slug": "notas-adhesivas",
+      "name_es": "Notas adhesivas",
+      "name_en": "Sticky notes",
+      "category_id": "stationery",
+      "subcategory": "Organización",
+      "description_es": "Bloc de notas adhesivas para recordatorios.",
+      "proposed_price_eur": 0.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica blocs de tareas y notas desde 0,99 €.",
+      "source_ids": [
+        "action_stationery"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "study-small",
+        "study-medium",
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-STU-001",
+        "HP-STU-006"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-STU-005",
+      "slug": "rotuladores-pack-12",
+      "name_es": "Rotuladores (pack de 12)",
+      "name_en": "Markers (12 pack)",
+      "category_id": "stationery",
+      "subcategory": "Dibujo y color",
+      "description_es": "Pack de rotuladores de colores.",
+      "proposed_price_eur": 1.99,
+      "price_confidence": "medium",
+      "benchmark_note": "Action y TEDi publican packs de rotuladores desde 1 €; los packs de mayor tamaño llegan a 2,99-5 €.",
+      "source_ids": [
+        "action_stationery",
+        "tedi_stationery"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "study-medium",
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-STU-001",
+        "HP-STU-003"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-STU-006",
+      "slug": "estuche-tela",
+      "name_es": "Estuche de tela",
+      "name_en": "Fabric pencil case",
+      "category_id": "stationery",
+      "subcategory": "Organización",
+      "description_es": "Estuche sencillo para material de escritura.",
+      "proposed_price_eur": 2.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica estuches entre 1,39 € y 2,49 €.",
+      "source_ids": [
+        "action_stationery"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "study-medium",
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-STU-002",
+        "HP-STU-005"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-STU-007",
+      "slug": "bloc-dibujo-a4",
+      "name_es": "Bloc de dibujo A4",
+      "name_en": "A4 sketch pad",
+      "category_id": "stationery",
+      "subcategory": "Dibujo y color",
+      "description_es": "Bloc de dibujo A4; número de hojas por confirmar.",
+      "proposed_price_eur": 3.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Action publica cuadernos de bocetos A4 de 200 hojas por 3,49 €; TEDi muestra blocs A4 por 2 €.",
+      "source_ids": [
+        "action_stationery",
+        "tedi_stationery"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-STU-005",
+        "HP-STU-003"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-STU-008",
+      "slug": "tijeras-escolares",
+      "name_es": "Tijeras multiuso pequeñas",
+      "name_en": "Small multipurpose scissors",
+      "category_id": "stationery",
+      "subcategory": "Accesorios",
+      "description_es": "Tijeras de uso escolar o doméstico; tamaño y seguridad por confirmar.",
+      "proposed_price_eur": 1.49,
+      "price_confidence": "low",
+      "benchmark_note": "Estimación de accesorio básico; validar modelo, edad recomendada y precio real antes de comercializar.",
+      "source_ids": [
+        "bazaar_chinatown"
+      ],
+      "pack_eligible": true,
+      "pack_ids": [
+        "study-large"
+      ],
+      "cross_sell_ids": [
+        "HP-STU-001",
+        "HP-STU-006"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-DEC-001",
+      "slug": "vela-decorativa",
+      "name_es": "Vela decorativa",
+      "name_en": "Decorative candle",
+      "category_id": "decoration_party",
+      "subcategory": "Decoración",
+      "description_es": "Vela decorativa; tamaño, aroma y composición por confirmar.",
+      "proposed_price_eur": 1.99,
+      "price_confidence": "low",
+      "benchmark_note": "Categoría habitual en surtido de hogar/decoración, pero sin precio comparable directo verificado en esta investigación.",
+      "source_ids": [
+        "bazaar_corona"
+      ],
+      "pack_eligible": false,
+      "pack_ids": [],
+      "cross_sell_ids": [
+        "HP-DEC-002",
+        "HP-ORG-001"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-DEC-002",
+      "slug": "bolsa-regalo",
+      "name_es": "Bolsa de regalo",
+      "name_en": "Gift bag",
+      "category_id": "decoration_party",
+      "subcategory": "Regalo y envoltorio",
+      "description_es": "Bolsa para presentación de regalos; tamaño por confirmar.",
+      "proposed_price_eur": 1.49,
+      "price_confidence": "low",
+      "benchmark_note": "Precio orientativo sin referencia directa; validar formato y coste de compra.",
+      "source_ids": [
+        "bazaar_chinatown",
+        "bazar_corona"
+      ],
+      "pack_eligible": false,
+      "pack_ids": [],
+      "cross_sell_ids": [
+        "HP-DEC-003"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-DEC-003",
+      "slug": "set-globos-fiesta",
+      "name_es": "Set de globos para fiesta",
+      "name_en": "Party balloon set",
+      "category_id": "decoration_party",
+      "subcategory": "Fiesta",
+      "description_es": "Set decorativo de globos; unidades y material por confirmar.",
+      "proposed_price_eur": 1.99,
+      "price_confidence": "low",
+      "benchmark_note": "Los bazares comparables incluyen categoría de fiesta y globos; precio no verificado directamente.",
+      "source_ids": [
+        "bazaar_chinatown",
+        "bazar_corona",
+        "hiper_pozuelo_public_context"
+      ],
+      "pack_eligible": false,
+      "pack_ids": [],
+      "cross_sell_ids": [
+        "HP-DEC-002"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-DIY-001",
+      "slug": "cinta-adhesiva-transparente-2",
+      "name_es": "Cinta adhesiva transparente (2 rollos)",
+      "name_en": "Clear adhesive tape (2 rolls)",
+      "category_id": "diy",
+      "subcategory": "Adhesivos",
+      "description_es": "Cinta adhesiva de uso doméstico.",
+      "proposed_price_eur": 1.29,
+      "price_confidence": "medium",
+      "benchmark_note": "Bazar Chinatown publica cinta celo invisible de 2 unidades por 1,08 €.",
+      "source_ids": [
+        "bazaar_chinatown"
+      ],
+      "pack_eligible": false,
+      "pack_ids": [],
+      "cross_sell_ids": [
+        "HP-STU-001",
+        "HP-STU-008"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    },
+    {
+      "id": "HP-DIY-003",
+      "slug": "cola-blanca-250ml",
+      "name_es": "Cola blanca 250 ml",
+      "name_en": "250 ml white glue",
+      "category_id": "diy",
+      "subcategory": "Adhesivos y manualidades",
+      "description_es": "Adhesivo escolar/manualidades; fórmula y etiquetado por confirmar.",
+      "proposed_price_eur": 4.49,
+      "price_confidence": "medium",
+      "benchmark_note": "Bazar Chinatown publica cola blanca de 250 ml por 4,38 €.",
+      "source_ids": [
+        "bazaar_chinatown"
+      ],
+      "pack_eligible": false,
+      "pack_ids": [],
+      "cross_sell_ids": [
+        "HP-STU-007"
+      ],
+      "catalog_status": "proposed_not_verified",
+      "orderable": false
+    }
+  ],
+  "bundles": [
+    {
+      "id": "kitchen-small",
+      "category_id": "kitchen",
+      "name_es": "Kitchen Pack Small",
+      "tier": "small",
+      "description_es": "Una selección compacta de utensilios esenciales.",
+      "product_ids": [
+        "HP-KIT-001",
+        "HP-KIT-002",
+        "HP-KIT-004",
+        "HP-KIT-005",
+        "HP-KIT-009"
+      ],
+      "estimated_total_eur": 7.95,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    },
+    {
+      "id": "kitchen-medium",
+      "category_id": "kitchen",
+      "name_es": "Kitchen Pack Medium",
+      "tier": "medium",
+      "description_es": "Más utensilios y preparación para el día a día.",
+      "product_ids": [
+        "HP-KIT-001",
+        "HP-KIT-002",
+        "HP-KIT-003",
+        "HP-KIT-004",
+        "HP-KIT-005",
+        "HP-KIT-006",
+        "HP-KIT-007",
+        "HP-KIT-009",
+        "HP-KIT-012"
+      ],
+      "estimated_total_eur": 19.41,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    },
+    {
+      "id": "kitchen-large",
+      "category_id": "kitchen",
+      "name_es": "Kitchen Pack Large",
+      "tier": "large",
+      "description_es": "Una solución más completa con almacenaje y accesorios adicionales.",
+      "product_ids": [
+        "HP-KIT-001",
+        "HP-KIT-002",
+        "HP-KIT-003",
+        "HP-KIT-004",
+        "HP-KIT-005",
+        "HP-KIT-006",
+        "HP-KIT-007",
+        "HP-KIT-008",
+        "HP-KIT-009",
+        "HP-KIT-010",
+        "HP-KIT-011",
+        "HP-KIT-012"
+      ],
+      "estimated_total_eur": 28.88,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    },
+    {
+      "id": "bath-small",
+      "category_id": "bathroom",
+      "name_es": "Bathroom Pack Small",
+      "tier": "small",
+      "description_es": "Accesorios básicos para equipar el baño.",
+      "product_ids": [
+        "HP-BTH-001",
+        "HP-BTH-002",
+        "HP-BTH-003",
+        "HP-BTH-004"
+      ],
+      "estimated_total_eur": 6.26,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    },
+    {
+      "id": "bath-medium",
+      "category_id": "bathroom",
+      "name_es": "Bathroom Pack Medium",
+      "tier": "medium",
+      "description_es": "Añade almacenaje para mantener el baño ordenado.",
+      "product_ids": [
+        "HP-BTH-001",
+        "HP-BTH-002",
+        "HP-BTH-003",
+        "HP-BTH-004",
+        "HP-BTH-005",
+        "HP-ORG-001",
+        "HP-ORG-003"
+      ],
+      "estimated_total_eur": 12.73,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    },
+    {
+      "id": "bath-large",
+      "category_id": "bathroom",
+      "name_es": "Bathroom Pack Large",
+      "tier": "large",
+      "description_es": "Una selección ampliada con ducha, colada y organización.",
+      "product_ids": [
+        "HP-BTH-001",
+        "HP-BTH-002",
+        "HP-BTH-003",
+        "HP-BTH-004",
+        "HP-BTH-005",
+        "HP-BTH-006",
+        "HP-BTH-007",
+        "HP-BTH-008",
+        "HP-ORG-001",
+        "HP-ORG-002",
+        "HP-ORG-005",
+        "HP-ORG-006"
+      ],
+      "estimated_total_eur": 39.18,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    },
+    {
+      "id": "cleaning-small",
+      "category_id": "cleaning",
+      "name_es": "Cleaning Pack Small",
+      "tier": "small",
+      "description_es": "Básicos para empezar con la limpieza del hogar.",
+      "product_ids": [
+        "HP-CLE-001",
+        "HP-CLE-002",
+        "HP-CLE-003",
+        "HP-CLE-004",
+        "HP-CLE-005"
+      ],
+      "estimated_total_eur": 8.95,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    },
+    {
+      "id": "cleaning-medium",
+      "category_id": "cleaning",
+      "name_es": "Cleaning Pack Medium",
+      "tier": "medium",
+      "description_es": "Más herramientas para mantener las superficies y los suelos.",
+      "product_ids": [
+        "HP-CLE-001",
+        "HP-CLE-002",
+        "HP-CLE-003",
+        "HP-CLE-004",
+        "HP-CLE-005",
+        "HP-CLE-006"
+      ],
+      "estimated_total_eur": 10.94,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    },
+    {
+      "id": "cleaning-large",
+      "category_id": "cleaning",
+      "name_es": "Cleaning Pack Large",
+      "tier": "large",
+      "description_es": "Una selección más completa de útiles de limpieza y residuos.",
+      "product_ids": [
+        "HP-CLE-001",
+        "HP-CLE-002",
+        "HP-CLE-003",
+        "HP-CLE-004",
+        "HP-CLE-005",
+        "HP-CLE-006",
+        "HP-CLE-007",
+        "HP-CLE-008"
+      ],
+      "estimated_total_eur": 22.92,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    },
+    {
+      "id": "study-small",
+      "category_id": "stationery",
+      "name_es": "Study Pack Small",
+      "tier": "small",
+      "description_es": "Lo básico para tomar apuntes y organizar tareas.",
+      "product_ids": [
+        "HP-STU-001",
+        "HP-STU-002",
+        "HP-STU-003",
+        "HP-STU-004"
+      ],
+      "estimated_total_eur": 4.96,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    },
+    {
+      "id": "study-medium",
+      "category_id": "stationery",
+      "name_es": "Study Pack Medium",
+      "tier": "medium",
+      "description_es": "Más variedad de escritura y material de organización.",
+      "product_ids": [
+        "HP-STU-001",
+        "HP-STU-002",
+        "HP-STU-003",
+        "HP-STU-004",
+        "HP-STU-005",
+        "HP-STU-006",
+        "HP-STU-008",
+        "HP-ORG-003"
+      ],
+      "estimated_total_eur": 13.42,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    },
+    {
+      "id": "study-large",
+      "category_id": "stationery",
+      "name_es": "Study Pack Large",
+      "tier": "large",
+      "description_es": "Una selección ampliada para estudiar, dibujar y organizar el escritorio.",
+      "product_ids": [
+        "HP-STU-001",
+        "HP-STU-002",
+        "HP-STU-003",
+        "HP-STU-004",
+        "HP-STU-005",
+        "HP-STU-006",
+        "HP-STU-007",
+        "HP-STU-008",
+        "HP-ORG-001",
+        "HP-ORG-003",
+        "HP-ORG-007"
+      ],
+      "estimated_total_eur": 23.89,
+      "price_status": "estimated_sum_no_discount",
+      "orderable": false,
+      "catalog_status": "proposed_not_verified"
+    }
+  ],
+  "recommended_future_bundles": [
+    {
+      "id": "first-flat-starter",
+      "name_es": "Piso nuevo / First Flat Pack",
+      "name_en": "First Flat Starter Pack",
+      "status": "concept_only_not_priced",
+      "description_es": "Pack transversal para quien llega a un piso: mezcla de cocina, baño, limpieza y organización. Puede ser el bundle principal para estudiantes y personas que se mudan, sin limitar el resto del catálogo.",
+      "note": "No crear precio hasta validar componentes, coste, margen y disponibilidad."
+    }
+  ],
+  "implementation_rules": [
+    "Mostrar un aviso visible y discreto de que el catálogo y los precios son orientativos mientras dure el prototipo.",
+    "Mantener todos los productos con catalog_status=proposed_not_verified y orderable=false.",
+    "Permitir navegación, filtros, selección demo y prueba de carrito, pero bloquear cualquier afirmación de stock y cualquier pedido real.",
+    "No mostrar descuentos ni precio tachado: los totales de pack son sumas estimadas sin ahorro aplicado.",
+    "No crear reseñas, ratings, popularidad, ventas, SKU comercial ni disponibilidad ficticios.",
+    "Usar IDs internos HP-... solo como identificadores de desarrollo, nunca como SKU real de tienda.",
+    "Los productos de decoración, DIY, jardín y textil tienen menor confianza de precio; no destacarlos como best sellers.",
+    "Separar precio propuesto, precio validado, coste de compra, margen y stock como campos distintos en el modelo futuro.",
+    "No convertir las referencias de Action, TEDi, IKEA o bazares comparables en afirmaciones de que Hiper Pozuelo vende esos mismos productos."
+  ]
+}

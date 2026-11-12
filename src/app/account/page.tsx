@@ -1,0 +1,6 @@
+"use client";
+import Link from "next/link";
+import { Heart, MapPin, Package, UserRound, LogOut } from "lucide-react";
+import { AccountLayout } from "./account-layout";
+export default function AccountPage(){return <AccountLayout title="Hola, visitante"><div className="account-welcome"><span className="eyebrow">Cuenta demo</span><h1>Tu espacio Hiper Pozuelo.</h1><p>Gestiona tus pedidos, preferencias y favoritos desde un mismo lugar.</p></div><div className="account-cards"><AccountCard href="/account/orders" icon={<Package/>} title="Pedidos" text="Consulta tus pedidos de demostración."/><AccountCard href="/account/addresses" icon={<MapPin/>} title="Direcciones" text="Guarda tus direcciones localmente."/><AccountCard href="/favorites" icon={<Heart/>} title="Favoritos" text="Revisa tus productos guardados."/><AccountCard href="/account/profile" icon={<UserRound/>} title="Perfil" text="Edita tus preferencias demo."/></div><button className="account-logout"><LogOut size={17}/> Cerrar sesión demo</button></AccountLayout>}
+function AccountCard({href,icon,title,text}:{href:string;icon:React.ReactNode;title:string;text:string}){return <Link href={href} className="account-card">{icon}<strong>{title}</strong><span>{text}</span></Link>}

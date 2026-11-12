@@ -1,0 +1,10 @@
+node_modules
+.next
+.vercel
+work
+outputs
+start3020.log
+tsconfig.tsbuildinfo
+*.zip
+.env*.local
+.env

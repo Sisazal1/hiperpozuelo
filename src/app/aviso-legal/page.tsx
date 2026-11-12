@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function LegalPage(){return <main className="commerce-page info-page" id="main-content"><div className="commerce-container"><span className="eyebrow">Información legal</span><h1>Aviso legal</h1><p>Responsable de la tienda: [Pendiente de confirmación comercial].</p><p>CIF, domicilio social y datos de contacto: [Pendiente de confirmación comercial].</p><Link href="/" className="btn btn-primary">Volver a inicio</Link></div></main>}

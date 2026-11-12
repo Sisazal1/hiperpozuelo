@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function ShippingPage(){return <main className="commerce-page info-page" id="main-content"><div className="commerce-container"><span className="eyebrow">Información</span><h1>Envíos y devoluciones</h1><p>Las tarifas, plazos, dirección de tienda y política de devoluciones están pendientes de confirmación comercial.</p><p>La experiencia actual es una demostración y no genera envíos reales.</p><Link href="/shop" className="btn btn-primary">Volver a la tienda</Link></div></main>}

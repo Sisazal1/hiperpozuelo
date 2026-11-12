@@ -1,0 +1,4 @@
+"use client";
+import Link from "next/link";
+export default function Login(){return <AuthPage title="Inicia sesión"><form className="auth-form" onSubmit={e=>{e.preventDefault();window.location.href="/account"}}><input type="email" placeholder="Email demo" required/><input type="password" placeholder="Contraseña demo" required/><label><input type="checkbox"/> Recordarme</label><button className="summary-cta">Entrar en cuenta demo</button><small>No se envían datos a ningún servidor y la contraseña no se almacena.</small></form><p className="auth-switch">¿Aún no tienes cuenta? <Link href="/account/register">Crear cuenta demo</Link></p></AuthPage>}
+function AuthPage({title,children}:{title:string;children:React.ReactNode}){return <main className="auth-page"><Link href="/" className="commerce-logo">Hiper Pozuelo</Link><section className="auth-card"><span className="eyebrow">Área de cliente · Demo</span><h1>{title}</h1>{children}</section></main>}

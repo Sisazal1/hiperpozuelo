@@ -1,0 +1,11 @@
+export type Locale = "es" | "en";
+export type PriceConfidence = "low" | "medium" | "high";
+export type CatalogStatus = "proposed_not_verified";
+export type CatalogMode = "demo";
+export type BundleTier = "small" | "medium" | "large";
+export type ProductRelationship = "cross_sell" | "bundle_member";
+export type Product = { id:string; slug:string; name_es:string; name_en:string; category_id:string; subcategory:string; description_es:string; proposed_price_eur:number; price_confidence:PriceConfidence; source_ids:string[]; pack_eligible:boolean; pack_ids:string[]; cross_sell_ids:string[]; catalog_status:CatalogStatus; orderable:false; image?:string; validated_price_eur?:number; purchase_cost_eur?:number; profit_margin?:number; physical_stock?:number; };
+export type Category = { id:string; name_es:string; name_en:string; description_es:string; show_in_primary_navigation:boolean; slug?:string; };
+export type Bundle = { id:string; category_id:string; name_es:string; tier:BundleTier; description_es:string; product_ids:string[]; estimated_total_eur:number; price_status:"estimated_sum_no_discount"; orderable:false; catalog_status:CatalogStatus; };
+export type CatalogMetadata = { schema_version:string; catalog_name:string; generated_on:string; currency:"EUR"; language:string[]; catalog_status:CatalogStatus; important_notice:string; pricing_methodology:unknown; };
+export type CatalogSeed = CatalogMetadata & { sources:unknown[]; categories:Category[]; products:Product[]; bundles:Bundle[]; [key:string]:unknown };
