@@ -8,4 +8,3 @@ export const logisticsConfig = {
   pickupWindows: [] as string[],
   storeAddress: null as string | null,
 };
-export const demoPaymentMethods = ["Visa", "Mastercard", "American Express", "Bizum", "Apple Pay", "Google Pay", "PayPal", "Klarna"];
