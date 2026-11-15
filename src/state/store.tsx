@@ -1,31 +1,141 @@
 "use client";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { getProductById } from "@/lib/catalog/products";
-import { calculateBundleTotal } from "@/lib/catalog/bundles";
+import { getCartSubtotal } from "@/lib/cart/lines";
+import type { CartLine } from "@/lib/cart/types";
 import type { Product } from "@/types/catalog";
 
-export type ProductLine = { lineId:string; type:"product"; productId:string; quantity:number; quantities:Record<string,number>; categoryId?:string };
-export type BundleLine = { lineId:string; type:"bundle"; bundleId:string; tier:string; quantity:number; quantities:Record<string,number>; categoryId?:string };
-export type CustomBundleLine = { lineId:string; type:"custom_bundle"; productIds:string[]; quantities:Record<string,number>; quantity:number; categoryId?:string };
-export type CartLine = ProductLine | BundleLine | CustomBundleLine;
-type Store = { favorites:string[]; cart:CartLine[]; toggleFavorite:(id:string)=>void; addProduct:(id:string)=>void; addBundle:(bundleId:string,tier:string)=>void; addCustomBundle:(productIds:string[],quantities:Record<string,number>,categoryId?:string)=>void; updateCustomBundle:(lineId:string,productIds:string[],quantities:Record<string,number>,categoryId?:string)=>void; updateQuantity:(lineId:string,delta:number)=>void; removeLine:(lineId:string)=>void; clearCart:()=>void; openCartDrawer:()=>void; closeCartDrawer:()=>void; cartDrawerOpen:boolean; cartCount:number; favoriteProducts:Product[]; cartTotal:number };
-const StoreContext = createContext<Store|null>(null);
-const normalize = (raw:unknown):CartLine[] => Array.isArray(raw) ? raw.flatMap((x:any) => x?.type === "product" && typeof x.productId === "string" ? [{lineId:x.lineId||x.productId,type:"product",productId:x.productId,quantity:Math.max(1,x.quantity||1),quantities:{}}] : x?.type === "bundle" ? [{...x,lineId:x.lineId||x.bundleId,quantity:Math.max(1,x.quantity||1),quantities:x.quantities||{}}] : x?.type === "custom_bundle" ? [x] : []) : [];
-export function StoreProvider({children}:{children:React.ReactNode}) {
-  const [favorites,setFavorites] = useState<string[]>([]); const [cart,setCart] = useState<CartLine[]>([]); const [hydrated,setHydrated] = useState(false); const [cartDrawerOpen,setCartDrawerOpen] = useState(false);
-  useEffect(() => { try { setFavorites(JSON.parse(localStorage.getItem("hp-favorites")||"[]")); setCart(normalize(JSON.parse(localStorage.getItem("hp-shared-cart")||"[]"))); } catch { setFavorites([]); setCart([]); } finally { setHydrated(true); } }, []);
-  useEffect(() => { if (hydrated) localStorage.setItem("hp-favorites",JSON.stringify(favorites)); }, [favorites,hydrated]);
-  useEffect(() => { if (hydrated) localStorage.setItem("hp-shared-cart",JSON.stringify(cart)); }, [cart,hydrated]);
-  const value = useMemo<Store>(() => ({ favorites,cart,cartDrawerOpen,openCartDrawer:()=>setCartDrawerOpen(true),closeCartDrawer:()=>setCartDrawerOpen(false),
-    toggleFavorite:(id)=>setFavorites(x=>x.includes(id)?x.filter(i=>i!==id):[...x,id]),
-    addProduct:(id)=>{setCart(x=>{const line=x.find(i=>i.type==="product"&&i.productId===id);return line?x.map(i=>i===line?{...i,quantity:i.quantity+1}:i):[...x,{lineId:`product-${id}`,type:"product",productId:id,quantity:1,quantities:{}}]});setCartDrawerOpen(true);},
-    addBundle:(bundleId,tier)=>{setCart(x=>{const line=x.find(i=>i.type==="bundle"&&i.bundleId===bundleId&&i.tier===tier);return line?x.map(i=>i===line?{...i,quantity:i.quantity+1}:i):[...x,{lineId:`bundle-${bundleId}-${tier}`,type:"bundle",bundleId,tier,quantity:1,quantities:{}}]});setCartDrawerOpen(true);},
-    addCustomBundle:(productIds,quantities,categoryId)=>{setCart(x=>[...x,{lineId:`custom-${Date.now()}`,type:"custom_bundle",productIds,quantities,categoryId,quantity:1}]);setCartDrawerOpen(true);},
-    updateCustomBundle:(lineId,productIds,quantities,categoryId)=>setCart(x=>x.map(i=>i.lineId===lineId&&i.type==="custom_bundle"?{...i,productIds,quantities,categoryId}:i)),
-    updateQuantity:(lineId,delta)=>setCart(x=>x.map(i=>i.lineId===lineId?{...i,quantity:Math.max(1,i.quantity+delta)}:i)), removeLine:(lineId)=>setCart(x=>x.filter(i=>i.lineId!==lineId)), clearCart:()=>setCart([]),
-    cartCount:cart.reduce((n,i)=>n+i.quantity,0), favoriteProducts:favorites.map(getProductById).filter(Boolean) as Product[],
-    cartTotal:cart.reduce((n,i)=>i.type==="product"?n+(getProductById(i.productId)?.proposed_price_eur||0)*i.quantity:i.type==="bundle"?n+calculateBundleTotal(i.bundleId)*i.quantity:n+i.productIds.reduce((s,id)=>s+(getProductById(id)?.proposed_price_eur||0)*(i.quantities[id]||0),0),0)
-  }),[favorites,cart,cartDrawerOpen]);
+export type { CartLine, ProductLine, BundleLine, CustomBundleLine } from "@/lib/cart/types";
+
+type Store = {
+  favorites: string[];
+  cart: CartLine[];
+  hydrated: boolean;
+  cartCount: number;
+  cartTotal: number;
+  favoriteProducts: Product[];
+  cartDrawerOpen: boolean;
+  toggleFavorite: (id: string) => void;
+  addProduct: (id: string, quantity?: number) => void;
+  addBundle: (bundleId: string, tier: string, quantity?: number) => void;
+  addCustomBundle: (productIds: string[], quantities: Record<string, number>, categoryId?: string) => void;
+  updateCustomBundle: (lineId: string, productIds: string[], quantities: Record<string, number>, categoryId?: string) => void;
+  updateQuantity: (lineId: string, delta: number) => void;
+  removeLine: (lineId: string) => void;
+  clearCart: () => void;
+  openCartDrawer: () => void;
+  closeCartDrawer: () => void;
+};
+
+const StoreContext = createContext<Store | null>(null);
+
+const CART_KEY = "hp-shared-cart";
+const FAVORITES_KEY = "hp-favorites";
+
+type RawLine = Partial<CartLine> & { type?: string };
+
+/** Reads whatever is in localStorage defensively so an old or corrupt cart never breaks the page. */
+function normalize(raw: unknown): CartLine[] {
+  if (!Array.isArray(raw)) return [];
+  return (raw as RawLine[]).flatMap((x): CartLine[] => {
+    if (!x || typeof x !== "object") return [];
+    const quantity = Math.max(1, Number(x.quantity) || 1);
+    if (x.type === "product" && "productId" in x && typeof x.productId === "string") {
+      return [{ lineId: x.lineId || `product-${x.productId}`, type: "product", productId: x.productId, quantity, quantities: {} }];
+    }
+    if (x.type === "bundle" && "bundleId" in x && typeof x.bundleId === "string") {
+      return [{ lineId: x.lineId || `bundle-${x.bundleId}`, type: "bundle", bundleId: x.bundleId, tier: String((x as { tier?: string }).tier ?? ""), quantity, quantities: {} }];
+    }
+    if (x.type === "custom_bundle" && "productIds" in x && Array.isArray(x.productIds)) {
+      return [{ lineId: x.lineId || `custom-${Date.now()}`, type: "custom_bundle", productIds: x.productIds, quantities: (x as { quantities?: Record<string, number> }).quantities ?? {}, quantity, categoryId: x.categoryId }];
+    }
+    return [];
+  });
+}
+
+export function StoreProvider({ children }: { children: React.ReactNode }) {
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [cart, setCart] = useState<CartLine[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      const savedFavorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
+      setFavorites(Array.isArray(savedFavorites) ? savedFavorites.filter((id): id is string => typeof id === "string") : []);
+      setCart(normalize(JSON.parse(localStorage.getItem(CART_KEY) || "[]")));
+    } catch {
+      setFavorites([]);
+      setCart([]);
+    } finally {
+      setHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (hydrated) {
+      try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites)); } catch { /* storage unavailable */ }
+    }
+  }, [favorites, hydrated]);
+
+  useEffect(() => {
+    if (hydrated) {
+      try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch { /* storage unavailable */ }
+    }
+  }, [cart, hydrated]);
+
+  const openCartDrawer = useCallback(() => setCartDrawerOpen(true), []);
+  const closeCartDrawer = useCallback(() => setCartDrawerOpen(false), []);
+
+  const value = useMemo<Store>(
+    () => ({
+      favorites,
+      cart,
+      hydrated,
+      cartDrawerOpen,
+      openCartDrawer,
+      closeCartDrawer,
+      toggleFavorite: (id) => setFavorites((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id])),
+      addProduct: (id, quantity = 1) => {
+        setCart((current) => {
+          const line = current.find((item) => item.type === "product" && item.productId === id);
+          return line
+            ? current.map((item) => (item === line ? { ...item, quantity: item.quantity + quantity } : item))
+            : [...current, { lineId: `product-${id}`, type: "product", productId: id, quantity, quantities: {} }];
+        });
+        setCartDrawerOpen(true);
+      },
+      addBundle: (bundleId, tier, quantity = 1) => {
+        setCart((current) => {
+          const line = current.find((item) => item.type === "bundle" && item.bundleId === bundleId && item.tier === tier);
+          return line
+            ? current.map((item) => (item === line ? { ...item, quantity: item.quantity + quantity } : item))
+            : [...current, { lineId: `bundle-${bundleId}-${tier}`, type: "bundle", bundleId, tier, quantity, quantities: {} }];
+        });
+        setCartDrawerOpen(true);
+      },
+      addCustomBundle: (productIds, quantities, categoryId) => {
+        setCart((current) => [...current, { lineId: `custom-${Date.now()}`, type: "custom_bundle", productIds, quantities, categoryId, quantity: 1 }]);
+        setCartDrawerOpen(true);
+      },
+      updateCustomBundle: (lineId, productIds, quantities, categoryId) =>
+        setCart((current) => current.map((item) => (item.lineId === lineId && item.type === "custom_bundle" ? { ...item, productIds, quantities, categoryId } : item))),
+      updateQuantity: (lineId, delta) =>
+        setCart((current) => current.map((item) => (item.lineId === lineId ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item))),
+      removeLine: (lineId) => setCart((current) => current.filter((item) => item.lineId !== lineId)),
+      clearCart: () => setCart([]),
+      cartCount: cart.reduce((sum, item) => sum + item.quantity, 0),
+      cartTotal: getCartSubtotal(cart),
+      favoriteProducts: favorites.map(getProductById).filter((p): p is Product => Boolean(p)),
+    }),
+    [favorites, cart, hydrated, cartDrawerOpen, openCartDrawer, closeCartDrawer],
+  );
+
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
-export function useStore(){const value=useContext(StoreContext);if(!value)throw new Error("useStore must be used within StoreProvider");return value;}
+
+export function useStore() {
+  const value = useContext(StoreContext);
+  if (!value) throw new Error("useStore must be used within StoreProvider");
+  return value;
+}
