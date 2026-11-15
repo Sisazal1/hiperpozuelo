@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "validate:catalog": "node scripts/validate-catalog.mjs"
+    "validate:catalog": "node scripts/validate-catalog.mjs",
+    "check:launch": "node scripts/check-launch.mjs",
+    "images": "node scripts/process-images.mjs",
+    "check:images": "node scripts/check-images.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
@@ -26,6 +29,7 @@
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "sharp": "^0.35.5"
   }
 }
