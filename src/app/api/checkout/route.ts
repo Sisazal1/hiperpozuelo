@@ -57,7 +57,9 @@ export async function POST(req: Request) {
   const stripe = stripeClient();
   if (!stripe) return NextResponse.json({ error: "payment_unavailable" }, { status: 503 });
   try {
-    const body = await req.json() as { lines?: Line[]; delivery?: "delivery" | "collect"; discountCode?: string };
+    // Un POST con cuerpo vacío o mal formado debe dar 400, no tumbar el handler.
+    const body = await req.json().catch(() => null) as { lines?: Line[]; delivery?: "delivery" | "collect"; discountCode?: string } | null;
+    if (!body) return NextResponse.json({ error: "invalid_request" }, { status: 400 });
     const delivery = body.delivery === "collect" ? "collect" : "delivery";
     const lines = (body.lines || []).map(pricedLine).filter(Boolean) as { id: string; name: string; amount: number; quantity: number }[];
     if (!lines.length) return NextResponse.json({ error: "invalid_request" }, { status: 400 });
