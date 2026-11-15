@@ -7,6 +7,7 @@ export const siteConfig = {
   openingHours: null as string | null,
   collection: null as string | null,
   deliveryTime: null as string | null,
+  prelaunch: true,
 };
 
 export const launchData = [

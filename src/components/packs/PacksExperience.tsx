@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Check, Heart, Minus, Plus, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getAllBundles, calculateBundleTotal } from "@/lib/catalog/bundles";
+import { getBundlePricing, getFamilyPricing } from "@/lib/catalog/pack-pricing";
 import { getProductById } from "@/lib/catalog/products";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
 import { useStore } from "@/state/store";

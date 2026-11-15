@@ -9,6 +9,7 @@ import { formatEuroPrice } from "@/lib/catalog/pricing";
 import { commerceConfig } from "@/config/commerce";
 import { useStore } from "@/state/store";
 import type { BundleTier, Product } from "@/types/catalog";
+import FamilyComparison from "@/components/home/FamilyComparison";
 
 const categories = getAllCategories();
 const products = getAllProducts();

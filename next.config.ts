@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
       { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
     ] }];
   },
+  async redirects() {
+    return [{ source: "/product/paño-cocina", destination: "/product/pano-cocina", permanent: true }];
+  },
 };
 
 export default nextConfig;
