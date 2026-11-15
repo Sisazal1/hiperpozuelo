@@ -1,18 +1,41 @@
-# AGENTS.md — Hiper Pozuelo (tienda demo)
+# AGENTS.md — Hiper Pozuelo (tienda en preapertura)
 
 Contexto para agentes de código (OpenCode, Codex, Claude Code). Léelo antes de tocar nada.
 
 ## Qué es esto
 
-Tienda online de demostración para **Hiper Pozuelo S.L.** (bazar de barrio en C/ Sevilla 5,
-Pozuelo de Alarcón, Madrid). Es un escaparate funcional: catálogo estimado, packs, cesta y
-checkout **sin pasarela de pago real**. Nunca inventes precios, stock ni datos del cliente:
-todo lo no confirmado va marcado como «pendiente de validación comercial» en la UI.
+Tienda online de **Hiper Pozuelo S.L.** (bazar de barrio en C/ Sevilla 5, Pozuelo de Alarcón,
+Madrid) en **preapertura**, con pago de Stripe en modo test. El objetivo es una experiencia
+premium y lista para lanzar, no un escaparate de demostración. Hay rutas de servidor
+(`/api/checkout`, webhook de Stripe). No hay base de datos propia: el pedido vive en Stripe y en
+su metadata, salvo que el usuario apruebe otra cosa.
+
+## Reglas de contenido y confianza (prevalecen sobre cualquier brief antiguo)
+
+- Nunca inventes precios, stock, descuentos, reseñas, datos de empresa ni fotos de producto.
+- Los datos desconocidos van como `null` en `src/config/site.ts` y la UI los oculta.
+  PROHIBIDO mostrar «IMAGEN PENDIENTE», «[Pendiente de confirmación comercial]», «demo» u
+  «orientativo» en la interfaz. Lo que falte lo lista `pnpm check:launch`.
+- Productos sin foto: tile de categoría limpio, sin texto. Las imágenes generadas con IA solo
+  se usan como ambiente (hero, banners, estados vacíos), registradas en
+  `src/data/image-manifest.json` con `kind: "ambient"`. Nunca como foto de un producto concreto.
+- Las páginas legales llevan texto real conforme a la ley española con los datos de `site.ts`,
+  sin etiquetas de pendiente.
+
+## Cómo trabajar
+
+- Antes de cualquier tarea de UI, lee `DESIGN_BRIEF.md` y las skills `impeccable`,
+  `design-taste-frontend` y `emil-design-eng` de `.agents/skills`, y cita al final qué reglas
+  aplicaste.
+- Las instrucciones del prompt del usuario prevalecen sobre cualquier brief antiguo de `docs/`.
+  Los archivos de `docs/archivo/` son históricos: no apliques sus «No tocar».
+- Cada tarea termina con `pnpm build` verde y capturas reales (1440 y 390 px).
+- Si no cabe todo en la sesión, termina el paso en curso, haz commit y di qué falta.
 
 ## Stack
 
 - Next.js 15 (App Router, `src/app`) + React 19 + TypeScript + Tailwind 4 (`@tailwindcss/postcss`).
-- Sin backend ni base de datos: el catálogo es un JSON semilla y el estado vive en `localStorage`.
+- El catálogo es un JSON semilla, la cesta y los favoritos viven en `localStorage` y el pago pasa por Stripe (`stripe` en `package.json`).
 - Gestor de paquetes: **pnpm** (`pnpm-lock.yaml`). No generes `package-lock.json`.
 
 ## Estructura
@@ -34,8 +57,6 @@ src/types/catalog.ts     tipos del dominio
 - Español de España en toda la UI; importes con coma decimal y `€` (`0,99 €`).
 - Marcas del catálogo: los slugs de categorías son los `id` del JSON (`kitchen`, `bath`…), no
   traducciones. Los deep links de pack son `/packs/<familia>/<tier>` con tier `small|medium|large`.
-- No añadas imágenes inventadas: los huecos llevan placeholder «IMAGEN PENDIENTE» a propósito.
-- Los textos legales llevan `[Pendiente de confirmación comercial]` hasta que el cliente confirme.
 
 ## Comandos
 

@@ -1,3 +1,5 @@
+> **HISTÓRICO:** no aplicar sus restricciones «No tocar» ni «No empieces otras fases». Las reglas vigentes están en AGENTS.md.
+
 # Brief — Stripe Checkout real (modo test) en Hiper Pozuelo
 
 > Repo: `C:\Users\simon\Documents\Codex\2026-11-11\no` (rama `main`, HEAD limpio antes de empezar).
