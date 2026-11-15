@@ -1,6 +1,11 @@
 {
   "version": 1,
   "assets": [
+    {"file":"hero-home.webp","use":"Hero principal 16:9","kind":"ambient","prompt":"Hogar luminoso recién equipado, luz natural lateral, fondo cálido off-white #FAF7F2, acentos rojos sutiles, espacio libre para texto, sin texto, logos ni personas.","date":"2026-11-16"},
+    {"file":"pack-cocina.webp","use":"Portada pack Cocina 4:5","kind":"ambient","prompt":"Escena ambiental de cocina organizada, luz natural lateral, fondo cálido off-white #FAF7F2, acentos rojos sutiles, sin texto, logos ni personas.","date":"2026-11-16"},
+    {"file":"pack-bano.webp","use":"Portada pack Baño 4:5","kind":"ambient","prompt":"Escena ambiental de baño luminoso y ordenado, luz natural lateral, fondo cálido off-white #FAF7F2, acentos rojos sutiles, sin texto, logos ni personas.","date":"2026-11-16"},
+    {"file":"pack-limpieza.webp","use":"Portada pack Limpieza 4:5","kind":"ambient","prompt":"Escena ambiental de zona doméstica de limpieza ordenada, luz natural lateral, fondo cálido off-white #FAF7F2, acentos rojos sutiles, sin texto, logos ni personas.","date":"2026-11-16"},
+    {"file":"pack-estudio.webp","use":"Portada pack Estudio 4:5","kind":"ambient","prompt":"Escena ambiental de estudio luminoso y organizado, luz natural lateral, fondo cálido off-white #FAF7F2, acentos rojos sutiles, sin texto, logos ni personas.","date":"2026-11-16"},
     {"file":"hero-home-16x9.png","use":"Hero principal 16:9","kind":"ambient","prompt":"Hogar luminoso recién equipado, luz natural lateral, fondo #FAF7F2, espacio negativo a la izquierda, sin texto, logos, marcas ni caras.","date":"2026-11-15"},
     {"file":"packs-cocina-4x5.png","use":"Portada pack Cocina 4:5","kind":"ambient","prompt":"Ambiente de cocina doméstica recién organizada, luz natural lateral, fondo cálido, formas genéricas sin productos identificables.","date":"2026-11-15"},
     {"file":"packs-bano-4x5.png","use":"Portada pack Baño 4:5","kind":"ambient","prompt":"Baño luminoso y ordenado, texturas genéricas, fondo cálido, luz natural lateral, sin marcas ni texto.","date":"2026-11-15"},

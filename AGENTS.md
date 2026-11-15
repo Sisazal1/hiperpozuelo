@@ -62,11 +62,14 @@ src/types/catalog.ts     tipos del dominio
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm dev            # localhost:3000
-pnpm build          # debe pasar antes de cualquier entrega
+pnpm dev            # localhost:3000 — escribe en .next-dev
+pnpm build          # escribe en .next; seguro con `pnpm dev` corriendo
 pnpm lint
-pnpm validate:catalog   # valida el JSON semilla
+pnpm validate:catalog
 ```
+
+Dev y build usan carpetas distintas (`.next-dev` vs `.next`, ver `next.config.ts`). Antes se
+pisaban y el servidor de desarrollo devolvía 500 en todas las rutas tras cada build; ya no.
 
 ## Entrega y despliegue
 
