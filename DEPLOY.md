@@ -22,8 +22,8 @@
 | Console | no failed resources, no 4xx/5xx |
 
 ## Known notes
-- Catalogue is demo data (`src/data/seed/hiper-pozuelo-catalogo-estimado.json`, 48 products, 9 categories, 12 bundles); prices are labelled "orientativo".
-- Images are placeholders ("IMAGEN PENDIENTE") by design.
+- Catalogue is provisional seed data (`src/data/seed/hiper-pozuelo-catalogo-estimado.json`, 48 products, 9 categories, 12 bundles). Do not show "demo" or "orientativo" labels in the UI; see AGENTS.md.
+- Products without a photo use a clean category tile (no text). "IMAGEN PENDIENTE" is no longer allowed; see AGENTS.md.
 - `/packs/[family]/[tier]` renders the packs experience client-side, so its `<title>` stays "Hiper Pozuelo".
 
 ## Redeploy
