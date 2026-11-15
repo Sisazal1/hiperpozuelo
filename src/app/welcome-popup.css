@@ -1,0 +1,215 @@
+/* Popup de bienvenida (10% primera compra) */
+.welcome-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(23, 23, 23, .55);
+  backdrop-filter: blur(3px);
+  animation: welcome-fade .22s ease-out;
+}
+.welcome-card {
+  position: relative;
+  width: min(430px, 100%);
+  padding: 32px 30px 26px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px rgba(23, 23, 23, .22);
+  text-align: left;
+  animation: welcome-rise .26s cubic-bezier(.2, .8, .3, 1);
+}
+.welcome-card h2 {
+  margin: 10px 0 8px;
+  font-size: 1.85rem;
+  line-height: 1.05;
+  letter-spacing: -.04em;
+  color: var(--ink);
+}
+.welcome-card p {
+  max-width: none;
+  margin: 0;
+  font-size: .95rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.welcome-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.welcome-close:hover { background: var(--neutral-50); color: var(--ink); }
+.welcome-close:focus-visible,
+.welcome-code button:focus-visible,
+.welcome-primary:focus-visible,
+.welcome-secondary:focus-visible {
+  outline: 2px solid var(--brand-red);
+  outline-offset: 2px;
+}
+.welcome-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffecef;
+  color: var(--brand-red);
+}
+.welcome-eyebrow {
+  margin-top: 16px !important;
+  color: var(--brand-red) !important;
+  font-size: .72rem !important;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+.welcome-code {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 20px 0 18px;
+  padding: 12px 14px;
+  border: 1.5px dashed var(--brand-red);
+  border-radius: var(--radius-sm);
+  background: #fffafb;
+}
+.welcome-code span {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: var(--ink);
+}
+.welcome-code button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: .82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.welcome-code button:hover { border-color: var(--ink); }
+.welcome-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+.welcome-primary,
+.welcome-secondary {
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.welcome-primary {
+  border: 0;
+  background: var(--brand-red);
+  color: #fff;
+}
+.welcome-primary:hover { background: var(--brand-red-hover); }
+.welcome-secondary {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+}
+.welcome-secondary:hover { border-color: var(--ink); color: var(--ink); }
+.welcome-note {
+  display: block;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: .72rem;
+  line-height: 1.45;
+}
+@keyframes welcome-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes welcome-rise { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+@media (max-width: 480px) {
+  .welcome-card { padding: 26px 20px 20px; }
+  .welcome-card h2 { font-size: 1.6rem; }
+  .welcome-actions { grid-template-columns: 1fr; }
+  .welcome-secondary { order: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-backdrop, .welcome-card { animation: none; }
+}
+
+/* Descuento en cesta */
+.summary-discount strong { color: var(--brand-red); }
+.cart-coupon { display: flex; gap: 8px; margin: 4px 0 14px; }
+.cart-coupon input { flex: 1; min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); font: inherit; font-size: .9rem; text-transform: uppercase; }
+.cart-coupon input:focus-visible { outline: 2px solid var(--brand-red); outline-offset: 2px; }
+.cart-coupon button { min-height: 44px; padding: 0 16px; border: 1px solid var(--ink); border-radius: var(--radius-sm); background: #fff; color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
+.cart-coupon button:hover { background: var(--neutral-50); }
+.cart-coupon-remove { width: 100%; border-color: var(--line) !important; color: var(--muted) !important; font-weight: 600 !important; }
+
+/* Zona de rascado */
+.scratch-stage {
+  position: relative;
+  height: 132px;
+  margin: 18px 0 14px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffe9ec, #fff);
+  border: 1px dashed #e6b6be;
+}
+.scratch-prize {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 2px;
+  color: var(--brand-red);
+  text-align: center;
+}
+.scratch-prize strong { font-size: 1.05rem; letter-spacing: -.01em; }
+.scratch-prize span { font-size: .95rem; font-weight: 800; letter-spacing: .16em; color: var(--ink); }
+.scratch-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+.scratch-canvas:active { cursor: grabbing; }
+.scratch-controls { display: flex; align-items: center; gap: 12px; }
+.scratch-meter { flex: 1; height: 4px; border-radius: 999px; background: #f0ebe3; overflow: hidden; }
+.scratch-meter span { display: block; height: 100%; background: var(--brand-red); transition: width .18s ease-out; }
+.scratch-controls .welcome-secondary { min-height: 40px; padding: 0 14px; font-size: .82rem; }
+.welcome-head { display: flex; align-items: center; gap: 10px; }
+.welcome-head .welcome-eyebrow { margin: 0 !important; }
+.welcome-card.is-revealed .scratch-stage { border-style: solid; border-color: #f0ccd2; }
+.welcome-dismiss-link { margin-top: 10px; padding: 0; border: 0; background: none; color: var(--muted); font: inherit; font-size: .8rem; text-decoration: underline; cursor: pointer; }
+.welcome-dismiss-link:hover { color: var(--ink); }
+.scratch-canvas { display: none; }
+.scratch-foil {
+  position: absolute;
+  inset: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  cursor: grab;
+  touch-action: none;
+}
+.scratch-foil:active { cursor: grabbing; }

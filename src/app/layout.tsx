@@ -6,7 +6,7 @@ import SiteFooter from "@/components/site/SiteFooter";
 import CartDrawer from "@/components/cart/CartDrawer";
 import { siteConfig } from "@/config/site";
 import CookieBanner from "@/components/site/CookieBanner";
-import WelcomeScratchCard from "@/components/marketing/WelcomeScratchCard";
+import WelcomeScratch from "@/components/marketing/WelcomeScratch";
 import AnnouncementTicker from "@/components/site/AnnouncementTicker";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
 
@@ -21,5 +21,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="es"><body className={`${display.variable} ${sans.variable}`}><StoreProvider><AnnouncementTicker /><GlobalNavbar />{children}<SiteFooter /><CartDrawer /><CookieBanner /><WelcomeScratchCard /></StoreProvider></body></html>;
+  return <html lang="es"><body className={`${display.variable} ${sans.variable}`}><StoreProvider><AnnouncementTicker /><GlobalNavbar />{children}<SiteFooter /><CartDrawer /><CookieBanner /><WelcomeScratch /></StoreProvider></body></html>;
 }

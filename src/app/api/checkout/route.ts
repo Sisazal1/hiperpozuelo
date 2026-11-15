@@ -2,9 +2,31 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getBundleById, calculateBundleTotal } from "@/lib/catalog/bundles";
 import { getProductById } from "@/lib/catalog/products";
-import { calculateOrderTotals } from "@/config/commerce";
+import { calculateOrderTotals, calculateDiscount, commerceConfig } from "@/config/commerce";
 
 export const runtime = "nodejs";
+
+// Cupón de bienvenida: se crea una vez y se reutiliza. El descuento se valida siempre
+// en servidor a partir del código, nunca desde un importe enviado por el cliente.
+let welcomeCoupon: Promise<string> | null = null;
+function welcomeCouponId(stripe: Stripe): Promise<string> {
+  const id = "hp-bienvenida10";
+  if (!welcomeCoupon) {
+    welcomeCoupon = (async () => {
+      try {
+        const coupon = await stripe.coupons.create({
+          id, name: "Bienvenida 10%", percent_off: commerceConfig.welcomeDiscountRate * 100, duration: "once",
+        });
+        return coupon.id;
+      } catch (error) {
+        if ((error as { code?: string }).code === "resource_already_exists") return id;
+        welcomeCoupon = null;
+        throw error;
+      }
+    })();
+  }
+  return welcomeCoupon;
+}
 
 type Line = { type: "product" | "bundle" | "custom_bundle"; productId?: string; bundleId?: string; productIds?: string[]; quantities?: Record<string, number>; quantity?: number; tier?: string };
 
@@ -35,20 +57,23 @@ export async function POST(req: Request) {
   const stripe = stripeClient();
   if (!stripe) return NextResponse.json({ error: "payment_unavailable" }, { status: 503 });
   try {
-    const body = await req.json() as { lines?: Line[]; delivery?: "delivery" | "collect"; discount?: number };
+    const body = await req.json() as { lines?: Line[]; delivery?: "delivery" | "collect"; discountCode?: string };
     const delivery = body.delivery === "collect" ? "collect" : "delivery";
     const lines = (body.lines || []).map(pricedLine).filter(Boolean) as { id: string; name: string; amount: number; quantity: number }[];
     if (!lines.length) return NextResponse.json({ error: "invalid_request" }, { status: 400 });
     const subtotal = lines.reduce((sum, line) => sum + line.amount * line.quantity, 0) / 100;
-    const totals = calculateOrderTotals(subtotal, delivery, 0);
+    const discountAmount = calculateDiscount(subtotal, body.discountCode);
+    const totals = calculateOrderTotals(subtotal, delivery, discountAmount);
     const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
     const shippingAmount = Math.round(totals.shippingCost * 100);
+    const couponId = discountAmount > 0 ? await welcomeCouponId(stripe) : null;
     const session = await stripe.checkout.sessions.create({
       mode: "payment", locale: "es", phone_number_collection: { enabled: true },
       line_items: lines.map((line) => ({ price_data: { currency: "eur", product_data: { name: line.name }, unit_amount: line.amount }, quantity: line.quantity })),
+      ...(couponId ? { discounts: [{ coupon: couponId }] } : {}),
       ...(delivery === "delivery" ? { shipping_address_collection: { allowed_countries: ["ES"] }, shipping_options: [{ shipping_rate_data: { type: "fixed_amount", fixed_amount: { amount: shippingAmount, currency: "eur" }, display_name: "Entrega a domicilio" } }] } : {}),
       success_url: `${origin}/checkout?session_id={CHECKOUT_SESSION_ID}`, cancel_url: `${origin}/checkout?canceled=1`,
-      metadata: { delivery, discount: "0", subtotal: String(Math.round(subtotal * 100)), order_items: JSON.stringify(lines.map(({ id, quantity }) => ({ id, quantity }))) },
+      metadata: { delivery, discount: String(Math.round(discountAmount * 100)), discount_code: couponId ? commerceConfig.welcomeDiscountCode : "", subtotal: String(Math.round(subtotal * 100)), order_items: JSON.stringify(lines.map(({ id, quantity }) => ({ id, quantity }))) },
     });
     return NextResponse.json({ url: session.url });
   } catch { return NextResponse.json({ error: "payment_unavailable" }, { status: 503 }); }
