@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getCategoryBySlug } from "@/lib/catalog/categories";
+import { getAllCategories, getCategoryBySlug } from "@/lib/catalog/categories";
 import { getProductsByCategory } from "@/lib/catalog/products";
 import { CatalogBrowser } from "@/app/shop/catalog-browser";
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -19,7 +19,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const category = getCategoryBySlug(slug);
   return {
-    title: category ? `${category.name_es} · Hiper Pozuelo` : "Categoría no encontrada",
+    title: category ? category.name_es : "Categoría no encontrada",
     description: category?.description_es,
   };
+}
+export function generateStaticParams() {
+  return getAllCategories().map((c) => ({ slug: c.slug ?? c.id }));
 }

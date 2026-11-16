@@ -92,7 +92,7 @@ test("tienda: filtro por categoría y orden por precio", async ({ page }) => {
 
 test("pack deep link → añadir → la cesta tiene el pack con su precio", async ({ page }) => {
   await page.goto("/packs/kitchen/small");
-  await expect(page.locator(".pack-detail-summary h2")).toContainText("7,95");
+  await expect(page.locator(".pack-summary-price")).toContainText("7,95");
   await page.locator(".pack-detail-summary .add-main").click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page.getByRole("dialog")).toContainText("7,95");
@@ -115,13 +115,13 @@ test("checkout: pagar redirige a Stripe o muestra error recuperable", async ({ p
     page.getByRole("button", { name: /pagar/i }).click(),
   ]);
   if (resp.status() === 200) await expect(page).toHaveURL(/checkout\.stripe\.com/, { timeout: 15000 });
-  else await expect(page.getByRole("alert")).toBeVisible();
+  else await expect(page.locator(".checkout-error")).toBeVisible();
 });
 
 test("checkout cancelado conserva la cesta", async ({ page }) => {
   await seedCart(page, [{ lineId: "p", type: "product", productId: "HP-KIT-001", quantity: 2, quantities: {} }]);
   await page.goto("/checkout?canceled=1");
-  await expect(page.getByRole("alert")).toContainText(/cancelado/i);
+  await expect(page.locator(".checkout-error")).toContainText(/cancelado/i);
   await expect(page.locator(".checkout-review-line")).toHaveCount(1);
 });
 

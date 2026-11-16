@@ -3,11 +3,15 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronRight, ShieldCheck, Store } from "lucide-react";
 import { useStore, type CartLine } from "@/state/store";
-import { getBundleById, calculateBundleTotal } from "@/lib/catalog/bundles";
+import { getBundleById } from "@/lib/catalog/bundles";
 import { getProductById } from "@/lib/catalog/products";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
-import { calculateOrderTotals, calculateDiscount, commerceConfig } from "@/config/commerce";
+import { commerceConfig } from "@/config/commerce";
+import { cartSummary, lineTotal } from "@/lib/cart/totals";
+import { useTweenedNumber } from "@/components/motion/hooks";
+import ProductVisual from "@/components/catalog/ProductVisual";
 import { siteConfig } from "@/config/site";
+import { saveLocalOrder } from "@/lib/orders";
 type Delivery = "delivery" | "collect";
 type PaidOrder = {
   id: string;
@@ -27,8 +31,9 @@ export default function CheckoutPage() {
   const [paid, setPaid] = useState<PaidOrder | null>(null);
   const [loading, setLoading] = useState(false);
   const creating = useRef(false);
-  const discount = calculateDiscount(store.cartTotal, store.discountCode);
-  const totals = calculateOrderTotals(store.cartTotal, delivery, discount);
+  const totals = cartSummary(store.cart, store.discountCode, delivery);
+  const discount = totals.discount;
+  const animatedTotal = useTweenedNumber(totals.finalTotal);
   useEffect(() => {
     const p = new URLSearchParams(location.search);
     const id = p.get("session_id");
@@ -39,6 +44,13 @@ export default function CheckoutPage() {
       .then((d) => {
         if (d?.payment_status === "paid") {
           setPaid(d);
+          saveLocalOrder({
+            id: d.id,
+            createdAt: new Date().toISOString(),
+            amount: (d.amount_total || 0) / 100,
+            items: (d.line_items || []).reduce((n: number, l: { quantity: number | null }) => n + (l.quantity || 0), 0),
+            delivery: d.shipping ? "delivery" : "collect",
+          });
           store.clearCart();
           localStorage.removeItem("hp-checkout-draft");
         } else setError("No hemos podido confirmar el pago. Tu cesta sigue intacta.");
@@ -75,23 +87,30 @@ export default function CheckoutPage() {
   };
   if (paid)
     return (
-      <main className="checkout-page">
+      <div className="checkout-page">
         <Confirmation order={paid} />
-      </main>
+      </div>
+    );
+  if (!store.hydrated)
+    return (
+      <div className="checkout-page">
+        <div className="skeleton-block" style={{ height: 320, maxWidth: 1100, margin: "48px auto" }} aria-hidden="true" />
+        <h1 className="sr-only">Revisa tu cesta</h1>
+      </div>
     );
   if (!store.cart.length)
     return (
-      <main className="checkout-page">
+      <div className="checkout-page">
         <div className="empty-commerce checkout-empty">
           <h1>No hay productos en tu cesta</h1>
           <Link href="/shop" className="btn btn-primary">
             Explorar la tienda
           </Link>
         </div>
-      </main>
+      </div>
     );
   return (
-    <main className="checkout-page" id="main-content">
+    <div className="checkout-page">
       <header className="checkout-header">
         <span>
           <ShieldCheck size={16} /> Pago seguro con Stripe
@@ -108,23 +127,38 @@ export default function CheckoutPage() {
         </section>
         <aside className="checkout-sidebar">
           <span className="eyebrow">Entrega</span>
-          <div className="delivery-choice">
-            <button
-              className={delivery === "delivery" ? "selected" : ""}
-              onClick={() => setDelivery("delivery")}
-            >
-              <strong>Envío a domicilio</strong>
-              <span>{totals.shippingCost ? formatEuroPrice(totals.shippingCost) : "Gratis"}</span>
-            </button>
-            <button
-              className={delivery === "collect" ? "selected" : ""}
-              onClick={() => setDelivery("collect")}
-            >
-              <strong>
-                <Store size={16} /> Recogida en tienda
-              </strong>
-              <span>{formatEuroPrice(commerceConfig.collectionFee)}</span>
-            </button>
+          <div className="delivery-choice" role="radiogroup" aria-label="Método de entrega">
+            {(
+              [
+                ["delivery", "Envío a domicilio", totals.subtotal ? (cartSummary(store.cart, store.discountCode, "delivery").shippingCost ? formatEuroPrice(commerceConfig.standardShippingFee) : "Gratis") : "", null],
+                ["collect", "Recogida en tienda", commerceConfig.collectionFee ? formatEuroPrice(commerceConfig.collectionFee) : "Gratis", Store],
+              ] as const
+            ).map(([value, label, price, Icon]) => (
+              <button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={delivery === value}
+                className={delivery === value ? "selected" : ""}
+                onClick={() => setDelivery(value)}
+                onKeyDown={(e) => {
+                  if (["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft"].includes(e.key)) {
+                    e.preventDefault();
+                    const next = value === "delivery" ? "collect" : "delivery";
+                    setDelivery(next);
+                    (e.currentTarget.parentElement?.querySelector(`[data-value="${next}"]`) as HTMLElement | null)?.focus();
+                  }
+                }}
+                tabIndex={delivery === value ? 0 : -1}
+                data-value={value}
+              >
+                <span className="radio-dot" aria-hidden="true" />
+                <strong>
+                  {Icon && <Icon size={16} />} {label}
+                </strong>
+                <span>{price}</span>
+              </button>
+            ))}
           </div>
           {delivery === "collect" && siteConfig.collection && (
             <p className="checkout-info">
@@ -149,17 +183,20 @@ export default function CheckoutPage() {
             </div>
             <div className="checkout-total">
               <span>Total</span>
-              <strong>{formatEuroPrice(totals.finalTotal)}</strong>
+              <strong>{formatEuroPrice(animatedTotal)}</strong>
             </div>
           </div>
-          <button className="summary-cta checkout-pay" onClick={pay} disabled={loading}>
-            {loading ? "Preparando pago…" : `Pagar ${formatEuroPrice(totals.finalTotal)}`}
+          <button className={`summary-cta checkout-pay ${loading ? "is-loading" : ""}`} onClick={pay} disabled={loading} aria-busy={loading}>
+            {loading && <span className="spinner" aria-hidden="true" />}
+            {loading ? "Conectando con Stripe…" : `Pagar ${formatEuroPrice(totals.finalTotal)}`}
             <ChevronRight size={18} />
           </button>
           <p className="checkout-trust">
             <ShieldCheck size={15} /> Compra sin crear cuenta · Pago seguro con Stripe
           </p>
-          <p className="checkout-test-note">Modo prueba: usa 4242 4242 4242 4242</p>
+          {siteConfig.prelaunch && (
+            <p className="checkout-test-note">Preapertura: pasarela en modo prueba, no se cobra nada. Tarjeta de prueba 4242 4242 4242 4242.</p>
+          )}
         </aside>
       </div>
       {error && (
@@ -173,32 +210,24 @@ export default function CheckoutPage() {
           )}
         </div>
       )}
-    </main>
+    </div>
   );
 }
 function CheckoutLine({ line }: { line: CartLine }) {
   const p = line.type === "product" ? getProductById(line.productId) : undefined;
   const b = line.type === "bundle" ? getBundleById(line.bundleId) : undefined;
   const name = p?.name_es || b?.name_es || "Pack personalizado";
-  const unit =
-    line.type === "product"
-      ? p?.proposed_price_eur || 0
-      : line.type === "bundle"
-        ? calculateBundleTotal(line.bundleId)
-        : line.productIds.reduce(
-            (s, id) => s + (getProductById(id)?.proposed_price_eur || 0) * (line.quantities[id] || 0),
-            0,
-          );
+  const categoryId = p?.category_id ?? b?.category_id ?? (line.type === "custom_bundle" ? line.categoryId : undefined) ?? "kitchen";
   return (
     <article className="checkout-review-line">
+      <ProductVisual categoryId={categoryId} subcategory={p?.subcategory} image={p?.image} name={name} size="sm" />
       <div>
         <strong>{name}</strong>
         <small>
-          {line.type === "product" ? "Producto" : "Pack"} · {line.quantity} unidad
-          {line.quantity === 1 ? "" : "es"}
+          {line.type === "product" ? p?.subcategory : "Pack"} · {line.quantity} {line.quantity === 1 ? "unidad" : "unidades"}
         </small>
       </div>
-      <b>{formatEuroPrice(unit * line.quantity)}</b>
+      <b>{formatEuroPrice(lineTotal(line))}</b>
     </article>
   );
 }

@@ -1,381 +1,229 @@
-"use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
-import { ArrowRight, Check, ChevronDown, Heart, ShoppingBag } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Lock, RotateCcw, Store, Truck } from "lucide-react";
 import { getAllCategories } from "@/lib/catalog/categories";
 import { getAllProducts } from "@/lib/catalog/products";
 import { getAllBundles, calculateBundleTotal } from "@/lib/catalog/bundles";
+import { families } from "@/lib/catalog/families";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
 import { commerceConfig } from "@/config/commerce";
-import { useStore } from "@/state/store";
-import type { BundleTier, Product } from "@/types/catalog";
-import FamilyComparison from "@/components/home/FamilyComparison";
+import { FAQ } from "@/lib/faq";
+import { categoryIcon } from "@/components/catalog/ProductVisual";
+import PackConfigurator from "@/components/home/PackConfigurator";
+import ProductRail from "@/components/home/ProductRail";
+import HeroParallax from "@/components/home/HeroParallax";
 
 const categories = getAllCategories();
 const products = getAllProducts();
 const bundles = getAllBundles();
-const familyIds = ["kitchen", "bathroom", "cleaning", "stationery"] as const;
-const familyLabels: Record<string, string> = {
-  kitchen: "Cocina",
-  bathroom: "Baño",
-  cleaning: "Limpieza",
-  stationery: "Estudio",
-};
-const tierLabels: Record<BundleTier, string> = { small: "Pequeño", medium: "Mediano", large: "Grande" };
+const free = formatEuroPrice(commerceConfig.freeShippingThreshold);
 
-function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          node.dataset.revealed = "true";
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.12 },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+
+export default function Home() {
+  const headline = ["Casa", "lista.", "Sin", "dar", "mil", "vueltas."];
+  const rail = categories
+    .flatMap((c) => products.filter((p) => p.category_id === c.id).slice(0, 2))
+    .slice(0, 12);
   return (
-    <div ref={ref} className={`home-reveal ${className}`}>
-      {children}
-    </div>
-  );
-}
-function ProductArt() {
-  return (
-    <span className="home-product-art" aria-hidden="true">
-      <span />
-    </span>
-  );
-}
-function Hero({ featured }: { featured: Product[] }) {
-  return (
-    <main className="home-hero" id="main-content">
-      <div className="home-hero-copy">
-        <span className="eyebrow">Tu casa lista en un pack</span>
-        <h1>Casa lista. Sin dar mil vueltas.</h1>
-        <p>Soluciones prácticas para empezar en casa y resolver lo importante de una sola vez.</p>
-        <div className="home-actions">
-          <Link className="btn btn-primary" href="/packs">
-            Explorar packs <ArrowRight size={17} />
-          </Link>
-          <Link className="btn btn-secondary" href="/shop">
-            Ver productos
-          </Link>
-        </div>
-        <div className="home-trust">
-          <span>
-            <Check size={16} /> Envío gratis desde {formatEuroPrice(commerceConfig.freeShippingThreshold)}
-          </span>
-          <span>
-            <Check size={16} /> Recogida gratis
-          </span>
-          <span>
-            <Check size={16} /> Compra sin cuenta
-          </span>
-        </div>
-      </div>
-      <div className="home-featured">
-        <div className="home-featured-heading">
-          <span className="eyebrow">Para empezar hoy</span>
-          <strong>Cuatro básicos para tu casa</strong>
-        </div>
-        <div className="home-featured-grid">
-          {featured.map((product) => (
-            <Link href={`/product/${product.slug}`} key={product.id} className="home-featured-card">
-              <ProductArt />
-              <span>{product.subcategory}</span>
-              <strong>{product.name_es}</strong>
-              <b>{formatEuroPrice(product.proposed_price_eur)}</b>
+    <>
+      <section className="hp-hero" aria-labelledby="hero-title">
+        <HeroParallax>
+          <Image src="/ai/hero-home.webp" alt="" fill sizes="100vw" priority className="hp-hero-img" />
+        </HeroParallax>
+        <div className="hp-hero-scrim" aria-hidden="true" />
+        <div className="hp-hero-inner">
+          <span className="eyebrow hp-hero-eyebrow">Tu casa lista en un pack</span>
+          <h1 id="hero-title" className="hp-hero-title">
+            {headline.map((w, i) => (
+              <span className="hp-hero-word" key={i} style={{ ["--i" as string]: i }}>
+                <span>{w}</span>{" "}
+              </span>
+            ))}
+          </h1>
+          <p className="hp-hero-lede">
+            Packs para cocina, baño, limpieza y estudio. Eliges estancia y tamaño, ves lo que lleva y listo.
+          </p>
+          <div className="hp-hero-actions">
+            <Link className="btn btn-primary btn-lg" href="/packs">
+              Elige tu pack <ArrowRight size={18} />
             </Link>
-          ))}
+            <Link className="btn btn-ghost-light btn-lg" href="/shop">
+              Ver toda la tienda
+            </Link>
+          </div>
+          <ul className="hp-hero-trust">
+            <li>
+              <Truck size={16} /> Envío gratis desde {free}
+            </li>
+            <li>
+              <Store size={16} /> Recogida gratis en tienda
+            </li>
+            <li>
+              <Lock size={16} /> Compra sin cuenta
+            </li>
+          </ul>
         </div>
-      </div>
-    </main>
-  );
-}
-function RoomSelector() {
-  return (
-    <Reveal>
-      <section className="home-section room-section">
-        <div className="home-section-heading">
+        <a className="hp-hero-scroll" href="#estancias" aria-label="Bajar a elegir estancia">
+          <ChevronDown size={20} />
+        </a>
+      </section>
+
+      <section className="hp-home-section" id="estancias" aria-labelledby="rooms-title">
+        <div className="hp-home-section-heading" data-reveal>
           <div>
             <span className="eyebrow">Empieza por una estancia</span>
-            <h2>¿Qué estancia equipas?</h2>
+            <h2 id="rooms-title">¿Qué toca equipar?</h2>
           </div>
-          <p>Elige una solución y ajusta el tamaño a lo que necesitas.</p>
+          <p>Cada pack viene en tres tamaños. El precio es la suma de lo que lleva.</p>
         </div>
-        <div className="room-grid">
-          {familyIds.map((id) => {
-            const familyBundles = bundles.filter((bundle) => bundle.category_id === id);
-            const medium = familyBundles.find((bundle) => bundle.tier === "medium");
+        <ul className="hp-room-grid" data-reveal-stagger>
+          {families.map((family, i) => {
+            const fb = bundles.filter((b) => b.category_id === family.id);
+            const from = Math.min(...fb.map(calculateBundleTotal));
             return (
-              <Link className="room-card" href={`/packs/${id}/${medium?.tier ?? "medium"}`} key={id}>
-                <div className="room-art" aria-hidden="true">
-                  <span />
-                </div>
-                <div className="room-card-copy">
-                  <span className="eyebrow">{familyBundles.length} tamaños</span>
-                  <h3>{familyLabels[id]}</h3>
-                  <strong>
-                    Desde{" "}
-                    {formatEuroPrice(
-                      familyBundles.length ? Math.min(...familyBundles.map(calculateBundleTotal)) : 0,
-                    )}
-                  </strong>
-                  <div className="room-tiers">
-                    {familyBundles.map((bundle) => (
-                      <span key={bundle.id}>{tierLabels[bundle.tier]}</span>
-                    ))}
-                  </div>
-                  <span className="room-link">
-                    Ver pack <ArrowRight size={16} />
+              <li key={family.id} data-reveal>
+                <Link className="hp-room-card" href={`/packs/${family.id}/medium`}>
+                  <span className="hp-room-media">
+                    <Image src={family.image} alt="" fill sizes="(max-width: 700px) 50vw, 25vw" priority={i < 2} />
                   </span>
-                </div>
-              </Link>
+                  <span className="hp-room-copy">
+                    <span className="hp-room-name">{family.label}</span>
+                    <span className="hp-room-from">
+                      Desde <strong>{formatEuroPrice(from)}</strong>
+                    </span>
+                  </span>
+                  <span className="hp-room-arrow" aria-hidden="true">
+                    <ArrowRight size={18} />
+                  </span>
+                </Link>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </section>
-    </Reveal>
-  );
-}
-function Comparison() {
-  return (
-    <Reveal>
-      <section className="home-section comparison-section">
-        <div className="home-section-heading">
-          <div>
-            <span className="eyebrow">Compara sin sorpresas</span>
-            <h2>El tamaño que encaja contigo.</h2>
-          </div>
-          <p>Las cifras salen de los productos reales incluidos en cada pack.</p>
-        </div>
-        <div className="comparison-table-wrap">
-          <table className="comparison-table">
-            <thead>
-              <tr>
-                <th>Tamaño</th>
-                <th>Artículos</th>
-                <th>Precio</th>
-                <th>Precio por artículo</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {(["small", "medium", "large"] as BundleTier[]).map((tier) => {
-                const items = bundles.filter((bundle) => bundle.tier === tier);
-                const count = items.reduce((sum, bundle) => sum + bundle.product_ids.length, 0);
-                const total = items.reduce((sum, bundle) => sum + calculateBundleTotal(bundle), 0);
-                return (
-                  <tr key={tier}>
-                    <th>{tierLabels[tier]}</th>
-                    <td>{(count / Math.max(1, items.length)).toFixed(1)} de media</td>
-                    <td>
-                      <strong>{formatEuroPrice(total / Math.max(1, items.length))}</strong>
-                    </td>
-                    <td>{formatEuroPrice(total / Math.max(1, count))}</td>
-                    <td>
-                      <Link href={`/packs/kitchen/${tier}`} aria-label={`Ver pack ${tierLabels[tier]}`}>
-                        <ArrowRight size={17} />
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </Reveal>
-  );
-}
-function BentoCategories() {
-  return (
-    <Reveal>
-      <section className="home-section bento-section">
-        <div className="home-section-heading">
-          <div>
-            <span className="eyebrow">Ordena tu compra</span>
-            <h2>Todo empieza por una categoría.</h2>
-          </div>
-          <Link className="text-link" href="/shop">
-            Ver catálogo <ArrowRight size={16} />
-          </Link>
-        </div>
-        <div className="bento-grid">
-          {categories.map((category, index) => (
-            <Link
-              href={`/category/${category.id}`}
-              className={`bento-card bento-${index % 5}`}
-              key={category.id}
-            >
-              <span className="bento-icon" aria-hidden="true">
-                <span />
-              </span>
-              <div>
-                <h3>{category.name_es}</h3>
-                <p>{category.description_es}</p>
-              </div>
-              <ArrowRight size={18} />
-            </Link>
+
+      <div className="hp-value-marquee" aria-hidden="true">
+        <div className="hp-value-marquee-track">
+          {[0, 1].map((k) => (
+            <span key={k}>
+              Precio claro <i>✶</i> Cero sorpresas <i>✶</i> Envío gratis desde {free} <i>✶</i> Recogida gratis <i>✶</i> 14 días para desistir <i>✶</i>{" "}
+            </span>
           ))}
         </div>
-      </section>
-    </Reveal>
-  );
-}
-function ProductSelection({
-  items,
-  addProduct,
-  favorites,
-  toggleFavorite,
-}: {
-  items: Product[];
-  addProduct: (id: string) => void;
-  favorites: string[];
-  toggleFavorite: (id: string) => void;
-}) {
-  return (
-    <Reveal>
-      <section className="home-section product-selection">
-        <div className="home-section-heading">
+      </div>
+
+      <section className="hp-home-section hp-configurator-section" aria-labelledby="config-title">
+        <div className="hp-home-section-heading" data-reveal>
           <div>
-            <span className="eyebrow">Una selección por categoría</span>
-            <h2>Lo que necesitas, sin lo que no.</h2>
+            <span className="eyebrow">Compara sin sorpresas</span>
+            <h2 id="config-title">Elige el tamaño que te encaja.</h2>
+          </div>
+          <p>Cambia de estancia y tamaño: ves al momento qué entra y cuánto cuesta.</p>
+        </div>
+        <PackConfigurator />
+      </section>
+
+      <section className="hp-home-section" aria-labelledby="cats-title">
+        <div className="hp-home-section-heading" data-reveal>
+          <div>
+            <span className="eyebrow">Ordena tu compra</span>
+            <h2 id="cats-title">O ve directo a lo que buscas.</h2>
+          </div>
+          <Link className="text-link" href="/shop">
+            Ver todo el catálogo <ArrowRight size={16} />
+          </Link>
+        </div>
+        <ul className="hp-category-grid" data-reveal-stagger>
+          {categories.map((category) => {
+            const Icon = categoryIcon(category.id);
+            const count = products.filter((p) => p.category_id === category.id).length;
+            return (
+              <li key={category.id} data-reveal>
+                <Link href={`/category/${category.id}`} className={`hp-category-card pv-cat-${category.id}`}>
+                  <span className="hp-category-icon" aria-hidden="true">
+                    <Icon strokeWidth={1.4} />
+                  </span>
+                  <span className="hp-category-copy">
+                    <strong>{category.name_es}</strong>
+                    <small>
+                      {count} {count === 1 ? "producto" : "productos"}
+                    </small>
+                  </span>
+                  <ArrowRight size={18} className="hp-category-arrow" aria-hidden="true" />
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      <section className="hp-home-section hp-rail-section" aria-labelledby="rail-title">
+        <div className="hp-home-section-heading" data-reveal>
+          <div>
+            <span className="eyebrow">Básicos de cada estancia</span>
+            <h2 id="rail-title">Lo que necesitas, sin lo que no.</h2>
           </div>
           <Link className="text-link" href="/shop">
             Explorar todo <ArrowRight size={16} />
           </Link>
         </div>
-        <div className="home-product-grid">
-          {items.map((product) => (
-            <article className="home-product-card" key={product.id}>
-              <Link href={`/product/${product.slug}`}>
-                <div className="home-product-media">
-                  <ProductArt />
-                  <button
-                    className="home-favorite"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      toggleFavorite(product.id);
-                    }}
-                    aria-label={favorites.includes(product.id) ? "Quitar de favoritos" : "Añadir a favoritos"}
-                  >
-                    <Heart size={17} fill={favorites.includes(product.id) ? "currentColor" : "none"} />
-                  </button>
-                </div>
-                <div className="home-product-info">
-                  <span>{product.subcategory}</span>
-                  <h3>{product.name_es}</h3>
-                  <strong>{formatEuroPrice(product.proposed_price_eur)}</strong>
-                </div>
-              </Link>
-              <button className="home-add" onClick={() => addProduct(product.id)}>
-                <ShoppingBag size={16} /> Añadir
-              </button>
-            </article>
-          ))}
-        </div>
+        <ProductRail products={rail} />
       </section>
-    </Reveal>
-  );
-}
-function HowItWorks() {
-  return (
-    <Reveal>
-      <section className="home-section how-section">
-        <div className="home-section-heading">
+
+      <section className="hp-home-section how-section" aria-labelledby="how-title">
+        <div className="hp-home-section-heading" data-reveal>
           <div>
             <span className="eyebrow">Fácil desde el primer clic</span>
-            <h2>Cómo funciona</h2>
+            <h2 id="how-title">Tres pasos y a casa.</h2>
           </div>
         </div>
-        <div className="how-grid">
+        <ol className="hp-how-steps" data-reveal-stagger>
           {[
-            ["01", "Elige una estancia", "Cocina, baño, limpieza o estudio. Empieza por lo que más te urge."],
-            ["02", "Escoge tu tamaño", "Pequeño, mediano o grande. Compara productos y precio al momento."],
-            ["03", "Añádelo a la cesta", "Listo para revisar, ajustar y preparar tu compra."],
-          ].map(([number, title, text]) => (
-            <article key={number}>
-              <span>{number}</span>
+            ["Elige una estancia", "Cocina, baño, limpieza o estudio. Empieza por lo que más te urge."],
+            ["Escoge el tamaño", "Pequeño, mediano o grande. Ves cada producto y el precio total."],
+            ["Recíbelo o recógelo", `Envío gratis desde ${free} o recogida gratis en tienda.`],
+          ].map(([title, text], i) => (
+            <li key={title} data-reveal>
+              <span className="hp-how-num">{String(i + 1).padStart(2, "0")}</span>
               <h3>{title}</h3>
               <p>{text}</p>
-            </article>
+            </li>
           ))}
-        </div>
-        <div className="faq-list">
-          {[
-            [
-              "¿Cuándo es gratis el envío?",
-              `A partir de ${formatEuroPrice(commerceConfig.freeShippingThreshold)} de compra.`,
-            ],
-            ["¿Puedo recoger mi compra?", "Sí. La recogida en tienda no añade coste."],
-            [
-              "¿Puedo devolver un producto?",
-              "El derecho de desistimiento es de 14 días naturales, con las excepciones legales aplicables.",
-            ],
-            ["¿Cómo se paga?", "Los métodos de pago se habilitarán cuando la tienda abra."],
-            ["¿Necesito crear una cuenta?", "No. Puedes preparar tu compra sin registrarte."],
-          ].map(([question, answer]) => (
-            <details key={question}>
+        </ol>
+        <div className="hp-home-faq" data-reveal>
+          <h3>Dudas rápidas</h3>
+          {FAQ.filter((f) => f.home).map(({ q, a }) => (
+            <details key={q} className="faq-item">
               <summary>
-                {question}
-                <ChevronDown size={18} />
+                {q}
+                <ChevronDown size={18} aria-hidden="true" />
               </summary>
-              <p>{answer}</p>
+              <div className="faq-answer">
+                <p>{a}</p>
+              </div>
             </details>
           ))}
         </div>
       </section>
-    </Reveal>
-  );
-}
-function CreatePack() {
-  return (
-    <Reveal>
-      <section className="create-pack">
+
+      <section className="hp-create-pack" data-reveal="scale" aria-labelledby="create-title">
         <div>
           <span className="eyebrow">Tu combinación, tus reglas</span>
-          <h2>Crea tu pack.</h2>
+          <h2 id="create-title">Monta tu propio pack.</h2>
           <p>Si ya sabes lo que necesitas, elige productos y cantidades a tu manera.</p>
+          <ul className="hp-create-pack-points">
+            <li>
+              <Check size={16} /> Precio al momento
+            </li>
+            <li>
+              <RotateCcw size={16} /> Lo editas cuando quieras desde la cesta
+            </li>
+          </ul>
         </div>
-        <Link className="btn btn-primary" href="/build-pack">
-          Personalizar pack <ArrowRight size={17} />
+        <Link className="btn btn-primary btn-lg" href="/build-pack">
+          Crear mi pack <ArrowRight size={18} />
         </Link>
       </section>
-    </Reveal>
-  );
-}
-export default function Home() {
-  const { addProduct, toggleFavorite, favorites } = useStore();
-  const featured = products.slice(0, 4);
-  const perCategory = categories
-    .map((category) => products.find((product) => product.category_id === category.id))
-    .filter(Boolean) as Product[];
-  return (
-    <>
-      <div className="home-ambient-hero">
-        <Image src="/ai/hero-home.webp" alt="Hogar luminoso recién equipado" fill sizes="100vw" priority />
-      </div>
-      <Hero featured={featured} />
-      <RoomSelector />
-      <Comparison />
-      <BentoCategories />
-      <ProductSelection
-        items={perCategory}
-        addProduct={addProduct}
-        favorites={favorites}
-        toggleFavorite={toggleFavorite}
-      />
-      <HowItWorks />
-      <CreatePack />
     </>
   );
 }

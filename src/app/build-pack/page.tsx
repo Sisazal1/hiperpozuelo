@@ -6,6 +6,7 @@ import { getAllProducts } from "@/lib/catalog/products";
 import { getAllCategories } from "@/lib/catalog/categories";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
 import { useStore } from "@/state/store";
+import ProductVisual from "@/components/catalog/ProductVisual";
 import { calculateOrderTotals, commerceConfig, shippingProgress } from "@/config/commerce";
 
 const steps = ["Estancia", "Productos", "Revisar"];
@@ -82,7 +83,7 @@ export default function BuildPackPage() {
     }, 100);
   };
   return (
-    <main className="builder-page" id="main-content">
+    <div className="builder-page">
       <header className="builder-header">
         <Link href="/shop" className="back-link">
           <ArrowLeft size={17} /> Volver al catálogo
@@ -155,7 +156,7 @@ export default function BuildPackPage() {
                     className={`builder-product ${selected[product.id] ? "chosen" : ""}`}
                     key={product.id}
                   >
-                    <div className="builder-image category-tile" aria-hidden="true" />
+                    <ProductVisual categoryId={product.category_id} subcategory={product.subcategory} image={product.image} size="sm" className="builder-image" />
                     <div className="builder-product-info">
                       <span className="product-category">{product.subcategory}</span>
                       <h3>{product.name_es}</h3>
@@ -244,6 +245,6 @@ export default function BuildPackPage() {
           )}
         </aside>
       </div>
-    </main>
+    </div>
   );
 }

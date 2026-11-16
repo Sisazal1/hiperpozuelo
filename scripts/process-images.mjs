@@ -4,8 +4,8 @@ import sharp from "sharp";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const sourceDir = path.join(root, "public", "products-src");
-const ambientSourceDir = path.join(root, "public", "ai-src");
+const sourceDir = path.join(root, "assets-src", "products-src");
+const ambientSourceDir = path.join(root, "assets-src", "ai-src");
 const outputDir = path.join(root, "public", "products");
 const ambientOutputDir = path.join(root, "public", "ai");
 const manifestPath = path.join(root, "src", "data", "product-images.json");

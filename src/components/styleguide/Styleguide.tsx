@@ -66,7 +66,7 @@ export default function Styleguide() {
   const [open, setOpen] = useState(false);
   const [toast, setToast] = useState(false);
   return (
-    <main className="sg-page" id="main-content">
+    <div className="sg-page">
       <header className="sg-hero">
         <span className="sg-kicker">Sistema Hiper Pozuelo</span>
         <h1>Una casa lista. Sin dar mil vueltas.</h1>
@@ -201,6 +201,6 @@ export default function Styleguide() {
           <span>Prueba otra búsqueda.</span>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

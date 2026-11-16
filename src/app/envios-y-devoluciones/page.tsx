@@ -1,7 +1,7 @@
 import Link from "next/link";
 export default function ShippingPage() {
   return (
-    <main className="commerce-page info-page" id="main-content">
+    <div className="commerce-page info-page">
       <div className="commerce-container">
         <span className="eyebrow">Información</span>
         <h1>Envíos y devoluciones</h1>
@@ -16,6 +16,6 @@ export default function ShippingPage() {
           Volver a la tienda
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

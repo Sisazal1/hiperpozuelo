@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useFocusTrap } from "@/components/motion/hooks";
 import { Check, Copy, Gift, Sparkles, X } from "lucide-react";
 import { commerceConfig } from "@/config/commerce";
 import { useStore } from "@/state/store";
@@ -22,19 +23,35 @@ export default function WelcomeScratch() {
   const scratching = useRef(false);
   const points = useRef(0);
   const lastFocus = useRef<Element | null>(null);
+  const trapRef = useRef<HTMLElement>(null);
 
-  // Aparece al entrar (1,2 s), una vez cada 30 días y nunca en cesta/checkout.
+  // Aparece tras 9 s o al 35 % de scroll, una vez cada 30 días y nunca en cesta/checkout.
   useEffect(() => {
     if (discountCode === commerceConfig.welcomeDiscountCode) return;
     if (["/cart", "/checkout"].some((p) => location.pathname.startsWith(p))) return;
     if (localStorage.getItem(REDEEMED_KEY) === "1") return;
     const closedAt = Number(localStorage.getItem(CLOSED_KEY) || 0);
     if (closedAt && Date.now() - closedAt < HIDE_FOR_MS) return;
-    const timer = setTimeout(() => {
+    // No intrusivo: tras 9 s o cuando el visitante ha recorrido un 35 % de la página.
+    let done = false;
+    const show = () => {
+      if (done || document.documentElement.dataset.drawer) return;
+      done = true;
       lastFocus.current = document.activeElement;
       setOpen(true);
-    }, 1200);
-    return () => clearTimeout(timer);
+      cleanup();
+    };
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      if (max > 0 && scrollY / max > 0.35) show();
+    };
+    const timer = setTimeout(show, 9000);
+    addEventListener("scroll", onScroll, { passive: true });
+    const cleanup = () => {
+      clearTimeout(timer);
+      removeEventListener("scroll", onScroll);
+    };
+    return cleanup;
   }, [discountCode]);
 
   const dismiss = useCallback(() => {
@@ -162,11 +179,13 @@ export default function WelcomeScratch() {
     setOpen(false);
   }
 
+  useFocusTrap(trapRef, open);
   if (!open) return null;
 
   return (
     <div className="welcome-backdrop" onMouseDown={(e) => e.target === e.currentTarget && dismiss()}>
       <section
+        ref={trapRef}
         className={`welcome-card${revealed ? " is-revealed" : ""}`}
         role="dialog"
         aria-modal="true"
@@ -182,7 +201,7 @@ export default function WelcomeScratch() {
           </span>
           <p className="welcome-eyebrow">Regalo de bienvenida</p>
         </div>
-        <h2 id="welcome-title">Rasca y gana un 10%</h2>
+        <h2 id="welcome-title">Rasca y descubre tu 10%</h2>
         <p id="welcome-desc">
           Un descuento real en tu primera compra, sobre los productos y no sobre el envío.
         </p>

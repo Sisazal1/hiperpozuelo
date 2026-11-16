@@ -1,14 +1,14 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Heart, Search, ShoppingBag, X } from "lucide-react";
-import { catalogNotice } from "@/lib/catalog";
+import { Check, Heart, Search, ShoppingBag, X } from "lucide-react";
 import { getAllCategories } from "@/lib/catalog/categories";
 import { searchProducts } from "@/lib/catalog/products";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
 import { useStore } from "@/state/store";
 import type { Product } from "@/types/catalog";
-import CatalogVisual from "@/components/catalog/CatalogVisual";
+import ProductVisual from "@/components/catalog/ProductVisual";
+import { useAddedFeedback } from "@/components/motion/hooks";
 
 export function CatalogBrowser({
   products,
@@ -32,6 +32,14 @@ export function CatalogBrowser({
     setQ(params.get("q") || "");
     setSort(params.get("sort") || "default");
   }, []);
+  useEffect(() => {
+    setPage(1);
+    const params = new URLSearchParams(window.location.search);
+    q ? params.set("q", q) : params.delete("q");
+    sort !== "default" ? params.set("sort", sort) : params.delete("sort");
+    const next = `${window.location.pathname}${params.size ? `?${params}` : ""}`;
+    if (next !== `${window.location.pathname}${window.location.search}`) window.history.replaceState(null, "", next);
+  }, [q, sort, category, sub]);
   const filtered = useMemo(() => {
     let list = q
       ? searchProducts(q).filter((product) => products.some((item) => item.id === product.id))
@@ -66,12 +74,13 @@ export function CatalogBrowser({
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const visible = filtered.slice((page - 1) * pageSize, page * pageSize);
   return (
-    <main id="main-content" className="catalog-page">
+    <div className="catalog-page">
       <div className="catalog-container">
-        <span className="eyebrow">Catálogo provisional</span>
-        <h1>{title}</h1>
-        <p>{intro}</p>
-        <div className="catalog-notice">{catalogNotice}</div>
+        <span className="eyebrow" data-reveal>
+          {categoryId ? "Categoría" : "Todo el catálogo"}
+        </span>
+        <h1 data-reveal>{title}</h1>
+        <p data-reveal>{intro}</p>
         <nav className="catalog-categories" aria-label="Categorías">
           {getAllCategories().map((cat) => (
             <Link className={category === cat.id ? "active" : ""} key={cat.id} href={`/category/${cat.id}`}>
@@ -141,12 +150,12 @@ export function CatalogBrowser({
             <option value="alpha">A–Z</option>
           </select>
         </div>
-        <div className="catalog-result-count">
+        <div className="catalog-result-count" aria-live="polite">
           {filtered.length} {filtered.length === 1 ? "resultado" : "resultados"}
         </div>
         {filtered.length ? (
           <>
-            <div className="catalog-grid">
+            <div className="catalog-grid" key={`${page}-${category}-${sub}-${sort}-${q}`} data-reveal-stagger>
               {visible.map((product) => (
                 <CatalogCard
                   key={product.id}
@@ -159,13 +168,25 @@ export function CatalogBrowser({
             </div>
             {pageCount > 1 && (
               <nav className="catalog-pagination" aria-label="Paginación">
-                <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+                <button
+                  disabled={page === 1}
+                  onClick={() => {
+                    setPage(page - 1);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
                   Anterior
                 </button>
                 <span>
                   Página {page} de {pageCount}
                 </span>
-                <button disabled={page === pageCount} onClick={() => setPage(page + 1)}>
+                <button
+                  disabled={page === pageCount}
+                  onClick={() => {
+                    setPage(page + 1);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
                   Siguiente
                 </button>
               </nav>
@@ -181,7 +202,7 @@ export function CatalogBrowser({
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }
 export function CatalogCard({
@@ -195,35 +216,39 @@ export function CatalogCard({
   onFavorite?: (id: string) => void;
   onAdd?: (id: string) => void;
 }) {
+  const [added, flash] = useAddedFeedback();
   return (
-    <article className="catalog-card">
-      <Link href={`/product/${product.slug}`}>
+    <article className="catalog-card" data-reveal>
+      <Link href={`/product/${product.slug}`} className="catalog-card-link">
         <div className="catalog-image">
-          {onFavorite && (
-            <button
-              className="favorite-button"
-              onClick={(event) => {
-                event.preventDefault();
-                onFavorite(product.id);
-              }}
-              aria-label={
-                favorite ? `Quitar ${product.name_es} de favoritos` : `Añadir ${product.name_es} a favoritos`
-              }
-            >
-              <Heart size={18} fill={favorite ? "currentColor" : "none"} />
-            </button>
-          )}
-          <CatalogVisual image={product.image} label={product.subcategory} />
+          <ProductVisual categoryId={product.category_id} subcategory={product.subcategory} image={product.image} name={product.name_es} />
         </div>
         <div className="catalog-card-info">
           <span className="product-category">{product.subcategory}</span>
           <h2>{product.name_es}</h2>
-          <strong>{formatEuroPrice(product.proposed_price_eur)}</strong>
+          <strong className="price">{formatEuroPrice(product.proposed_price_eur)}</strong>
         </div>
       </Link>
+      {onFavorite && (
+        <button
+          className={`favorite-button ${favorite ? "is-saved" : ""}`}
+          onClick={() => onFavorite(product.id)}
+          aria-pressed={favorite}
+          aria-label={favorite ? `Quitar ${product.name_es} de favoritos` : `Añadir ${product.name_es} a favoritos`}
+        >
+          <Heart size={18} fill={favorite ? "currentColor" : "none"} />
+        </button>
+      )}
       {onAdd && (
-        <button className="add-button" onClick={() => onAdd(product.id)}>
-          <ShoppingBag size={15} /> Añadir a la cesta
+        <button
+          className={`add-button ${added ? "is-added" : ""}`}
+          onClick={() => {
+            onAdd(product.id);
+            flash();
+          }}
+          aria-label={added ? `Añadido a la cesta: ${product.name_es}` : `Añadir a la cesta: ${product.name_es}`}
+        >
+          {added ? <Check size={15} /> : <ShoppingBag size={15} />} {added ? "Añadido" : "Añadir a la cesta"}
         </button>
       )}
     </article>

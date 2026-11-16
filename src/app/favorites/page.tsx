@@ -1,53 +1,60 @@
 "use client";
 import Link from "next/link";
-import { Heart, Trash2 } from "lucide-react";
+import { Heart, ShoppingBag, X } from "lucide-react";
 import { useStore } from "@/state/store";
+import { formatEuroPrice } from "@/lib/catalog/pricing";
+import ProductVisual from "@/components/catalog/ProductVisual";
+
 export default function Favorites() {
-  const { favoriteProducts, toggleFavorite } = useStore();
+  const { favoriteProducts, toggleFavorite, addProduct, hydrated } = useStore();
   return (
-    <main className="commerce-page">
-      <header className="commerce-header">
-        <Link href="/" className="commerce-logo">
-          Hiper Pozuelo
-        </Link>
-        <span>Favoritos · Demo</span>
-      </header>
+    <div className="commerce-page">
       <div className="commerce-container">
-        <div className="commerce-heading">
+        <div className="commerce-heading" data-reveal>
           <div>
             <span className="eyebrow">Tu selección</span>
             <h1>Favoritos</h1>
           </div>
-          <span className="dev-pill">{favoriteProducts.length} guardados</span>
+          {favoriteProducts.length > 0 && <span className="dev-pill">{favoriteProducts.length} guardados</span>}
         </div>
-        {favoriteProducts.length ? (
-          <div className="favorites-grid">
+        {!hydrated ? (
+          <div className="skeleton-block" style={{ height: 280 }} aria-hidden="true" />
+        ) : favoriteProducts.length ? (
+          <ul className="favorites-grid" data-reveal-stagger>
             {favoriteProducts.map((item) => (
-              <article className="favorite-card" key={item.id}>
-                <div className="product-image">
-                  <span>Imagen pendiente</span>
-                </div>
-                <div>
+              <li className="favorite-card" key={item.id} data-reveal>
+                <Link href={`/product/${item.slug}`} className="favorite-media" tabIndex={-1} aria-hidden="true">
+                  <ProductVisual categoryId={item.category_id} subcategory={item.subcategory} image={item.image} name={item.name_es} />
+                </Link>
+                <button className="favorite-remove" onClick={() => toggleFavorite(item.id)} aria-label={`Quitar ${item.name_es} de favoritos`}>
+                  <X size={16} />
+                </button>
+                <div className="favorite-body">
                   <span className="product-category">{item.subcategory}</span>
-                  <h2>{item.name_es}</h2>
-                  <p>Precio orientativo · disponibilidad pendiente.</p>
-                  <button onClick={() => toggleFavorite(item.id)}>
-                    <Trash2 size={16} /> Quitar
+                  <h2>
+                    <Link href={`/product/${item.slug}`}>{item.name_es}</Link>
+                  </h2>
+                  <strong className="price">{formatEuroPrice(item.proposed_price_eur)}</strong>
+                  <button className="btn btn-primary btn-block" onClick={() => addProduct(item.id)}>
+                    <ShoppingBag size={16} /> Añadir a la cesta
                   </button>
                 </div>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         ) : (
-          <div className="empty-commerce">
-            <Heart size={30} />
+          <div className="empty-commerce" data-reveal>
+            <span className="empty-bag" aria-hidden="true">
+              <Heart size={32} strokeWidth={1.4} />
+            </span>
             <h2>Aún no tienes favoritos</h2>
+            <p>Toca el corazón de cualquier producto para guardarlo aquí.</p>
             <Link href="/shop" className="btn btn-primary">
               Explorar la tienda
             </Link>
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

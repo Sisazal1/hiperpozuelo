@@ -1,7 +1,7 @@
 import Link from "next/link";
 export default function TermsPage() {
   return (
-    <main className="commerce-page info-page" id="main-content">
+    <div className="commerce-page info-page">
       <div className="commerce-container">
         <span className="eyebrow">Información legal</span>
         <h1>Condiciones</h1>
@@ -11,6 +11,6 @@ export default function TermsPage() {
           Resolver dudas
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

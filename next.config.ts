@@ -8,6 +8,7 @@ import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 export default function config(phase: string): NextConfig {
   const nextConfig: NextConfig = {
     reactStrictMode: true,
+    poweredByHeader: false,
     ...(phase === PHASE_DEVELOPMENT_SERVER ? { distDir: ".next-dev" } : {}),
     // Sin esto Next elige C:\Users\simon como raíz del workspace por el package-lock.json
     // suelto de la carpeta de usuario y avisa en cada build.
@@ -21,7 +22,11 @@ export default function config(phase: string): NextConfig {
       ] }];
     },
     async redirects() {
-      return [{ source: "/product/paño-cocina", destination: "/product/pano-cocina", permanent: true }];
+      return [
+        { source: "/product/paño-cocina", destination: "/product/pano-cocina", permanent: true },
+        // El área de cliente "demo" (login sin backend) se retiró: la compra es como invitado.
+        { source: "/account/:path+", destination: "/account", permanent: false },
+      ];
     },
   };
 

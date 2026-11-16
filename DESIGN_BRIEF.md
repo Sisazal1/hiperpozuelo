@@ -10,9 +10,14 @@ E-commerce de supermercado/hogar creíble y premium. Referencias: Zara (limpieza
 - En las cards el precio tiene más jerarquía que el nombre.
 - Todo elemento interactivo tiene hover, focus-visible (anillo 2px), active, disabled y loading.
 
-# Movimiento (Emil Kowalski)
-- 150–250ms, ease-out. Entradas con opacity + translateY ≤ 8px. Solo transform y opacity.
-- Respetar prefers-reduced-motion. Nada que bloquee la interacción. No animar listas largas al cargar.
+# Movimiento (sistema vigente desde 2026-11-16 — sustituye a las reglas anteriores)
+- Todo vive en `src/app/experience.css` + `src/components/motion/*`. No crear animaciones sueltas fuera de ahí.
+- Curvas: `--ease-out-expo` (entradas), `--ease-drawer` (paneles y pills), `--ease-spring` (feedback: badge, check, corazón).
+- Duraciones: feedback 160–260 ms; entradas de contenido 500–800 ms; paneles 450–550 ms. Solo transform/opacity (clip-path en la intro).
+- Piezas: intro de marca (1 vez por sesión), barra de progreso de navegación, transición de página (`app/template.tsx`), skeleton (`app/loading.tsx`),
+  reveal global con `data-reveal` / `data-reveal-stagger`, toasts (`toast()`), números animados (`useTweenedNumber`),
+  botón que se convierte en ✓ al añadir (`useAddedFeedback`), barra de compra fija (`useScrolledPast`), header que se oculta al bajar.
+- `prefers-reduced-motion`: todo instantáneo y sin bucles (bloque final de experience.css). Nada bloquea la interacción.
 
 # Confianza
 - NUNCA inventar reseñas, stock, descuentos, datos de empresa ni fotos.
@@ -33,8 +38,6 @@ Voz: cercana, directa, con un toque de humor suave en español de España. Frase
 - Fotografía: producto sobre fondo neutro cálido + fotos de uso. Ratios fijos: cards 4:5, galería 1:1, hero 16:9. Si no hay foto, tile de categoría con icono de línea, sin texto. Nunca foto de stock, nunca generada por IA, nunca copiada de otra tienda.
 - Prueba social: no mostrar estrellas, reseñas ni contadores hasta que existan reseñas reales verificadas. Dejar los huecos de componente preparados pero ocultos.
 
-# Movimiento
-Reveal de secciones al hacer scroll (opacity + translateY 8px, 200ms, una sola vez, sin retraso acumulado), hover de card con elevación sutil (translateY -2px), cambio de imagen en hover solo si hay segunda foto.
 
 # Stageshow
 Para escenas de producto, demos visuales o walkthroughs: una sola idea por escena, contexto suficiente para reconocerla, palabras reales solo donde aporten significado y movimiento con causa. El resultado debe funcionar como póster antes de animarse. Los cambios de estado se mantienen montados y se animan con transform/opacity, con pausas breves, sin resets arbitrarios ni cursores decorativos.

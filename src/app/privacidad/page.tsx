@@ -1,7 +1,7 @@
 import Link from "next/link";
 export default function PrivacyPage() {
   return (
-    <main className="commerce-page info-page" id="main-content">
+    <div className="commerce-page info-page">
       <div className="commerce-container">
         <span className="eyebrow">Información legal</span>
         <h1>Privacidad</h1>
@@ -14,6 +14,6 @@ export default function PrivacyPage() {
           Ver cookies
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

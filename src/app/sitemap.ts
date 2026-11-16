@@ -1,16 +1,16 @@
 import type { MetadataRoute } from "next";
+import { getAllProducts } from "@/lib/catalog/products";
+import { getAllCategories } from "@/lib/catalog/categories";
+import { getAllBundles } from "@/lib/catalog/bundles";
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://hiper-pozuelo.vercel.app";
+  const base = process.env.NEXT_PUBLIC_SITE_URL || "https://hiper-pozuelo.vercel.app";
+  const now = new Date();
+  const pages = ["/", "/shop", "/packs", "/build-pack", "/faq", "/contacto", "/envios-y-devoluciones", "/privacidad", "/cookies", "/condiciones", "/aviso-legal"];
   return [
-    "/",
-    "/shop",
-    "/packs",
-    "/faq",
-    "/contacto",
-    "/privacidad",
-    "/cookies",
-    "/condiciones",
-    "/envios-y-devoluciones",
-    "/aviso-legal",
-  ].map((path) => ({ url: `${base}${path}`, lastModified: new Date() }));
+    ...pages.map((p) => ({ url: `${base}${p}`, lastModified: now, priority: p === "/" ? 1 : 0.6 })),
+    ...getAllBundles().map((b) => ({ url: `${base}/packs/${b.category_id}/${b.tier}`, lastModified: now, priority: 0.8 })),
+    ...getAllCategories().map((c) => ({ url: `${base}/category/${c.slug ?? c.id}`, lastModified: now, priority: 0.7 })),
+    ...getAllProducts().map((p) => ({ url: `${base}/product/${p.slug}`, lastModified: now, priority: 0.6 })),
+  ];
 }

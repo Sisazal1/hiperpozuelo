@@ -1,45 +1,20 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Check, Heart, Minus, Plus, ShoppingBag } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { getAllBundles, calculateBundleTotal } from "@/lib/catalog/bundles";
-import { getBundlePricing, getFamilyPricing } from "@/lib/catalog/pack-pricing";
+import { useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, Check, Minus, Plus, RotateCcw, ShoppingBag, Store, Truck } from "lucide-react";
+import { getAllBundles, calculateBundleTotal, TIER_LABEL } from "@/lib/catalog/bundles";
 import { getProductById } from "@/lib/catalog/products";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
+import { commerceConfig } from "@/config/commerce";
 import { useStore } from "@/state/store";
-import { calculateOrderTotals } from "@/config/commerce";
 import type { BundleTier } from "@/types/catalog";
+import ProductVisual from "@/components/catalog/ProductVisual";
+import { useAddedFeedback, useScrolledPast, useTweenedNumber } from "@/components/motion/hooks";
 
-export const families = [
-  {
-    id: "kitchen",
-    label: "Cocina",
-    image: "/ai/pack-cocina.webp",
-    intro: "Utensilios y accesorios para preparar tu día a día.",
-  },
-  {
-    id: "bathroom",
-    label: "Baño",
-    image: "/ai/pack-bano.webp",
-    intro: "Una selección práctica para mantener el baño equipado.",
-  },
-  {
-    id: "cleaning",
-    label: "Limpieza",
-    image: "/ai/pack-limpieza.webp",
-    intro: "Soluciones esenciales para las tareas de casa.",
-  },
-  {
-    id: "stationery",
-    label: "Estudio",
-    image: "/ai/pack-estudio.webp",
-    intro: "Materiales para estudiar, organizar y trabajar.",
-  },
-] as const;
+import { families } from "@/lib/catalog/families";
 const tiers: BundleTier[] = ["small", "medium", "large"];
-const tierLabels: Record<BundleTier, string> = { small: "Pequeño", medium: "Mediano", large: "Grande" };
+
 export default function PacksExperience({
   initialFamily = "__overview__",
   initialTier = "medium",
@@ -47,193 +22,153 @@ export default function PacksExperience({
   initialFamily?: string;
   initialTier?: BundleTier;
 }) {
-  return initialFamily === "__overview__" ? (
-    <PacksOverview />
-  ) : (
-    <>
-      <div className="pack-ambient-cover">
-        <Image
-          src={families.find((family) => family.id === initialFamily)?.image || "/ai/pack-cocina.webp"}
-          alt={`Ambiente de ${families.find((family) => family.id === initialFamily)?.label || "pack"}`}
-          fill
-          sizes="(max-width: 700px) 100vw, 420px"
-        />
-        <PackDetail initialFamily={initialFamily} initialTier={initialTier} />
-      </div>
-    </>
-  );
+  return initialFamily === "__overview__" ? <PacksOverview /> : <PackDetail family={initialFamily} tier={initialTier} />;
 }
+
 function PacksOverview() {
   const bundles = getAllBundles();
   return (
-    <main className="packs-page packs-overview-page" id="main-content">
+    <div className="packs-page packs-overview-page">
       <header className="packs-overview-hero">
-        <span className="eyebrow">Packs prediseñados</span>
-        <h1>Elige una solución. Casa lista.</h1>
-        <p>Cuatro familias, tres tamaños y todo claro desde el principio.</p>
+        <span className="eyebrow" data-reveal>
+          Packs prediseñados
+        </span>
+        <h1 data-reveal>Elige una estancia. Nosotros ponemos el resto.</h1>
+        <p data-reveal>Cuatro packs, tres tamaños cada uno. Ves qué lleva y cuánto cuesta antes de decidir.</p>
       </header>
-      <nav className="packs-overview-nav" aria-label="Familias de packs">
-        {families.map((family) => (
-          <a key={family.id} href={`#${family.id}`}>
-            {family.label}
-          </a>
-        ))}
-      </nav>
-      <section className="packs-family-overview" aria-labelledby="packs-family-title">
-        <div className="packs-overview-heading">
-          <div>
-            <span className="eyebrow">Descubre la colección</span>
-            <h2 id="packs-family-title">Compara nuestras familias</h2>
-          </div>
-          <p>Cada tarjeta muestra los tres tamaños. Tú eliges cuándo entrar.</p>
-        </div>
-        <div className="packs-family-grid">
-          {families.map((family) => {
-            const familyBundles = bundles.filter((bundle) => bundle.category_id === family.id);
-            return (
-              <article className="packs-family-overview-card" id={family.id} key={family.id}>
-                <div className="packs-family-overview-visual">
-                  <span>{family.label}</span>
-                  <small>{familyBundles.length} tamaños disponibles</small>
-                </div>
-                <div className="packs-family-overview-copy">
-                  <span className="eyebrow">{family.label}</span>
-                  <h3>{family.label}</h3>
-                  <p>{family.intro}</p>
-                  <div className="packs-family-size-list">
-                    {tiers.map((tier) => {
-                      const bundle = familyBundles.find((item) => item.tier === tier);
-                      return bundle ? (
-                        <Link key={tier} href={`/packs/${family.id}/${tier}`} className="pack-size-row">
+      <div className="packs-family-grid" data-reveal-stagger>
+        {families.map((family, index) => {
+          const familyBundles = bundles.filter((bundle) => bundle.category_id === family.id);
+          const from = Math.min(...familyBundles.map(calculateBundleTotal));
+          return (
+            <article className="pack-family-card" id={family.id} key={family.id} data-reveal>
+              <Link href={`/packs/${family.id}/medium`} className="pack-family-media" tabIndex={-1} aria-hidden="true">
+                <Image src={family.image} alt="" fill sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 25vw" priority={index < 2} />
+                <span className="pack-family-from">Desde {formatEuroPrice(from)}</span>
+              </Link>
+              <div className="pack-family-copy">
+                <h2>
+                  <Link href={`/packs/${family.id}/medium`}>Pack {family.label}</Link>
+                </h2>
+                <p>{family.intro}</p>
+                <ul className="pack-size-list">
+                  {tiers.map((tier) => {
+                    const bundle = familyBundles.find((item) => item.tier === tier);
+                    return bundle ? (
+                      <li key={tier}>
+                        <Link href={`/packs/${family.id}/${tier}`} className="pack-size-row">
                           <span>
-                            {tierLabels[tier]}
+                            {TIER_LABEL[tier]}
                             <small>{bundle.product_ids.length} artículos</small>
                           </span>
-                          <strong>{formatEuroPrice(calculateBundleTotal(bundle))}</strong>
-                          <ArrowRight size={16} />
+                          <strong className="price">{formatEuroPrice(calculateBundleTotal(bundle))}</strong>
+                          <ArrowRight size={16} aria-hidden="true" />
                         </Link>
-                      ) : null;
-                    })}
-                  </div>
-                  <a className="pack-compare-link" href={`#${family.id}-sizes`}>
-                    Comparar tamaños
-                  </a>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-      <section className="packs-custom-callout">
+                      </li>
+                    ) : null;
+                  })}
+                </ul>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      <section className="packs-custom-callout" data-reveal>
         <div>
-          <span className="eyebrow">Una opción más flexible</span>
-          <h2>Personaliza tu pack.</h2>
-          <p>Elige cada producto y cantidad a tu manera.</p>
+          <span className="eyebrow">¿Ya sabes lo que quieres?</span>
+          <h2>Monta tu propio pack.</h2>
+          <p>Eliges productos y cantidades. El precio se actualiza al momento.</p>
         </div>
-        <Link className="btn btn-secondary" href="/build-pack">
-          Personalizar pack
+        <Link className="btn btn-primary" href="/build-pack">
+          Crear mi pack <ArrowRight size={17} />
         </Link>
       </section>
-    </main>
+    </div>
   );
 }
-function PackDetail({ initialFamily, initialTier }: { initialFamily: string; initialTier: BundleTier }) {
-  const router = useRouter();
-  const bundles = getAllBundles();
+
+function PackDetail({ family: familyId, tier }: { family: string; tier: BundleTier }) {
   const { addBundle } = useStore();
-  const family = families.find((item) => item.id === initialFamily);
-  const familyBundles = useMemo(
-    () => bundles.filter((bundle) => bundle.category_id === initialFamily),
-    [bundles, initialFamily],
-  );
-  const selected = familyBundles.find((bundle) => bundle.tier === initialTier);
+  const family = families.find((item) => item.id === familyId);
+  const familyBundles = getAllBundles().filter((bundle) => bundle.category_id === familyId);
+  const selected = familyBundles.find((bundle) => bundle.tier === tier);
   const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
-  const [favorite, setFavorite] = useState(false);
-  const [buttonState, setButtonState] = useState(false);
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("hp-pack-favorites") || "[]") as string[];
-    setFavorite(saved.includes(`${initialFamily}-${initialTier}`));
-  }, [initialFamily, initialTier]);
+  const [added, flash] = useAddedFeedback(1800);
+  const cta = useRef<HTMLDivElement>(null);
+  const showBar = useScrolledPast(cta);
+  const packPrice = selected ? calculateBundleTotal(selected) : 0;
+  const shownPrice = useTweenedNumber(packPrice * quantity);
+  const unitPrice = useTweenedNumber(packPrice);
+
   if (!family || !selected)
     return (
-      <main className="packs-page">
+      <div className="packs-page">
         <div className="packs-hero">
           <h1>Pack no disponible</h1>
           <Link href="/packs" className="btn btn-primary">
-            Volver a packs
+            Ver todos los packs
           </Link>
         </div>
-      </main>
+      </div>
     );
-  const unitTotal = calculateBundleTotal(selected);
-  const packPrice = selected.estimated_total_eur;
-  const savings = unitTotal - packPrice;
-  const orderTotal = calculateOrderTotals(packPrice, "collect");
-  const toggleFavorite = () => {
-    const key = `${initialFamily}-${initialTier}`;
-    const saved = JSON.parse(localStorage.getItem("hp-pack-favorites") || "[]") as string[];
-    const next = saved.includes(key) ? saved.filter((item) => item !== key) : [...saved, key];
-    localStorage.setItem("hp-pack-favorites", JSON.stringify(next));
-    setFavorite(next.includes(key));
-  };
-  const addSelected = () => {
+
+  const tierIndex = tiers.indexOf(tier);
+  const add = () => {
     for (let i = 0; i < quantity; i += 1) addBundle(selected.id, selected.tier);
-    setButtonState(true);
-    setAdded(true);
-    window.setTimeout(() => setButtonState(false), 900);
-    window.setTimeout(() => setAdded(false), 4500);
+    flash();
   };
   return (
-    <main className="packs-page" id="main-content">
-      <div className="packs-hero">
-        <Link className="packs-back-link" href="/packs">
-          ← Ver todos los packs
-        </Link>
-        <span className="eyebrow">{family.label}</span>
-        <h1>{selected.name_es}</h1>
-        <p>{selected.description_es}</p>
-        <div className="pack-segmented" role="tablist" aria-label="Tamaño del pack">
-          {tiers.map((tier) => (
-            <Link
-              key={tier}
-              href={`/packs/${initialFamily}/${tier}`}
-              className={initialTier === tier ? "selected" : ""}
-              role="tab"
-              aria-selected={initialTier === tier}
-            >
-              {tierLabels[tier]}
-              <small>
-                {familyBundles.find((item) => item.tier === tier)?.product_ids.length ?? 0} artículos
-              </small>
-            </Link>
-          ))}
+    <div className="packs-page pack-detail-page">
+      <section className="pack-detail-hero">
+        <div className="pack-detail-hero-copy">
+          <Link className="back-link" href="/packs">
+            <ArrowLeft size={16} /> Todos los packs
+          </Link>
+          <span className="eyebrow">{family.label}</span>
+          <h1>{selected.name_es}</h1>
+          <p>{family.tagline} {selected.description_es}</p>
+          <div className="pack-segmented" role="radiogroup" aria-label="Tamaño del pack" style={{ ["--tier-index" as string]: tierIndex }}>
+            <span className="pack-segmented-pill" aria-hidden="true" />
+            {tiers.map((t) => {
+              const b = familyBundles.find((item) => item.tier === t);
+              return (
+                <Link
+                  key={t}
+                  href={`/packs/${familyId}/${t}`}
+                  scroll={false}
+                  replace
+                  role="radio"
+                  aria-checked={tier === t}
+                  className={tier === t ? "selected" : ""}
+                >
+                  {TIER_LABEL[t]}
+                  <small>{b?.product_ids.length ?? 0} artículos</small>
+                </Link>
+              );
+            })}
+          </div>
         </div>
-      </div>
+        <div className="pack-detail-hero-media" data-reveal="scale">
+          <Image src={family.image} alt={`Ambiente de ${family.label.toLowerCase()}`} fill sizes="(max-width: 900px) 100vw, 40vw" priority />
+        </div>
+      </section>
       <section className="pack-detail-layout">
         <div className="pack-detail-includes">
           <div className="pack-detail-heading">
-            <div>
-              <span className="eyebrow">Dentro del pack</span>
-              <h2>Lo que incluye</h2>
-            </div>
-            <button
-              className="pack-favorite"
-              onClick={toggleFavorite}
-              aria-label={favorite ? "Quitar pack de favoritos" : "Añadir pack a favoritos"}
-            >
-              <Heart size={20} fill={favorite ? "currentColor" : "none"} />
-            </button>
+            <span className="eyebrow">Dentro del pack</span>
+            <h2>
+              Lo que incluye <span className="count-badge">{selected.product_ids.length}</span>
+            </h2>
           </div>
-          <ul className="pack-product-list">
+          <ul className="pack-product-list" key={tier} data-reveal-stagger>
             {selected.product_ids.map((id) => {
               const product = getProductById(id);
               if (!product) return null;
               return (
-                <li key={id}>
-                  <span className="pack-product-thumb" aria-hidden="true" />
+                <li key={id} data-reveal>
+                  <ProductVisual categoryId={product.category_id} subcategory={product.subcategory} image={product.image} size="sm" />
                   <span>
-                    <strong>{product.name_es}</strong>
+                    <Link href={`/product/${product.slug}`}>{product.name_es}</Link>
                     <small>{product.subcategory}</small>
                   </span>
                   <b>{formatEuroPrice(product.proposed_price_eur)}</b>
@@ -242,52 +177,63 @@ function PackDetail({ initialFamily, initialTier }: { initialFamily: string; ini
             })}
           </ul>
         </div>
-        <aside className="pack-detail-summary">
-          <span className="eyebrow">{tierLabels[initialTier]}</span>
-          <h2>{formatEuroPrice(packPrice)}</h2>
-          <p>{selected.product_ids.length} artículos incluidos</p>
-          {savings > 0 && <div className="pack-savings">Ahorras {formatEuroPrice(savings)}</div>}
-          <div className="pack-buy-row">
-            <div className="pack-quantity">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Reducir cantidad">
+        <aside className="pack-detail-summary" aria-label="Comprar pack">
+          <span className="eyebrow">Pack {TIER_LABEL[tier].toLowerCase()}</span>
+          <strong className="pack-summary-price">{formatEuroPrice(unitPrice)}</strong>
+          <p>{selected.product_ids.length} artículos · el precio es la suma de lo que incluye</p>
+          <div className="pack-buy-row" ref={cta}>
+            <div className="quantity-control" role="group" aria-label="Cantidad de packs">
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} disabled={quantity <= 1} aria-label="Reducir cantidad">
                 <Minus size={16} />
               </button>
-              <strong>{quantity}</strong>
-              <button onClick={() => setQuantity(quantity + 1)} aria-label="Aumentar cantidad">
+              <span key={quantity} className="qty-value" aria-live="polite">
+                {quantity}
+              </span>
+              <button onClick={() => setQuantity(Math.min(20, quantity + 1))} aria-label="Aumentar cantidad">
                 <Plus size={16} />
               </button>
             </div>
-            <button
-              className={`btn btn-primary pack-add-button ${buttonState ? "is-added" : ""}`}
-              onClick={addSelected}
-            >
-              {buttonState ? (
-                <>
-                  <Check size={17} /> Añadido
-                </>
-              ) : (
-                <>
-                  <ShoppingBag size={17} /> Añadir a la cesta
-                </>
-              )}
+            <button className={`btn btn-primary btn-lg add-main ${added ? "is-added" : ""}`} onClick={add}>
+              <span className="add-main-label">
+                {added ? <Check size={18} /> : <ShoppingBag size={18} />}
+                {added ? "Añadido" : "Añadir pack"}
+              </span>
+              <span className="add-main-price">{formatEuroPrice(shownPrice)}</span>
             </button>
           </div>
-          <small className="pack-total-note">
-            Total del pack: {formatEuroPrice(orderTotal.subtotal * quantity)}
-          </small>
-          {added && (
-            <div className="pack-confirmation" role="status" aria-live="polite">
-              <Check size={17} /> Pack añadido · <Link href="/cart">Ver cesta</Link>
-            </div>
-          )}
+          <ul className="delivery-rows">
+            <li>
+              <Truck size={18} />
+              <span>
+                Envío {formatEuroPrice(commerceConfig.standardShippingFee)} · <strong>gratis desde {formatEuroPrice(commerceConfig.freeShippingThreshold)}</strong>
+              </span>
+            </li>
+            <li>
+              <Store size={18} />
+              <span>
+                <strong>Recogida gratis</strong> en tienda
+              </span>
+            </li>
+            <li>
+              <RotateCcw size={18} />
+              <span>
+                <strong>14 días</strong> para desistir
+              </span>
+            </li>
+          </ul>
         </aside>
       </section>
-      <div className="pack-mobile-sticky">
-        <strong>{formatEuroPrice(packPrice * quantity)}</strong>
-        <button className="btn btn-primary" onClick={addSelected}>
-          Añadir a la cesta
-        </button>
+      <div className={`sticky-buy ${showBar ? "is-visible" : ""}`} aria-hidden={!showBar} inert={!showBar}>
+        <div className="sticky-buy-inner">
+          <div className="sticky-buy-copy">
+            <strong>{selected.name_es}</strong>
+            <span>{formatEuroPrice(packPrice * quantity)}</span>
+          </div>
+          <button className={`btn btn-primary ${added ? "is-added" : ""}`} onClick={add} tabIndex={showBar ? 0 : -1}>
+            {added ? <Check size={17} /> : <ShoppingBag size={17} />} {added ? "Añadido" : "Añadir pack"}
+          </button>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }

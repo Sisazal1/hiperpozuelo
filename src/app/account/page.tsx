@@ -1,63 +1,70 @@
 "use client";
 import Link from "next/link";
-import { Heart, MapPin, Package, UserRound, LogOut } from "lucide-react";
-import { AccountLayout } from "./account-layout";
+import { useEffect, useState } from "react";
+import { ArrowRight, Heart, Mail, Package, ShieldCheck } from "lucide-react";
+import { formatEuroPrice } from "@/lib/catalog/pricing";
+import { readLocalOrders, type LocalOrder } from "@/lib/orders";
+
+// No hay cuentas de cliente: la compra es como invitado y Stripe envía el recibo por email.
+// Antes había un login "demo" que pedía contraseña sin backend; se ha retirado por honestidad.
 export default function AccountPage() {
+  const [orders, setOrders] = useState<LocalOrder[] | null>(null);
+  useEffect(() => setOrders(readLocalOrders()), []);
   return (
-    <AccountLayout title="Hola, visitante">
-      <div className="account-welcome">
-        <span className="eyebrow">Cuenta demo</span>
-        <h1>Tu espacio Hiper Pozuelo.</h1>
-        <p>Gestiona tus pedidos, preferencias y favoritos desde un mismo lugar.</p>
+    <div className="account-page">
+      <div className="account-container">
+        <header className="account-hero" data-reveal>
+          <span className="eyebrow">Tu cuenta</span>
+          <h1>Aquí no hace falta contraseña.</h1>
+          <p>Compras como invitado: sin registrarte y con pago seguro en Stripe. El recibo te llega por email al pagar.</p>
+        </header>
+        <div className="account-cards" data-reveal-stagger>
+          <Link href="/favorites" className="account-card" data-reveal>
+            <Heart aria-hidden="true" />
+            <strong>Favoritos</strong>
+            <span>Lo que has guardado en este dispositivo.</span>
+          </Link>
+          <div className="account-card" data-reveal>
+            <Mail aria-hidden="true" />
+            <strong>Recibos</strong>
+            <span>Llegan al email que pongas al pagar.</span>
+          </div>
+          <div className="account-card" data-reveal>
+            <ShieldCheck aria-hidden="true" />
+            <strong>Pago seguro</strong>
+            <span>Tus datos de tarjeta los gestiona Stripe, nunca nosotros.</span>
+          </div>
+        </div>
+        <section className="account-orders" aria-labelledby="orders-title" data-reveal>
+          <h2 id="orders-title">
+            <Package size={20} aria-hidden="true" /> Pedidos en este dispositivo
+          </h2>
+          {orders === null ? (
+            <div className="skeleton-block" style={{ height: 96 }} aria-hidden="true" />
+          ) : orders.length ? (
+            <ul className="local-orders">
+              {orders.map((o) => (
+                <li key={o.id}>
+                  <span>
+                    <strong>{new Date(o.createdAt).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}</strong>
+                    <small>
+                      {o.items} {o.items === 1 ? "artículo" : "artículos"} · {o.delivery === "collect" ? "Recogida" : "Envío"} · ref. {o.id.slice(-8)}
+                    </small>
+                  </span>
+                  <b>{formatEuroPrice(o.amount)}</b>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="account-empty">
+              Aún no has hecho pedidos desde este dispositivo.{" "}
+              <Link href="/packs">
+                Empieza por un pack <ArrowRight size={14} />
+              </Link>
+            </p>
+          )}
+        </section>
       </div>
-      <div className="account-cards">
-        <AccountCard
-          href="/account/orders"
-          icon={<Package />}
-          title="Pedidos"
-          text="Consulta tus pedidos de demostración."
-        />
-        <AccountCard
-          href="/account/addresses"
-          icon={<MapPin />}
-          title="Direcciones"
-          text="Guarda tus direcciones localmente."
-        />
-        <AccountCard
-          href="/favorites"
-          icon={<Heart />}
-          title="Favoritos"
-          text="Revisa tus productos guardados."
-        />
-        <AccountCard
-          href="/account/profile"
-          icon={<UserRound />}
-          title="Perfil"
-          text="Edita tus preferencias demo."
-        />
-      </div>
-      <button className="account-logout">
-        <LogOut size={17} /> Cerrar sesión demo
-      </button>
-    </AccountLayout>
-  );
-}
-function AccountCard({
-  href,
-  icon,
-  title,
-  text,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  title: string;
-  text: string;
-}) {
-  return (
-    <Link href={href} className="account-card">
-      {icon}
-      <strong>{title}</strong>
-      <span>{text}</span>
-    </Link>
+    </div>
   );
 }

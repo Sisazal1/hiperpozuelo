@@ -2,7 +2,7 @@ import Link from "next/link";
 import { siteConfig } from "@/config/site";
 export default function ContactPage() {
   return (
-    <main className="commerce-page info-page" id="main-content">
+    <div className="commerce-page info-page">
       <div className="commerce-container">
         <span className="eyebrow">Ayuda</span>
         <h1>Contacto</h1>
@@ -12,6 +12,6 @@ export default function ContactPage() {
           Ver preguntas frecuentes
         </Link>
       </div>
-    </main>
+    </div>
   );
 }
