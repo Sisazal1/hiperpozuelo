@@ -20,3 +20,10 @@ Thumbs.db
 # local scratch
 work/
 outputs/
+
+# auditoría
+/test-results/
+/playwright-report/
+
+# local de Claude (rutas de esta máquina)
+/.claude/launch.json

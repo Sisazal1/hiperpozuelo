@@ -10,8 +10,12 @@
     "validate:catalog": "node scripts/validate-catalog.mjs",
     "check:launch": "node scripts/check-launch.mjs",
     "images": "node scripts/process-images.mjs",
-    "check:images": "node scripts/check-images.mjs"
-    ,"test:pricing": "node scripts/test-pack-pricing.mjs"
+    "check:images": "node scripts/check-images.mjs",
+    "test:pricing": "node scripts/test-pack-pricing.mjs",
+    "test:e2e": "playwright test --grep-invert captura",
+    "test:a11y": "playwright test a11y",
+    "test:shots": "playwright test visual",
+    "audit:lighthouse": "node scripts/lighthouse.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
@@ -22,16 +26,20 @@
     "stripe": "^17.5.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.1",
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@tailwindcss/postcss": "^4.0.0",
+    "chrome-launcher": "^1.2.3",
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.1.0",
+    "lighthouse": "^13.6.0",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.2",
-    "sharp": "^0.35.5"
+    "typescript": "^5.7.2"
   }
 }
