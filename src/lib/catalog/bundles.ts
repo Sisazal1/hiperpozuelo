@@ -11,3 +11,14 @@ export const calculateBundleTotal = (bundle: Bundle | string) => {
   const total = item.product_ids.reduce((sum, id) => sum + (getProductById(id)?.proposed_price_eur ?? 0), 0);
   return Math.round((total + Number.EPSILON) * 100) / 100;
 };
+
+const FAMILY_LABEL: Record<string, string> = {
+  kitchen: "Cocina",
+  bathroom: "Baño",
+  cleaning: "Limpieza",
+  stationery: "Estudio",
+};
+export const TIER_LABEL = { small: "Pequeño", medium: "Mediano", large: "Grande" } as const;
+/** Nombre visible del pack en español ("Pack Cocina · Pequeño"); el seed trae nombres en inglés. */
+export const bundleDisplayName = (bundle: Bundle) =>
+  `Pack ${FAMILY_LABEL[bundle.category_id] ?? bundle.category_id} · ${TIER_LABEL[bundle.tier]}`;

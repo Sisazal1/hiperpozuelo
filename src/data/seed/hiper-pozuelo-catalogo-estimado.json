@@ -669,7 +669,7 @@
         "bath-large"
       ],
       "cross_sell_ids": [
-    "HP-ORG-001"
+        "HP-ORG-001"
       ],
       "catalog_status": "proposed_not_verified",
       "orderable": false
@@ -761,7 +761,7 @@
       "name_en": "Bin bags (roll)",
       "category_id": "cleaning",
       "subcategory": "Residuos",
-      "description_es": "Rollo de bolsas; capacidad y número de unidades pendientes de confirmar.",
+      "description_es": "Rollo de bolsas.",
       "proposed_price_eur": 1.49,
       "price_confidence": "medium",
       "benchmark_note": "Action publica formatos de bolsas de basura aproximadamente entre 0,68 € y 2,48 €.",
@@ -814,7 +814,7 @@
       "name_en": "Mop replacement head",
       "category_id": "cleaning",
       "subcategory": "Útiles de limpieza",
-      "description_es": "Recambio universal; compatibilidad pendiente de confirmar.",
+      "description_es": "Recambio universal.",
       "proposed_price_eur": 1.99,
       "price_confidence": "low",
       "benchmark_note": "Precio propuesto para recambio genérico; la referencia Vileda de Action es 5,95 €, por lo que la calidad y compatibilidad cambiarían el precio.",
@@ -972,7 +972,7 @@
       "name_en": "Storage box with lid",
       "category_id": "organization",
       "subcategory": "Cajas",
-      "description_es": "Caja apilable con tapa; capacidad pendiente de confirmar.",
+      "description_es": "Caja apilable con tapa.",
       "proposed_price_eur": 4.99,
       "price_confidence": "medium",
       "benchmark_note": "Action publica cajas de 13 L aproximadamente por 4,98 € y otros formatos entre 1,99 € y 8,95 €.",
@@ -1130,7 +1130,7 @@
       "name_en": "Pencil set",
       "category_id": "stationery",
       "subcategory": "Escritura",
-      "description_es": "Set básico de lápices; unidades pendientes de confirmar.",
+      "description_es": "Set básico de lápices.",
       "proposed_price_eur": 1.49,
       "price_confidence": "medium",
       "benchmark_note": "Action publica sets de lápices de 16 unidades por 0,69 € y sets de colores a precios superiores.",
@@ -1400,7 +1400,7 @@
     {
       "id": "kitchen-small",
       "category_id": "kitchen",
-      "name_es": "Kitchen Pack Small",
+      "name_es": "Pack Cocina · Pequeño",
       "tier": "small",
       "description_es": "Una selección compacta de utensilios esenciales.",
       "product_ids": [
@@ -1418,7 +1418,7 @@
     {
       "id": "kitchen-medium",
       "category_id": "kitchen",
-      "name_es": "Kitchen Pack Medium",
+      "name_es": "Pack Cocina · Mediano",
       "tier": "medium",
       "description_es": "Más utensilios y preparación para el día a día.",
       "product_ids": [
@@ -1440,7 +1440,7 @@
     {
       "id": "kitchen-large",
       "category_id": "kitchen",
-      "name_es": "Kitchen Pack Large",
+      "name_es": "Pack Cocina · Grande",
       "tier": "large",
       "description_es": "Una solución más completa con almacenaje y accesorios adicionales.",
       "product_ids": [
@@ -1465,7 +1465,7 @@
     {
       "id": "bath-small",
       "category_id": "bathroom",
-      "name_es": "Bathroom Pack Small",
+      "name_es": "Pack Baño · Pequeño",
       "tier": "small",
       "description_es": "Accesorios básicos para equipar el baño.",
       "product_ids": [
@@ -1482,7 +1482,7 @@
     {
       "id": "bath-medium",
       "category_id": "bathroom",
-      "name_es": "Bathroom Pack Medium",
+      "name_es": "Pack Baño · Mediano",
       "tier": "medium",
       "description_es": "Añade almacenaje para mantener el baño ordenado.",
       "product_ids": [
@@ -1502,7 +1502,7 @@
     {
       "id": "bath-large",
       "category_id": "bathroom",
-      "name_es": "Bathroom Pack Large",
+      "name_es": "Pack Baño · Grande",
       "tier": "large",
       "description_es": "Una selección ampliada con ducha, colada y organización.",
       "product_ids": [
@@ -1527,7 +1527,7 @@
     {
       "id": "cleaning-small",
       "category_id": "cleaning",
-      "name_es": "Cleaning Pack Small",
+      "name_es": "Pack Limpieza · Pequeño",
       "tier": "small",
       "description_es": "Básicos para empezar con la limpieza del hogar.",
       "product_ids": [
@@ -1545,7 +1545,7 @@
     {
       "id": "cleaning-medium",
       "category_id": "cleaning",
-      "name_es": "Cleaning Pack Medium",
+      "name_es": "Pack Limpieza · Mediano",
       "tier": "medium",
       "description_es": "Más herramientas para mantener las superficies y los suelos.",
       "product_ids": [
@@ -1564,7 +1564,7 @@
     {
       "id": "cleaning-large",
       "category_id": "cleaning",
-      "name_es": "Cleaning Pack Large",
+      "name_es": "Pack Limpieza · Grande",
       "tier": "large",
       "description_es": "Una selección más completa de útiles de limpieza y residuos.",
       "product_ids": [
@@ -1585,7 +1585,7 @@
     {
       "id": "study-small",
       "category_id": "stationery",
-      "name_es": "Study Pack Small",
+      "name_es": "Pack Estudio · Pequeño",
       "tier": "small",
       "description_es": "Lo básico para tomar apuntes y organizar tareas.",
       "product_ids": [
@@ -1602,7 +1602,7 @@
     {
       "id": "study-medium",
       "category_id": "stationery",
-      "name_es": "Study Pack Medium",
+      "name_es": "Pack Estudio · Mediano",
       "tier": "medium",
       "description_es": "Más variedad de escritura y material de organización.",
       "product_ids": [
@@ -1623,7 +1623,7 @@
     {
       "id": "study-large",
       "category_id": "stationery",
-      "name_es": "Study Pack Large",
+      "name_es": "Pack Estudio · Grande",
       "tier": "large",
       "description_es": "Una selección ampliada para estudiar, dibujar y organizar el escritorio.",
       "product_ids": [

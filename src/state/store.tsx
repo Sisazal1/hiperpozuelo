@@ -1,7 +1,8 @@
 "use client";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { getProductById } from "@/lib/catalog/products";
-import { calculateBundleTotal } from "@/lib/catalog/bundles";
+import { cartSubtotal } from "@/lib/cart/totals";
+import { toast } from "@/components/motion/Toaster";
 import type { Product } from "@/types/catalog";
 
 export type ProductLine = {
@@ -55,6 +56,8 @@ type Store = {
   cartCount: number;
   favoriteProducts: Product[];
   cartTotal: number;
+  lastAdded: { lineId: string; at: number } | null;
+  hydrated: boolean;
 };
 const StoreContext = createContext<Store | null>(null);
 const normalize = (raw: unknown): CartLine[] =>
@@ -79,8 +82,8 @@ const normalize = (raw: unknown): CartLine[] =>
                   quantities: x.quantities || {},
                 },
               ]
-            : x?.type === "custom_bundle"
-              ? [x]
+            : x?.type === "custom_bundle" && Array.isArray(x.productIds)
+              ? [{ ...x, quantity: Math.max(1, x.quantity || 1), quantities: x.quantities || {} }]
               : [],
       )
     : [];
@@ -90,9 +93,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [discountCode, setDiscountCode] = useState("");
   const [hydrated, setHydrated] = useState(false);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+  const [lastAdded, setLastAdded] = useState<{ lineId: string; at: number } | null>(null);
+  const markAdded = (lineId: string) => setLastAdded({ lineId, at: Date.now() });
   useEffect(() => {
     try {
-      setFavorites(JSON.parse(localStorage.getItem("hp-favorites") || "[]"));
+      const fav = JSON.parse(localStorage.getItem("hp-favorites") || "[]");
+      setFavorites(Array.isArray(fav) ? fav.filter((x) => typeof x === "string") : []);
       setCart(normalize(JSON.parse(localStorage.getItem("hp-shared-cart") || "[]")));
       setDiscountCode(localStorage.getItem("hp-discount-code") || "");
     } catch {
@@ -124,7 +130,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       cartDrawerOpen,
       openCartDrawer: () => setCartDrawerOpen(true),
       closeCartDrawer: () => setCartDrawerOpen(false),
-      toggleFavorite: (id) => setFavorites((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id])),
+      toggleFavorite: (id) => {
+        const saved = favorites.includes(id);
+        setFavorites((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]));
+        const name = getProductById(id)?.name_es ?? "Producto";
+        toast(saved ? `${name} ya no está en favoritos` : `${name} guardado en favoritos`, saved ? "unheart" : "heart");
+      },
       addProduct: (id) => {
         setCart((x) => {
           const line = x.find((i) => i.type === "product" && i.productId === id);
@@ -135,6 +146,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 { lineId: `product-${id}`, type: "product", productId: id, quantity: 1, quantities: {} },
               ];
         });
+        markAdded(`product-${id}`);
         setCartDrawerOpen(true);
       },
       addBundle: (bundleId, tier) => {
@@ -154,13 +166,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 },
               ];
         });
+        markAdded(`bundle-${bundleId}-${tier}`);
         setCartDrawerOpen(true);
       },
       addCustomBundle: (productIds, quantities, categoryId) => {
+        const lineId = `custom-${Date.now()}`;
+        markAdded(lineId);
         setCart((x) => [
           ...x,
           {
-            lineId: `custom-${Date.now()}`,
+            lineId,
             type: "custom_bundle",
             productIds,
             quantities,
@@ -186,21 +201,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       clearCart: () => setCart([]),
       cartCount: cart.reduce((n, i) => n + i.quantity, 0),
       favoriteProducts: favorites.map(getProductById).filter(Boolean) as Product[],
-      cartTotal: cart.reduce(
-        (n, i) =>
-          i.type === "product"
-            ? n + (getProductById(i.productId)?.proposed_price_eur || 0) * i.quantity
-            : i.type === "bundle"
-              ? n + calculateBundleTotal(i.bundleId) * i.quantity
-              : n +
-                i.productIds.reduce(
-                  (s, id) => s + (getProductById(id)?.proposed_price_eur || 0) * (i.quantities[id] || 0),
-                  0,
-                ),
-        0,
-      ),
+      cartTotal: cartSubtotal(cart),
+      lastAdded,
+      hydrated,
     }),
-    [favorites, cart, cartDrawerOpen, discountCode],
+    [favorites, cart, cartDrawerOpen, discountCode, lastAdded, hydrated],
   );
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getBundleById, calculateBundleTotal } from "@/lib/catalog/bundles";
+import { getBundleById, bundleDisplayName } from "@/lib/catalog/bundles";
+import { lineQuantity, lineUnitPrice } from "@/lib/cart/totals";
 import { getProductById } from "@/lib/catalog/products";
 import { calculateOrderTotals, calculateDiscount, commerceConfig } from "@/config/commerce";
 
@@ -33,6 +34,7 @@ function welcomeCouponId(stripe: Stripe): Promise<string> {
 
 type Line = {
   type: "product" | "bundle" | "custom_bundle";
+  lineId?: string;
   productId?: string;
   bundleId?: string;
   productIds?: string[];
@@ -47,45 +49,25 @@ function stripeClient() {
 }
 
 function pricedLine(line: Line) {
-  const quantity = Math.max(1, Math.floor(Number(line.quantity) || 1));
+  // Mismo cálculo que ve el cliente (src/lib/cart/totals.ts); el importe nunca viene del navegador.
+  if (!line || typeof line !== "object") return null;
+  const unit = lineUnitPrice(line);
+  if (unit === null) return null;
+  const quantity = Math.min(99, lineQuantity(line));
   if (line.type === "product") {
-    const product = line.productId ? getProductById(line.productId) : undefined;
-    return product
-      ? {
-          id: product.id,
-          name: product.name_es,
-          amount: Math.round(product.proposed_price_eur * 100),
-          quantity,
-        }
-      : null;
+    const product = getProductById(line.productId!)!;
+    return { id: product.id, name: product.name_es, amount: Math.round(unit * 100), quantity };
   }
   if (line.type === "bundle") {
-    const bundle = line.bundleId ? getBundleById(line.bundleId) : undefined;
-    return bundle
-      ? {
-          id: bundle.id,
-          name: bundle.name_es,
-          amount: Math.round(calculateBundleTotal(bundle) * 100),
-          quantity,
-        }
-      : null;
+    const bundle = getBundleById(line.bundleId!)!;
+    return { id: bundle.id, name: bundleDisplayName(bundle), amount: Math.round(unit * 100), quantity };
   }
-  const ids = line.productIds || [];
-  const quantities = line.quantities || {};
-  const products = ids.map((id) => getProductById(id)).filter(Boolean);
-  return products.length === ids.length && ids.length > 0
-    ? {
-        id: `custom:${ids.join(",")}`,
-        name: "Pack personalizado",
-        amount: Math.round(
-          products.reduce(
-            (sum, product) => sum + product!.proposed_price_eur * (quantities[product!.id] || 0),
-            0,
-          ) * 100,
-        ),
-        quantity,
-      }
-    : null;
+  return {
+    id: `custom:${(line.productIds || []).join(",")}`,
+    name: "Pack personalizado",
+    amount: Math.round(unit * 100),
+    quantity,
+  };
 }
 
 export async function POST(req: Request) {
@@ -100,7 +82,9 @@ export async function POST(req: Request) {
     } | null;
     if (!body) return NextResponse.json({ error: "invalid_request" }, { status: 400 });
     const delivery = body.delivery === "collect" ? "collect" : "delivery";
-    const lines = (body.lines || []).map(pricedLine).filter(Boolean) as {
+    if (!Array.isArray(body.lines) || body.lines.length > 50)
+      return NextResponse.json({ error: "invalid_request" }, { status: 400 });
+    const lines = body.lines.map(pricedLine).filter(Boolean) as {
       id: string;
       name: string;
       amount: number;
