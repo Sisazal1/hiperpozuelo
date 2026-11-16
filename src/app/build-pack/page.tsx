@@ -9,4 +9,241 @@ import { useStore } from "@/state/store";
 import { calculateOrderTotals, commerceConfig, shippingProgress } from "@/config/commerce";
 
 const steps = ["Estancia", "Productos", "Revisar"];
-export default function BuildPackPage() { const products = getAllProducts().filter((p) => p.pack_eligible); const categories = getAllCategories(); const { addCustomBundle, updateCustomBundle, cart } = useStore(); const [category, setCategory] = useState(categories[0]?.id ?? ""); const [selected, setSelected] = useState<Record<string, number>>({}); const [editingId, setEditingId] = useState<string | null>(null); const [step, setStep] = useState(1); const [query, setQuery] = useState(""); const [filter, setFilter] = useState(""); useEffect(() => { const id = new URLSearchParams(window.location.search).get("edit"); const line = cart.find((x) => x.lineId === id && x.type === "custom_bundle"); const saved = localStorage.getItem("hp-build-pack-draft"); if (line && line.type === "custom_bundle") { setEditingId(line.lineId); setSelected(line.quantities); if (line.categoryId) setCategory(line.categoryId); } else if (saved) { try { const draft = JSON.parse(saved); setSelected(draft.selected || {}); setCategory(draft.category || category); setStep(draft.step || 1); } catch { localStorage.removeItem("hp-build-pack-draft"); } } }, [cart]); useEffect(() => { localStorage.setItem("hp-build-pack-draft", JSON.stringify({ selected, category, step })); }, [selected, category, step]); const visible = useMemo(() => products.filter((p) => (!category || p.category_id === category) && (!filter || p.subcategory === filter) && (!query || `${p.name_es} ${p.subcategory}`.toLocaleLowerCase().includes(query.toLocaleLowerCase()))), [products, category, filter, query]); const subcategories = [...new Set(products.filter((p) => !category || p.category_id === category).map((p) => p.subcategory))]; const total = Object.entries(selected).reduce((sum, [id, quantity]) => sum + (products.find((p) => p.id === id)?.proposed_price_eur ?? 0) * quantity, 0); const itemCount = Object.values(selected).reduce((sum, quantity) => sum + quantity, 0); const totals = calculateOrderTotals(total, "delivery"); const change = (id: string, delta: number) => setSelected((current) => { const quantity = Math.max(0, (current[id] ?? 0) + delta); const next = { ...current }; if (quantity) next[id] = quantity; else delete next[id]; return next; }); const save = () => { if (!itemCount) { setStep(2); return; } const ids = Object.keys(selected); if (editingId) updateCustomBundle(editingId, ids, selected, category); else addCustomBundle(ids, selected, category); localStorage.removeItem("hp-build-pack-draft"); window.setTimeout(() => { window.location.href = "/cart"; }, 100); }; return <main className="builder-page" id="main-content"><header className="builder-header"><Link href="/shop" className="back-link"><ArrowLeft size={17}/> Volver al catálogo</Link><span className="eyebrow">Pack a tu medida</span><h1>{editingId ? "Edita tu pack" : "Crea tu pack"}</h1><p>Elige una estancia, añade productos y revisa el total antes de guardar.</p><nav className="builder-steps" aria-label="Progreso del pack">{steps.map((label, index) => <button key={label} className={step === index + 1 ? "active" : step > index + 1 ? "complete" : ""} onClick={() => index + 1 <= step && setStep(index + 1)}><span>{step > index + 1 ? <Check size={16}/> : index + 1}</span>{label}</button>)}</nav></header><div className="builder-layout"><section className="builder-selection">{step === 1 && <div className="builder-step-panel"><h2>¿Qué estancia equipas?</h2><div className="builder-category-grid">{categories.slice(0, 9).map((item) => <button key={item.id} className={category === item.id ? "selected" : ""} onClick={() => { setCategory(item.id); setStep(2); }}>{item.name_es}<small>{products.filter((p) => p.category_id === item.id).length} productos</small></button>)}</div></div>}{step >= 2 && <><div className="builder-toolbar"><div className="builder-search"><Search size={17}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar en esta estancia" aria-label="Buscar productos"/></div><select value={filter} onChange={(event) => setFilter(event.target.value)} aria-label="Filtrar por subcategoría"><option value="">Todas</option>{subcategories.map((item) => <option key={item}>{item}</option>)}</select></div><p className="builder-helper">Selecciona productos del catálogo y ajusta las cantidades.</p><div className="builder-products">{visible.map((product) => <article className={`builder-product ${selected[product.id] ? "chosen" : ""}`} key={product.id}><div className="builder-image category-tile" aria-hidden="true"/><div className="builder-product-info"><span className="product-category">{product.subcategory}</span><h3>{product.name_es}</h3><strong>{formatEuroPrice(product.proposed_price_eur)}</strong>{selected[product.id] ? <div className="quantity-control builder-stepper"><button aria-label="Reducir cantidad" onClick={() => change(product.id, -1)}><Minus size={15}/></button><strong>{selected[product.id]}</strong><button aria-label="Aumentar cantidad" onClick={() => change(product.id, 1)}><Plus size={15}/></button></div> : <button className="builder-add" onClick={() => change(product.id, 1)}>Añadir al pack <Plus size={16}/></button>}</div></article>)}</div></>}{step === 3 && <div className="builder-review"><h2>Revisa tu pack</h2><p>{itemCount} artículos seleccionados.</p>{Object.entries(selected).map(([id, quantity]) => <div key={id}><span>{products.find((p) => p.id === id)?.name_es}</span><strong>× {quantity}</strong></div>)}</div>}<div className="builder-step-actions">{step > 1 && <button className="btn btn-secondary" onClick={() => setStep(step - 1)}>Atrás</button>}{step < 3 && <button className="btn btn-primary" onClick={() => setStep(step + 1)} disabled={step === 2 && !itemCount}>Revisar pack</button>}</div></section><aside className="pack-summary builder-summary"><span className="eyebrow">Tu selección</span><h2>Pack personalizado</h2><p>{itemCount} {itemCount === 1 ? "artículo" : "artículos"}</p>{Object.entries(selected).map(([id, quantity]) => <div className="summary-item" key={id}><strong>{products.find((p) => p.id === id)?.name_es}</strong><small>× {quantity}</small></div>)}<div className="builder-shipping"><Truck size={17}/><span>{total >= commerceConfig.freeShippingThreshold ? "Envío gratis alcanzado" : `Añade ${formatEuroPrice(commerceConfig.freeShippingThreshold - total)} para envío gratis`}<i><b style={{ width: `${shippingProgress(total)}%` }}/></i></span></div><div className="summary-total"><span>Total</span><strong>{formatEuroPrice(totals.subtotal)}</strong></div>{step === 3 && <button className="summary-cta" disabled={!itemCount} onClick={save}><ShoppingBag size={16}/> {editingId ? "Guardar cambios" : "Añadir pack a la cesta"}</button>}</aside></div></main>; }
+export default function BuildPackPage() {
+  const products = getAllProducts().filter((p) => p.pack_eligible);
+  const categories = getAllCategories();
+  const { addCustomBundle, updateCustomBundle, cart } = useStore();
+  const [category, setCategory] = useState(categories[0]?.id ?? "");
+  const [selected, setSelected] = useState<Record<string, number>>({});
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [step, setStep] = useState(1);
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("");
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("edit");
+    const line = cart.find((x) => x.lineId === id && x.type === "custom_bundle");
+    const saved = localStorage.getItem("hp-build-pack-draft");
+    if (line && line.type === "custom_bundle") {
+      setEditingId(line.lineId);
+      setSelected(line.quantities);
+      if (line.categoryId) setCategory(line.categoryId);
+    } else if (saved) {
+      try {
+        const draft = JSON.parse(saved);
+        setSelected(draft.selected || {});
+        setCategory(draft.category || category);
+        setStep(draft.step || 1);
+      } catch {
+        localStorage.removeItem("hp-build-pack-draft");
+      }
+    }
+  }, [cart]);
+  useEffect(() => {
+    localStorage.setItem("hp-build-pack-draft", JSON.stringify({ selected, category, step }));
+  }, [selected, category, step]);
+  const visible = useMemo(
+    () =>
+      products.filter(
+        (p) =>
+          (!category || p.category_id === category) &&
+          (!filter || p.subcategory === filter) &&
+          (!query || `${p.name_es} ${p.subcategory}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())),
+      ),
+    [products, category, filter, query],
+  );
+  const subcategories = [
+    ...new Set(products.filter((p) => !category || p.category_id === category).map((p) => p.subcategory)),
+  ];
+  const total = Object.entries(selected).reduce(
+    (sum, [id, quantity]) => sum + (products.find((p) => p.id === id)?.proposed_price_eur ?? 0) * quantity,
+    0,
+  );
+  const itemCount = Object.values(selected).reduce((sum, quantity) => sum + quantity, 0);
+  const totals = calculateOrderTotals(total, "delivery");
+  const change = (id: string, delta: number) =>
+    setSelected((current) => {
+      const quantity = Math.max(0, (current[id] ?? 0) + delta);
+      const next = { ...current };
+      if (quantity) next[id] = quantity;
+      else delete next[id];
+      return next;
+    });
+  const save = () => {
+    if (!itemCount) {
+      setStep(2);
+      return;
+    }
+    const ids = Object.keys(selected);
+    if (editingId) updateCustomBundle(editingId, ids, selected, category);
+    else addCustomBundle(ids, selected, category);
+    localStorage.removeItem("hp-build-pack-draft");
+    window.setTimeout(() => {
+      window.location.href = "/cart";
+    }, 100);
+  };
+  return (
+    <main className="builder-page" id="main-content">
+      <header className="builder-header">
+        <Link href="/shop" className="back-link">
+          <ArrowLeft size={17} /> Volver al catálogo
+        </Link>
+        <span className="eyebrow">Pack a tu medida</span>
+        <h1>{editingId ? "Edita tu pack" : "Crea tu pack"}</h1>
+        <p>Elige una estancia, añade productos y revisa el total antes de guardar.</p>
+        <nav className="builder-steps" aria-label="Progreso del pack">
+          {steps.map((label, index) => (
+            <button
+              key={label}
+              className={step === index + 1 ? "active" : step > index + 1 ? "complete" : ""}
+              onClick={() => index + 1 <= step && setStep(index + 1)}
+            >
+              <span>{step > index + 1 ? <Check size={16} /> : index + 1}</span>
+              {label}
+            </button>
+          ))}
+        </nav>
+      </header>
+      <div className="builder-layout">
+        <section className="builder-selection">
+          {step === 1 && (
+            <div className="builder-step-panel">
+              <h2>¿Qué estancia equipas?</h2>
+              <div className="builder-category-grid">
+                {categories.slice(0, 9).map((item) => (
+                  <button
+                    key={item.id}
+                    className={category === item.id ? "selected" : ""}
+                    onClick={() => {
+                      setCategory(item.id);
+                      setStep(2);
+                    }}
+                  >
+                    {item.name_es}
+                    <small>{products.filter((p) => p.category_id === item.id).length} productos</small>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {step >= 2 && (
+            <>
+              <div className="builder-toolbar">
+                <div className="builder-search">
+                  <Search size={17} />
+                  <input
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Buscar en esta estancia"
+                    aria-label="Buscar productos"
+                  />
+                </div>
+                <select
+                  value={filter}
+                  onChange={(event) => setFilter(event.target.value)}
+                  aria-label="Filtrar por subcategoría"
+                >
+                  <option value="">Todas</option>
+                  {subcategories.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+              </div>
+              <p className="builder-helper">Selecciona productos del catálogo y ajusta las cantidades.</p>
+              <div className="builder-products">
+                {visible.map((product) => (
+                  <article
+                    className={`builder-product ${selected[product.id] ? "chosen" : ""}`}
+                    key={product.id}
+                  >
+                    <div className="builder-image category-tile" aria-hidden="true" />
+                    <div className="builder-product-info">
+                      <span className="product-category">{product.subcategory}</span>
+                      <h3>{product.name_es}</h3>
+                      <strong>{formatEuroPrice(product.proposed_price_eur)}</strong>
+                      {selected[product.id] ? (
+                        <div className="quantity-control builder-stepper">
+                          <button aria-label="Reducir cantidad" onClick={() => change(product.id, -1)}>
+                            <Minus size={15} />
+                          </button>
+                          <strong>{selected[product.id]}</strong>
+                          <button aria-label="Aumentar cantidad" onClick={() => change(product.id, 1)}>
+                            <Plus size={15} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button className="builder-add" onClick={() => change(product.id, 1)}>
+                          Añadir al pack <Plus size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </>
+          )}
+          {step === 3 && (
+            <div className="builder-review">
+              <h2>Revisa tu pack</h2>
+              <p>{itemCount} artículos seleccionados.</p>
+              {Object.entries(selected).map(([id, quantity]) => (
+                <div key={id}>
+                  <span>{products.find((p) => p.id === id)?.name_es}</span>
+                  <strong>× {quantity}</strong>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="builder-step-actions">
+            {step > 1 && (
+              <button className="btn btn-secondary" onClick={() => setStep(step - 1)}>
+                Atrás
+              </button>
+            )}
+            {step < 3 && (
+              <button
+                className="btn btn-primary"
+                onClick={() => setStep(step + 1)}
+                disabled={step === 2 && !itemCount}
+              >
+                Revisar pack
+              </button>
+            )}
+          </div>
+        </section>
+        <aside className="pack-summary builder-summary">
+          <span className="eyebrow">Tu selección</span>
+          <h2>Pack personalizado</h2>
+          <p>
+            {itemCount} {itemCount === 1 ? "artículo" : "artículos"}
+          </p>
+          {Object.entries(selected).map(([id, quantity]) => (
+            <div className="summary-item" key={id}>
+              <strong>{products.find((p) => p.id === id)?.name_es}</strong>
+              <small>× {quantity}</small>
+            </div>
+          ))}
+          <div className="builder-shipping">
+            <Truck size={17} />
+            <span>
+              {total >= commerceConfig.freeShippingThreshold
+                ? "Envío gratis alcanzado"
+                : `Añade ${formatEuroPrice(commerceConfig.freeShippingThreshold - total)} para envío gratis`}
+              <i>
+                <b style={{ width: `${shippingProgress(total)}%` }} />
+              </i>
+            </span>
+          </div>
+          <div className="summary-total">
+            <span>Total</span>
+            <strong>{formatEuroPrice(totals.subtotal)}</strong>
+          </div>
+          {step === 3 && (
+            <button className="summary-cta" disabled={!itemCount} onClick={save}>
+              <ShoppingBag size={16} /> {editingId ? "Guardar cambios" : "Añadir pack a la cesta"}
+            </button>
+          )}
+        </aside>
+      </div>
+    </main>
+  );
+}

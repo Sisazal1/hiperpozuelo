@@ -102,7 +102,10 @@ export default function WelcomeScratch() {
     };
     paint();
     setFoil(canvas.toDataURL());
-    const observer = new ResizeObserver(() => { paint(); setFoil(canvas.toDataURL()); });
+    const observer = new ResizeObserver(() => {
+      paint();
+      setFoil(canvas.toDataURL());
+    });
     observer.observe(card);
     return () => observer.disconnect();
   }, [open, revealed]);
@@ -174,11 +177,15 @@ export default function WelcomeScratch() {
           <X size={18} aria-hidden="true" />
         </button>
         <div className="welcome-head">
-          <span className="welcome-icon" aria-hidden="true"><Gift size={20} /></span>
+          <span className="welcome-icon" aria-hidden="true">
+            <Gift size={20} />
+          </span>
           <p className="welcome-eyebrow">Regalo de bienvenida</p>
         </div>
         <h2 id="welcome-title">Rasca y gana un 10%</h2>
-        <p id="welcome-desc">Un descuento real en tu primera compra, sobre los productos y no sobre el envío.</p>
+        <p id="welcome-desc">
+          Un descuento real en tu primera compra, sobre los productos y no sobre el envío.
+        </p>
 
         <div className="scratch-stage" ref={cardRef}>
           <div className="scratch-prize" aria-hidden={!revealed}>
@@ -200,8 +207,12 @@ export default function WelcomeScratch() {
                   scratchAt(e.clientX, e.clientY);
                 }}
                 onPointerMove={(e) => scratchAt(e.clientX, e.clientY)}
-                onPointerUp={() => { scratching.current = false; }}
-                onPointerLeave={() => { scratching.current = false; }}
+                onPointerUp={() => {
+                  scratching.current = false;
+                }}
+                onPointerLeave={() => {
+                  scratching.current = false;
+                }}
               />
             </>
           )}
@@ -209,7 +220,9 @@ export default function WelcomeScratch() {
 
         {!revealed ? (
           <div className="scratch-controls">
-            <div className="scratch-meter" aria-hidden="true"><span style={{ width: `${Math.round(progress * 100)}%` }} /></div>
+            <div className="scratch-meter" aria-hidden="true">
+              <span style={{ width: `${Math.round(progress * 100)}%` }} />
+            </div>
             <button type="button" className="welcome-secondary" onClick={() => setRevealed(true)}>
               Revelar sin rascar
             </button>
@@ -217,16 +230,27 @@ export default function WelcomeScratch() {
         ) : (
           <>
             <div className="welcome-actions">
-              <button type="button" className="welcome-primary" onClick={apply}>Aplicar a mi cesta</button>
-              <button type="button" className="welcome-secondary" onClick={copy} aria-label="Copiar el código de descuento">
+              <button type="button" className="welcome-primary" onClick={apply}>
+                Aplicar a mi cesta
+              </button>
+              <button
+                type="button"
+                className="welcome-secondary"
+                onClick={copy}
+                aria-label="Copiar el código de descuento"
+              >
                 {copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
                 {copied ? "Copiado" : "Copiar"}
               </button>
             </div>
-            <button type="button" className="welcome-dismiss-link" onClick={dismiss}>Ahora no, gracias</button>
+            <button type="button" className="welcome-dismiss-link" onClick={dismiss}>
+              Ahora no, gracias
+            </button>
           </>
         )}
-        <small className="welcome-note">Válido en tu primera compra. No acumulable con otras promociones.</small>
+        <small className="welcome-note">
+          Válido en tu primera compra. No acumulable con otras promociones.
+        </small>
       </section>
     </div>
   );

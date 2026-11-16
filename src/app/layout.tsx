@@ -21,5 +21,19 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="es"><body className={`${display.variable} ${sans.variable}`}><StoreProvider><AnnouncementTicker /><GlobalNavbar />{children}<SiteFooter /><CartDrawer /><CookieBanner /><WelcomeScratch /></StoreProvider></body></html>;
+  return (
+    <html lang="es">
+      <body className={`${display.variable} ${sans.variable}`}>
+        <StoreProvider>
+          <AnnouncementTicker />
+          <GlobalNavbar />
+          {children}
+          <SiteFooter />
+          <CartDrawer />
+          <CookieBanner />
+          <WelcomeScratch />
+        </StoreProvider>
+      </body>
+    </html>
+  );
 }

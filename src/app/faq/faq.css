@@ -1,1 +1,11 @@
-.faq-access-link{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:999px;background:var(--brand-red);color:#fff;font-weight:700;text-decoration:none}
+.faq-access-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: var(--brand-red);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}

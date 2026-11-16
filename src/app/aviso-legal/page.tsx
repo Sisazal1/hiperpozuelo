@@ -1,2 +1,16 @@
 import Link from "next/link";
-export default function LegalPage(){return <main className="commerce-page info-page" id="main-content"><div className="commerce-container"><span className="eyebrow">Información legal</span><h1>Aviso legal</h1><p>Responsable: Hiper Pozuelo S.L.</p><p>El CIF, domicilio social y datos de contacto se publicarán cuando estén confirmados.</p><Link href="/" className="btn btn-primary">Volver a inicio</Link></div></main>}
+export default function LegalPage() {
+  return (
+    <main className="commerce-page info-page" id="main-content">
+      <div className="commerce-container">
+        <span className="eyebrow">Información legal</span>
+        <h1>Aviso legal</h1>
+        <p>Responsable: Hiper Pozuelo S.L.</p>
+        <p>El CIF, domicilio social y datos de contacto se publicarán cuando estén confirmados.</p>
+        <Link href="/" className="btn btn-primary">
+          Volver a inicio
+        </Link>
+      </div>
+    </main>
+  );
+}

@@ -1,2 +1,23 @@
 import Link from "next/link";
-export default function FAQPage(){return <main className="commerce-page info-page" id="main-content"><div className="commerce-container"><span className="eyebrow">Ayuda</span><h1>Preguntas frecuentes</h1><h2>¿Puedo comprar ahora?</h2><p>Puedes recorrer la tienda y preparar tu cesta. El cobro y el envío comenzarán cuando se confirme la apertura.</p><h2>¿Cómo se guarda mi cesta?</h2><p>La cesta y tus favoritos se conservan en este navegador mediante almacenamiento técnico.</p><h2>¿Cuándo recibiré mi pedido?</h2><p>El plazo se comunicará cuando la logística de la tienda esté confirmada.</p><Link href="/shop" className="btn btn-primary">Explorar productos</Link></div></main>}
+export default function FAQPage() {
+  return (
+    <main className="commerce-page info-page" id="main-content">
+      <div className="commerce-container">
+        <span className="eyebrow">Ayuda</span>
+        <h1>Preguntas frecuentes</h1>
+        <h2>¿Puedo comprar ahora?</h2>
+        <p>
+          Puedes recorrer la tienda y preparar tu cesta. El cobro y el envío comenzarán cuando se confirme la
+          apertura.
+        </p>
+        <h2>¿Cómo se guarda mi cesta?</h2>
+        <p>La cesta y tus favoritos se conservan en este navegador mediante almacenamiento técnico.</p>
+        <h2>¿Cuándo recibiré mi pedido?</h2>
+        <p>El plazo se comunicará cuando la logística de la tienda esté confirmada.</p>
+        <Link href="/shop" className="btn btn-primary">
+          Explorar productos
+        </Link>
+      </div>
+    </main>
+  );
+}

@@ -2,7 +2,205 @@
 import { useState } from "react";
 import { ChevronDown, Heart, LoaderCircle, Search, ShoppingBag, X } from "lucide-react";
 
-function Button({ variant = "primary", size = "md", loading = false, onClick, children }: { variant?: "primary" | "secondary" | "ghost" | "dark"; size?: "sm" | "md" | "lg"; loading?: boolean; onClick?: () => void; children: React.ReactNode }) { return <button className={`sg-button sg-${variant} sg-${size}`} disabled={loading} onClick={onClick}>{loading ? <><LoaderCircle className="sg-spin" size={16}/> Cargando</> : children}</button>; }
-function Field({ select = false }: { select?: boolean }) { return select ? <label className="sg-field">Categoría<select defaultValue=""><option value="">Elige una categoría</option><option>Cocina</option><option>Baño</option></select></label> : <label className="sg-field">Buscar<input placeholder="Escribe una búsqueda"/></label>; }
-function Card({ pack = false }: { pack?: boolean }) { return <article className="sg-card"><div className="sg-media"><span aria-hidden="true">{pack ? "P" : "C"}</span><button className="sg-icon" aria-label="Guardar"><Heart size={18}/></button></div><div className="sg-card-body"><span className="sg-kicker">{pack ? "Pack hogar" : "Cocina"}</span><h3>{pack ? "Cocina lista" : "Organizador multiuso"}</h3><strong className="sg-price">{pack ? "24,90 €" : "4,90 €"}</strong><Button size="sm">Añadir</Button></div></article>; }
-export default function Styleguide() { const [open, setOpen] = useState(false); const [toast, setToast] = useState(false); return <main className="sg-page" id="main-content"><header className="sg-hero"><span className="sg-kicker">Sistema Hiper Pozuelo</span><h1>Una casa lista. Sin dar mil vueltas.</h1><p>Componentes, estados y tokens para una experiencia clara, cercana y consistente.</p></header><section className="sg-section"><h2>Paleta y tipografía</h2><div className="sg-palette"><div><i className="sg-swatch sg-swatch-bg"/><strong>Off-white</strong><span>#FAF7F2 · 15.4:1</span></div><div><i className="sg-swatch sg-swatch-ink"/><strong>Tinta</strong><span>#1A1A1A · 17.4:1</span></div><div><i className="sg-swatch sg-swatch-red"/><strong>Rojo CTA</strong><span>#C8102E · 5.1:1</span></div><div><i className="sg-swatch sg-swatch-sage"/><strong>Salvia</strong><span>#DCE8DF · apoyo</span></div></div><div className="sg-type"><span className="sg-display">Cocina lista.</span><p>Inter para texto, Bricolage Grotesque para titulares con carácter.</p></div></section><section className="sg-section"><h2>Botones y controles</h2><div className="sg-row"><Button>Primary</Button><Button variant="secondary">Secondary</Button><Button variant="ghost">Ghost</Button><Button variant="dark">Dark</Button><Button loading>Loading</Button></div><div className="sg-row"><Button size="sm">Small</Button><Button size="md">Medium</Button><Button size="lg">Large</Button></div><div className="sg-control-grid"><Field/><Field select/></div><div className="sg-row"><span className="sg-chip">Cocina <X size={14}/></span><span className="sg-badge">Nuevo</span><span className="sg-badge sg-badge-dark">Pack</span></div></section><section className="sg-section"><h2>Cards y navegación</h2><div className="sg-cards"><Card/><Card pack/></div><div className="sg-stepper"><span className="done">1</span><i/><span className="active">2</span><i/><span>3</span><i/><span>4</span></div><nav className="sg-breadcrumbs"><a href="#components">Inicio</a><span>/</span><strong>Styleguide</strong></nav></section><section className="sg-section"><h2>Accordion, modal y feedback</h2><details className="sg-accordion"><summary>¿Qué incluye un pack? <ChevronDown size={18}/></summary><p>Una selección ordenada para resolver una necesidad de casa.</p></details><div className="sg-row"><Button variant="secondary" onClick={() => setOpen(true)}>Abrir modal</Button><Button variant="ghost" onClick={() => { setToast(true); window.setTimeout(() => setToast(false), 2600); }}>Mostrar toast</Button></div>{open && <div className="sg-modal-backdrop" role="dialog" aria-modal="true" aria-label="Vista previa"><div className="sg-modal"><button className="sg-icon sg-modal-close" onClick={() => setOpen(false)} aria-label="Cerrar"><X/></button><h3>Tu cesta</h3><p>El contenido se mantiene visible y fácil de revisar.</p><Button onClick={() => setOpen(false)}>Continuar</Button></div></div>}{toast && <div className="sg-toast" role="status">Añadido a la cesta <ShoppingBag size={16}/></div>}</section><section className="sg-section"><h2>Estados auxiliares</h2><div className="sg-skeleton"><i/><i/><i/></div><div className="sg-empty"><Search size={22}/><strong>No hay resultados</strong><span>Prueba otra búsqueda.</span></div></section></main>; }
+function Button({
+  variant = "primary",
+  size = "md",
+  loading = false,
+  onClick,
+  children,
+}: {
+  variant?: "primary" | "secondary" | "ghost" | "dark";
+  size?: "sm" | "md" | "lg";
+  loading?: boolean;
+  onClick?: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button className={`sg-button sg-${variant} sg-${size}`} disabled={loading} onClick={onClick}>
+      {loading ? (
+        <>
+          <LoaderCircle className="sg-spin" size={16} /> Cargando
+        </>
+      ) : (
+        children
+      )}
+    </button>
+  );
+}
+function Field({ select = false }: { select?: boolean }) {
+  return select ? (
+    <label className="sg-field">
+      Categoría
+      <select defaultValue="">
+        <option value="">Elige una categoría</option>
+        <option>Cocina</option>
+        <option>Baño</option>
+      </select>
+    </label>
+  ) : (
+    <label className="sg-field">
+      Buscar
+      <input placeholder="Escribe una búsqueda" />
+    </label>
+  );
+}
+function Card({ pack = false }: { pack?: boolean }) {
+  return (
+    <article className="sg-card">
+      <div className="sg-media">
+        <span aria-hidden="true">{pack ? "P" : "C"}</span>
+        <button className="sg-icon" aria-label="Guardar">
+          <Heart size={18} />
+        </button>
+      </div>
+      <div className="sg-card-body">
+        <span className="sg-kicker">{pack ? "Pack hogar" : "Cocina"}</span>
+        <h3>{pack ? "Cocina lista" : "Organizador multiuso"}</h3>
+        <strong className="sg-price">{pack ? "24,90 €" : "4,90 €"}</strong>
+        <Button size="sm">Añadir</Button>
+      </div>
+    </article>
+  );
+}
+export default function Styleguide() {
+  const [open, setOpen] = useState(false);
+  const [toast, setToast] = useState(false);
+  return (
+    <main className="sg-page" id="main-content">
+      <header className="sg-hero">
+        <span className="sg-kicker">Sistema Hiper Pozuelo</span>
+        <h1>Una casa lista. Sin dar mil vueltas.</h1>
+        <p>Componentes, estados y tokens para una experiencia clara, cercana y consistente.</p>
+      </header>
+      <section className="sg-section">
+        <h2>Paleta y tipografía</h2>
+        <div className="sg-palette">
+          <div>
+            <i className="sg-swatch sg-swatch-bg" />
+            <strong>Off-white</strong>
+            <span>#FAF7F2 · 15.4:1</span>
+          </div>
+          <div>
+            <i className="sg-swatch sg-swatch-ink" />
+            <strong>Tinta</strong>
+            <span>#1A1A1A · 17.4:1</span>
+          </div>
+          <div>
+            <i className="sg-swatch sg-swatch-red" />
+            <strong>Rojo CTA</strong>
+            <span>#C8102E · 5.1:1</span>
+          </div>
+          <div>
+            <i className="sg-swatch sg-swatch-sage" />
+            <strong>Salvia</strong>
+            <span>#DCE8DF · apoyo</span>
+          </div>
+        </div>
+        <div className="sg-type">
+          <span className="sg-display">Cocina lista.</span>
+          <p>Inter para texto, Bricolage Grotesque para titulares con carácter.</p>
+        </div>
+      </section>
+      <section className="sg-section">
+        <h2>Botones y controles</h2>
+        <div className="sg-row">
+          <Button>Primary</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="dark">Dark</Button>
+          <Button loading>Loading</Button>
+        </div>
+        <div className="sg-row">
+          <Button size="sm">Small</Button>
+          <Button size="md">Medium</Button>
+          <Button size="lg">Large</Button>
+        </div>
+        <div className="sg-control-grid">
+          <Field />
+          <Field select />
+        </div>
+        <div className="sg-row">
+          <span className="sg-chip">
+            Cocina <X size={14} />
+          </span>
+          <span className="sg-badge">Nuevo</span>
+          <span className="sg-badge sg-badge-dark">Pack</span>
+        </div>
+      </section>
+      <section className="sg-section">
+        <h2>Cards y navegación</h2>
+        <div className="sg-cards">
+          <Card />
+          <Card pack />
+        </div>
+        <div className="sg-stepper">
+          <span className="done">1</span>
+          <i />
+          <span className="active">2</span>
+          <i />
+          <span>3</span>
+          <i />
+          <span>4</span>
+        </div>
+        <nav className="sg-breadcrumbs">
+          <a href="#components">Inicio</a>
+          <span>/</span>
+          <strong>Styleguide</strong>
+        </nav>
+      </section>
+      <section className="sg-section">
+        <h2>Accordion, modal y feedback</h2>
+        <details className="sg-accordion">
+          <summary>
+            ¿Qué incluye un pack? <ChevronDown size={18} />
+          </summary>
+          <p>Una selección ordenada para resolver una necesidad de casa.</p>
+        </details>
+        <div className="sg-row">
+          <Button variant="secondary" onClick={() => setOpen(true)}>
+            Abrir modal
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setToast(true);
+              window.setTimeout(() => setToast(false), 2600);
+            }}
+          >
+            Mostrar toast
+          </Button>
+        </div>
+        {open && (
+          <div className="sg-modal-backdrop" role="dialog" aria-modal="true" aria-label="Vista previa">
+            <div className="sg-modal">
+              <button className="sg-icon sg-modal-close" onClick={() => setOpen(false)} aria-label="Cerrar">
+                <X />
+              </button>
+              <h3>Tu cesta</h3>
+              <p>El contenido se mantiene visible y fácil de revisar.</p>
+              <Button onClick={() => setOpen(false)}>Continuar</Button>
+            </div>
+          </div>
+        )}
+        {toast && (
+          <div className="sg-toast" role="status">
+            Añadido a la cesta <ShoppingBag size={16} />
+          </div>
+        )}
+      </section>
+      <section className="sg-section">
+        <h2>Estados auxiliares</h2>
+        <div className="sg-skeleton">
+          <i />
+          <i />
+          <i />
+        </div>
+        <div className="sg-empty">
+          <Search size={22} />
+          <strong>No hay resultados</strong>
+          <span>Prueba otra búsqueda.</span>
+        </div>
+      </section>
+    </main>
+  );
+}

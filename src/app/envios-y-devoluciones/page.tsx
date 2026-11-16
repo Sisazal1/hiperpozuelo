@@ -1,2 +1,21 @@
 import Link from "next/link";
-export default function ShippingPage(){return <main className="commerce-page info-page" id="main-content"><div className="commerce-container"><span className="eyebrow">Información</span><h1>Envíos y devoluciones</h1><p>Las tarifas, plazos y datos de recogida se publicarán cuando estén confirmados.</p><h2>Derecho de desistimiento</h2><p>En las compras a distancia, el consumidor dispone de 14 días naturales para desistir, salvo las excepciones previstas por la normativa aplicable. Las condiciones completas se comunicarán antes de la apertura.</p><Link href="/shop" className="btn btn-primary">Volver a la tienda</Link></div></main>}
+export default function ShippingPage() {
+  return (
+    <main className="commerce-page info-page" id="main-content">
+      <div className="commerce-container">
+        <span className="eyebrow">Información</span>
+        <h1>Envíos y devoluciones</h1>
+        <p>Las tarifas, plazos y datos de recogida se publicarán cuando estén confirmados.</p>
+        <h2>Derecho de desistimiento</h2>
+        <p>
+          En las compras a distancia, el consumidor dispone de 14 días naturales para desistir, salvo las
+          excepciones previstas por la normativa aplicable. Las condiciones completas se comunicarán antes de
+          la apertura.
+        </p>
+        <Link href="/shop" className="btn btn-primary">
+          Volver a la tienda
+        </Link>
+      </div>
+    </main>
+  );
+}
