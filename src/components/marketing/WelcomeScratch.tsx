@@ -179,7 +179,7 @@ export default function WelcomeScratch() {
     setOpen(false);
   }
 
-  useFocusTrap(trapRef, open);
+  useFocusTrap(trapRef, open, dismiss);
   if (!open) return null;
 
   return (
