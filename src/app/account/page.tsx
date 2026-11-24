@@ -4,6 +4,8 @@ import { PackageSearch } from "lucide-react";
 import { ordersEnabled } from "@/config/commerce";
 import { dbAvailable } from "@/lib/server/db";
 import { addresses, currentCustomer, customerOrders, favoriteIds, type Customer } from "@/lib/server/customers";
+import { SUB_LABEL, customerSubscriptions } from "@/lib/server/subscriptions";
+import { weeksLabel } from "@/config/subscription";
 import { googleEnabled } from "@/lib/server/google";
 import { getProductById } from "@/lib/catalog/products";
 import { STATUS_LABEL, courierById, euros, publicPaymentLabel, type OrderStatus, type PaymentMode, type PaymentStatus } from "@/lib/orders/status";
@@ -69,7 +71,7 @@ function Guest({ on, p }: { on: boolean; p: Params }) {
 }
 
 async function Home({ c, pending }: { c: Customer; pending: string | null }) {
-  const [orders, addr, favs] = await Promise.all([customerOrders(c.id), addresses(c.id), favoriteIds(c.id)]);
+  const [orders, addr, favs, subs] = await Promise.all([customerOrders(c.id), addresses(c.id), favoriteIds(c.id), customerSubscriptions(c.id)]);
   const qrs = new Map<string, string>();
   for (const o of orders)
     if (o.delivery === "collect" && ["received", "preparing", "ready"].includes(o.status)) qrs.set(o.id, await QRCode.toString(o.code, { type: "svg", margin: 0, errorCorrectionLevel: "M" }));
@@ -138,6 +140,27 @@ async function Home({ c, pending }: { c: Customer; pending: string | null }) {
         </details>
       </section>
 
+      {subs.length > 0 && (
+        <section className="acc-block" aria-labelledby="a-sub">
+          <h2 id="a-sub">Suscripciones</h2>
+          <ul className="acc-orders">
+            {subs.map((s) => (
+              <li key={s.id}>
+                <div>
+                  <strong>
+                    Reposición {weeksLabel(s.weeks).toLowerCase()} · {SUB_LABEL[s.status]}
+                  </strong>
+                  {s.status === "active" && s.next_cycle_at && <p>Próximo cobro: {day(s.next_cycle_at)}</p>}
+                </div>
+                <Link className="text-link" href={`/suscripcion/${s.token}`}>
+                  Gestionar
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="acc-block" aria-labelledby="a-fav">
         <h2 id="a-fav">Favoritos</h2>
         {favs.length ? (
@@ -192,7 +215,7 @@ async function Home({ c, pending }: { c: Customer; pending: string | null }) {
           </p>
           <details className="acc-more">
             <summary>Eliminar la cuenta</summary>
-            <p>Se borran tu perfil, direcciones y favoritos. Los pedidos que la ley obliga a conservar dejan de estar vinculados a ti en la tienda.</p>
+            <p>Se borran tu perfil, direcciones y favoritos, y se cancelan tus suscripciones.{" "} Los pedidos que la ley obliga a conservar dejan de estar vinculados a ti en la tienda.</p>
             <DeleteAccount has={c.has_password} />
           </details>
         </section>

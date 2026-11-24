@@ -304,13 +304,16 @@ try {
   check("TPV: venta cobrada con cambio", await bo.getByText(/Cambio: 3,02/).last().waitFor({ timeout: 8000 }).then(() => true, () => false));
   check("TPV: stock descontado", (await stockNow()) === before - 2, `${before} → ${before - 2}`);
 
-  // ---------- 10. Falta de stock ----------
+  // ---------- 10. Falta de stock: ya estaba en la cesta ----------
+  const s = await ctx();
+  await addProduct(s);
   await bo.goto(`${BASE}/backoffice/inventario?q=espátula`);
   await bo.getByLabel(/Unidades de Espátula/i).first().fill("0");
   await bo.getByLabel(/Unidades de Espátula/i).first().locator("xpath=ancestor::form").getByRole("button").click();
   await bo.waitForTimeout(1200);
-  const s = await ctx();
-  await addProduct(s);
+  const s0 = await ctx();
+  await s0.goto(`${BASE}/product/espatula-silicona`);
+  check("La ficha marca «Agotado» y no deja comprar", await s0.locator(".add-main:disabled", { hasText: "Agotado" }).waitFor({ timeout: 8000 }).then(() => true, () => false));
   await fill(s, { delivery: "collect", payment: "online", phone: phone(6) });
   await s.locator(".checkout-pay").click();
   check("Sin stock no se puede pagar", await s.getByText(/No quedan unidades suficientes/).waitFor({ timeout: 10000 }).then(() => true, () => false));
@@ -330,7 +333,7 @@ try {
   await shot(bo, "bo-pedidos-1440");
   for (const [n, w, h] of [["390", 390, 844]]) {
     await bo.setViewportSize({ width: w, height: h });
-    for (const [k, u] of [["resumen", ""], ["pedidos", "/pedidos"], ["tpv", "/tpv"], ["inventario", "/inventario?q=espátula"]]) {
+    for (const [k, u] of [["resumen", ""], ["pedidos", "/pedidos"], ["tpv", "/tpv"], ["inventario", "/inventario?q=espátula"], ["suscripciones", "/suscripciones"]]) {
       await bo.goto(`${BASE}/backoffice${u}`);
       check(`Backoffice ${k} sin scroll horizontal a ${n}`, await bo.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
       await shot(bo, `bo-${k}-${n}`);

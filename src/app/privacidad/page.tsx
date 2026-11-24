@@ -49,6 +49,11 @@ export default function PrivacyPage() {
                     <td>Contrato</td>
                   </tr>
                   <tr>
+                    <th scope="row">Suscripción, si la contratas: artículos, frecuencia, entrega y fecha de tu autorización</th>
+                    <td>Cobrar y preparar cada ciclo hasta que la canceles. La tarjeta la guarda Stripe, no nosotros</td>
+                    <td>Contrato</td>
+                  </tr>
+                  <tr>
                     <th scope="row">Email, si marcas que quieres ofertas</th>
                     <td>Enviarte ofertas y novedades</td>
                     <td>Consentimiento, que puedes retirar en tu cuenta</td>

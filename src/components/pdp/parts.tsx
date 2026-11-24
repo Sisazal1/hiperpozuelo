@@ -17,20 +17,21 @@ import { useAddedFeedback } from "@/components/motion/hooks";
 import type { Bundle, Product } from "@/types/catalog";
 
 /** Agotado = inventariado en 0. Si no hay inventario o falla la consulta, no se afirma nada. */
-export function useSoldOut() {
-  const [ids, setIds] = useState<string[]>([]);
+export function useAvailability() {
+  const [state, setState] = useState<{ soldOut: string[]; subscriptions: boolean }>({ soldOut: [], subscriptions: false });
   useEffect(() => {
     let on = true;
     fetch("/api/availability")
-      .then((r) => (r.ok ? r.json() : { soldOut: [] }))
-      .then((d) => on && setIds(Array.isArray(d.soldOut) ? d.soldOut : []))
+      .then((r) => (r.ok ? r.json() : ({} as any)))
+      .then((d) => on && setState({ soldOut: Array.isArray(d.soldOut) ? d.soldOut : [], subscriptions: d.subscriptions === true }))
       .catch(() => {});
     return () => {
       on = false;
     };
   }, []);
-  return ids;
+  return state;
 }
+export const useSoldOut = () => useAvailability().soldOut;
 
 /** La columna más corta se queda fija; si no cabe en pantalla, se ancla por abajo para no cortarse. */
 export function stickyColumn(el: HTMLElement | null) {

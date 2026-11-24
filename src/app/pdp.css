@@ -628,3 +628,30 @@
     align-self: start;
   }
 }
+
+/* Acceso a la suscripción desde la ficha de un consumible */
+.pdp-subs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 16px;
+  border: 1px solid #8b857b;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--hp-ink);
+  line-height: 1.4;
+  text-decoration: none;
+}
+.pdp-subs:hover {
+  border-color: var(--hp-ink);
+}
+.pdp-subs svg {
+  flex: none;
+}
+.pdp-subs span {
+  flex: 1;
+}
+.pdp-subs strong {
+  display: block;
+}

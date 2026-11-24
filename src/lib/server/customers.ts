@@ -225,6 +225,9 @@ export async function exportData(c: Customer) {
     perfil: c,
     direcciones: await addresses(c.id),
     favoritos: await favoriteIds(c.id),
+    suscripciones: (await query("select * from subscriptions where customer_id=$1 and status not in ('pending','expired') order by created_at", [c.id])).map((s) => ({
+      estado: s.status, cada_semanas: s.weeks, proximo_cobro: s.next_cycle_at, entrega: s.delivery, nombre: s.customer_name, email: s.email, telefono: s.phone, direccion: s.address, codigo_postal: s.postal_code, alta: s.created_at,
+    })),
     pedidos: orders.map((o: Row) => ({
       codigo: o.code, fecha: o.created_at, estado: o.status, pago: o.payment_status, total_eur: o.total / 100, entrega: o.delivery,
       nombre: o.customer_name, email: o.email, telefono: o.phone, direccion: o.address, codigo_postal: o.postal_code, ciudad: o.city,
@@ -241,6 +244,8 @@ export async function deleteAccount(c: Customer, password: unknown) {
     await fail();
     throw new AccountError("La contraseña no es correcta.", 401);
   }
+  const { cancelAllFor } = await import("./subscriptions");
+  await cancelAllFor(c.id);
   await tx(async (q) => {
     await q("update orders set customer_id=null, linked_at=null where customer_id=$1", [c.id]);
     await q("delete from customers where id=$1", [c.id]);

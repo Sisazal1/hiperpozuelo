@@ -14,6 +14,7 @@ export default function SiteFooter() {
         <Link href="/shop">Explorar productos</Link>
         <Link href="/packs">Packs prediseñados</Link>
         <Link href="/build-pack">Crear un pack</Link>
+        <Link href="/reposicion">Reposición</Link>
         {ordersEnabled && <Link href="/pedido">Seguir mi pedido</Link>}
         <Link href="/faq">Preguntas frecuentes</Link>
         <Link href="/contacto">Contacto</Link>

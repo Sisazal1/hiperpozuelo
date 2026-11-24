@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Heart, ShoppingBag } from "lucide-react";
+import { ArrowRight, Check, Heart, RefreshCw, ShoppingBag } from "lucide-react";
 import { useStore } from "@/state/store";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
 import { getComplementaryProducts } from "@/lib/catalog/recommendations";
@@ -10,7 +10,8 @@ import { singular, unitsOf } from "@/lib/catalog/unit";
 import type { Product } from "@/types/catalog";
 import ProductVisual from "@/components/catalog/ProductVisual";
 import Gallery from "@/components/pdp/Gallery";
-import { Accordion, BuyBar, CompleteProducts, FactsBand, FamilyTiles, PayRow, PdpFaq, ReturnsAccordion, ShippingBox, Stepper, stickyColumn, useSoldOut } from "@/components/pdp/parts";
+import { Accordion, BuyBar, CompleteProducts, FactsBand, FamilyTiles, PayRow, PdpFaq, ReturnsAccordion, ShippingBox, Stepper, stickyColumn, useAvailability } from "@/components/pdp/parts";
+import { isEligible, subscriptionConfig } from "@/config/subscription";
 import { useBuyBar } from "@/components/pdp/useBuyBar";
 import { track } from "@/lib/track";
 import { useAddedFeedback, useTweenedNumber } from "@/components/motion/hooks";
@@ -23,7 +24,7 @@ export default function ProductExperience({ product }: { product: Product }) {
   const panel = useRef<HTMLDivElement>(null);
   const cta = useRef<HTMLButtonElement>(null);
   const showBar = useBuyBar(panel, cta);
-  const soldOut = useSoldOut();
+  const { soldOut, subscriptions } = useAvailability();
   const out = soldOut.includes(product.id);
   const total = product.proposed_price_eur * quantity;
   const price = useTweenedNumber(total);
@@ -116,6 +117,16 @@ export default function ProductExperience({ product }: { product: Product }) {
                 </>
               )}
             </button>
+            {subscriptions && isEligible(product.id) && (
+              <Link className="pdp-subs" href={`/reposicion?art=${product.id}&n=${quantity}`}>
+                <RefreshCw size={20} aria-hidden="true" />
+                <span>
+                  <strong>Suscríbete y ahorra un {subscriptionConfig.discountRate * 100} %</strong>
+                  Recíbelo cada {subscriptionConfig.weeksText} semanas.
+                </span>
+                <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+            )}
             <PayRow total={total} />
             <ShippingBox />
             <div className="pdp-acc">

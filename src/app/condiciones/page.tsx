@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ordersEnabled, paymentRules } from "@/config/commerce";
+import { subscriptionConfig } from "@/config/subscription";
 import { siteConfig } from "@/config/site";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
 
@@ -38,6 +39,22 @@ export default function TermsPage() {
             ? `Puedes pagar online a través de Stripe, al recoger en tienda o contra reembolso hasta ${formatEuroPrice(paymentRules.codMax)}. Un mismo teléfono puede tener como máximo ${paymentRules.maxOpenUnpaid} pedidos sin pagar. `
             : "El pago es online, a través de Stripe. "}<Link href="/pago-seguro">Más sobre el pago</Link>.
         </p>
+
+        {ordersEnabled && (
+          <>
+            <h2 id="suscripcion">Suscripción de reposición</h2>
+            <p>
+              Eliges artículos de reposición, cantidades y una frecuencia de {subscriptionConfig.weeksText} semanas. Se aplica un {subscriptionConfig.discountRate * 100} % de descuento sobre los productos, con un mínimo de{" "}
+              {formatEuroPrice(subscriptionConfig.minAfterDiscount)} por ciclo después del descuento. No se acumula con el código de bienvenida ni con el canje de puntos.
+            </p>
+            <p>
+              El primer cobro se hace al suscribirte y los siguientes, en la misma tarjeta, al cumplirse la frecuencia elegida. Dura hasta que la canceles, sin permanencia ni penalización. Desde tu enlace de gestión o tu
+              cuenta puedes saltar el próximo ciclo, pausarla, cambiarla o cancelarla en dos clics; lo ya cobrado sigue su curso. Si un cobro se rechaza, no preparamos ese ciclo hasta que se complete. Si falta un artículo,
+              te ofrecemos quitarlo o cancelar ese ciclo, con el reembolso de lo pagado. El precio aceptado no cambia sin que tú lo aceptes.
+            </p>
+            <p>Puedes desistir de cada pedido en los 14 días siguientes a recibirlo, con las excepciones de ley.</p>
+          </>
+        )}
 
         <h2>Entrega, desistimiento y garantía</h2>
         <p>

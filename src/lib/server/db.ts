@@ -97,6 +97,25 @@ create table if not exists customer_favorites (
 alter table orders add column if not exists customer_id text references customers(id) on delete set null;
 alter table orders add column if not exists linked_at timestamptz;
 create index if not exists orders_customer on orders (customer_id);
+create table if not exists subscriptions (
+  id text primary key, token text unique not null,
+  customer_id text references customers(id) on delete set null,
+  status text not null, weeks int not null, delivery text not null,
+  customer_name text, email text, phone text, address text, postal_code text, city text, delivery_note text,
+  stripe_session_id text unique, stripe_subscription_id text unique, stripe_customer_id text,
+  next_cycle_at timestamptz, notice_at timestamptz, noticed_for timestamptz,
+  consent_at timestamptz not null, cancelled_at timestamptz, test boolean not null default false,
+  created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+);
+create table if not exists subscription_items (
+  subscription_id text not null references subscriptions(id) on delete cascade, product_id text not null,
+  quantity int not null check (quantity > 0), unit int not null, primary key (subscription_id, product_id)
+);
+create table if not exists subscription_events (
+  id serial primary key, subscription_id text not null references subscriptions(id) on delete cascade,
+  label text not null, actor text not null, at timestamptz not null default now()
+);
+alter table orders add column if not exists subscription_id text references subscriptions(id) on delete set null;
 create table if not exists login_attempts (ip text not null, at timestamptz not null default now());
 `;
 

@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { dbAvailable } from "@/lib/server/db";
+import { expireSession, paymentFailed, syncInvoice, syncSession, syncSubscription } from "@/lib/server/subscriptions";
 import { flagByPaymentIntent, markPaidOnline, markSession, syncRefund } from "@/lib/server/orders";
 
 export const runtime = "nodejs";
@@ -25,14 +26,26 @@ export async function POST(req: Request) {
       case "checkout.session.completed":
       case "checkout.session.async_payment_succeeded": {
         const s = event.data.object;
-        if (s.payment_status === "paid") await markPaidOnline(s.id, idOf(s.payment_intent), s.amount_total ?? 0);
+        if (s.mode === "subscription") await syncSession(s);
+        else if (s.payment_status === "paid") await markPaidOnline(s.id, idOf(s.payment_intent), s.amount_total ?? 0);
         break;
       }
       case "checkout.session.async_payment_failed":
         await markSession(event.data.object.id, "failed");
         break;
       case "checkout.session.expired":
-        await markSession(event.data.object.id, "expired");
+        if (event.data.object.mode === "subscription") await expireSession(event.data.object.id);
+        else await markSession(event.data.object.id, "expired");
+        break;
+      case "invoice.paid":
+        await syncInvoice(event.data.object.id);
+        break;
+      case "invoice.payment_failed":
+        await paymentFailed(event.data.object.id);
+        break;
+      case "customer.subscription.updated":
+      case "customer.subscription.deleted":
+        await syncSubscription(event.data.object.id);
         break;
       case "charge.refunded":
         await syncRefund(idOf(event.data.object.payment_intent), event.data.object.amount_refunded);

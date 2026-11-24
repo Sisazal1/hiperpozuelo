@@ -1,4 +1,5 @@
 import { commerceConfig, ordersEnabled, paymentRules } from "@/config/commerce";
+import { subscriptionConfig } from "@/config/subscription";
 import { siteConfig } from "@/config/site";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
 
@@ -20,6 +21,9 @@ export const FAQ: { q: string; a: string; home?: boolean }[] = [
   { q: "¿Puedo devolver un producto?", a: "Tienes 14 días naturales para desistir de la compra, con las excepciones que marca la ley.", home: true },
   ...(siteConfig.deliveryTime || ordersEnabled
     ? [{ q: "¿Cuándo recibiré mi pedido?", a: siteConfig.deliveryTime ?? "Puedes ver en qué punto está en «Seguir mi pedido», con tu código y el email o teléfono de la compra." }]
+    : []),
+  ...(ordersEnabled
+    ? [{ q: "¿Cómo funciona la suscripción?", a: `Eliges artículos de reposición y cada cuánto los quieres: ${subscriptionConfig.weeksText} semanas, con un ${subscriptionConfig.discountRate * 100} % de descuento. Pagas con tarjeta en cada ciclo y la saltas, la pausas o la cancelas cuando quieras, sin cuenta.` }]
     : []),
   { q: "¿Necesito una cuenta?", a: ordersEnabled ? "No. Compras como invitado y sigues el pedido con su código. Si creas una cuenta, tienes tus pedidos, direcciones y favoritos en cualquier dispositivo." : "No. Compras como invitado. Tu cesta y favoritos se guardan en este navegador." },
 ];

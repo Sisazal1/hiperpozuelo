@@ -148,6 +148,28 @@ async function createOrderIn(q: Exec, o: NewOrder): Promise<Row> {
     return row;
 }
 
+/** Ciclo de suscripción ya cobrado: pedido pagado, idempotente por factura. Se llama con la suscripción bloqueada. */
+export async function createPaidCycle(
+  q: Exec,
+  c: Omit<NewOrder, "channel" | "mode" | "requestKey" | "actor"> & { key: string; subscriptionId: string; paymentIntent: string; amount: number; review: string | null },
+) {
+  const [dup] = await q("select * from orders where request_key=$1", [c.key]);
+  if (dup) return { row: dup, fresh: false };
+  const row = await createOrderIn(q, { ...c, channel: "web", mode: "online", requestKey: c.key, actor: "Suscripción" });
+  await q(
+    "insert into payments (order_id,kind,method,amount,reference,status,recorded_by,verified_by,verified_at) values ($1,'charge','stripe',$2,$3,'verified','Stripe','Stripe',now())",
+    [row.id, c.amount, c.paymentIntent || c.key],
+  );
+  const [u] = await q(
+    "update orders set payment_status='verified', status='received', stripe_payment_intent=$2, review_reason=$3, subscription_id=$4, updated_at=now() where id=$1 returning *",
+    [row.id, c.paymentIntent || null, c.review, c.subscriptionId],
+  );
+  await event(q, row.id, "paid", "Pedido de tu suscripción, pago confirmado", "Stripe", true);
+  if (c.review) await event(q, row.id, "review", `Revisar antes de preparar: ${c.review}`, "Sistema");
+  await moveStock(q, row.id, -1, "Stripe", "suscripción");
+  return { row: u, fresh: true };
+}
+
 export async function attachSession(orderId: string, sessionId: string) {
   await query("update orders set stripe_session_id=$2, updated_at=now() where id=$1", [orderId, sessionId]);
 }

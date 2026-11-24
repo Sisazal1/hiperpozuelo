@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarChart3, Boxes, LogOut, ReceiptText, ScanLine } from "lucide-react";
+import { BarChart3, Boxes, LogOut, RefreshCw, ReceiptText, ScanLine } from "lucide-react";
 import Flash from "./Flash";
 import { logoutAction } from "@/app/backoffice/actions";
 
@@ -7,6 +7,7 @@ const NAV = [
   ["/backoffice", "Resumen", BarChart3],
   ["/backoffice/pedidos", "Pedidos", ReceiptText],
   ["/backoffice/tpv", "TPV", ScanLine],
+  ["/backoffice/suscripciones", "Suscripciones", RefreshCw],
   ["/backoffice/inventario", "Inventario", Boxes],
 ] as const;
 

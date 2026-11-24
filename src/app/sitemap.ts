@@ -6,7 +6,7 @@ import { getAllBundles } from "@/lib/catalog/bundles";
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = process.env.NEXT_PUBLIC_SITE_URL || "https://hiper-pozuelo.vercel.app";
   const now = new Date();
-  const pages = ["/", "/shop", "/packs", "/build-pack", "/faq", "/contacto", "/envios-y-devoluciones", "/pago-seguro", "/privacidad", "/cookies", "/condiciones", "/aviso-legal"];
+  const pages = ["/", "/shop", "/packs", "/build-pack", "/reposicion", "/faq", "/contacto", "/envios-y-devoluciones", "/pago-seguro", "/privacidad", "/cookies", "/condiciones", "/aviso-legal"];
   return [
     ...pages.map((p) => ({ url: `${base}${p}`, lastModified: now, priority: p === "/" ? 1 : 0.6 })),
     ...getAllBundles().map((b) => ({ url: `${base}/packs/${b.category_id}/${b.tier}`, lastModified: now, priority: 0.8 })),

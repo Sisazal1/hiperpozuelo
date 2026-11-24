@@ -99,6 +99,7 @@ export default function ShippingPage() {
           <li>Devuelves los productos en los 14 días siguientes. En tienda no tiene coste; si lo mandas por mensajería, el envío de vuelta corre de tu cuenta.</li>
           <li>Te reembolsamos en un máximo de 14 días, incluido el envío estándar que pagaste. Podemos esperar a recibir los productos.</li>
         </ol>
+        {ordersEnabled && <p>Cada ciclo de una suscripción es un pedido: se recoge, se envía y se devuelve igual, con las mismas zonas y tarifas.</p>}
         <p>El reembolso va al mismo medio con el que pagaste.</p>
         <p>
           No se admiten devoluciones de productos precintados que no son aptos por higiene una vez abiertos, ni las demás excepciones del artículo 103 de la Ley General para la Defensa de los

@@ -8,6 +8,7 @@ export const ROUTES = [
   "/category/kitchen",
   "/product/espatula-silicona",
   "/build-pack",
+  "/reposicion",
   "/cart",
   "/checkout",
   "/favorites",
