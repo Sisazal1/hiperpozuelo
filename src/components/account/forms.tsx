@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
+import { pointsLabel } from "@/config/points";
 import { accountPost, afterLogin, hasAccountFlag, setAccountFlag } from "@/lib/account-client";
 
 /** Formulario de cuenta: un solo envío a la vez, error junto al botón y recarga al guardar. */
@@ -120,13 +121,13 @@ export function SignUp() {
 }
 
 /** Después de comprar como invitado: solo pide contraseña y vincula ese pedido. */
-export function ClaimOrder({ token, email, children }: { token: string; email?: string | null; children?: ReactNode }) {
+export function ClaimOrder({ token, email, points = 0 }: { token: string; email?: string | null; points?: number }) {
   return (
     <section className="acc-claim" aria-labelledby="claim-t">
       <div>
         <h2 id="claim-t">Crea tu cuenta con este email</h2>
         <p>
-          {email ? `${email}. ` : ""}Opcional: guarda este pedido y síguelo sin buscar el código. {children}
+          {email ? `${email}. ` : ""}Opcional: sigue tu pedido sin buscar el código{points ? <> y suma <strong>{pointsLabel(points)}</strong></> : null}.
         </p>
         <p>
           ¿Ya tienes cuenta? <Link href={`/account?pedido=${token}`}>Entra y añade este pedido</Link>.

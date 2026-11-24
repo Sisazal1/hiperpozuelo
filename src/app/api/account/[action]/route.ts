@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { dbAvailable } from "@/lib/server/db";
 import { sameOrigin } from "@/lib/server/guard";
 import * as acc from "@/lib/server/customers";
+import { pointsState } from "@/lib/server/points";
 
 export const runtime = "nodejs";
 const noStore = { headers: { "cache-control": "no-store" } };
@@ -48,7 +49,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ action: st
   const { action } = await params;
   const c = await acc.currentCustomer();
   if (action === "me")
-    return NextResponse.json(c ? { customer: { email: c.email, name: c.name, phone: c.phone }, addresses: await acc.addresses(c.id), favorites: await acc.favoriteIds(c.id) } : { customer: null }, noStore);
+    return NextResponse.json(c ? { customer: { email: c.email, name: c.name, phone: c.phone }, addresses: await acc.addresses(c.id), favorites: await acc.favoriteIds(c.id), points: (await pointsState(c.id)).available } : { customer: null }, noStore);
   if (action === "export" && c)
     return new NextResponse(JSON.stringify(await acc.exportData(c), null, 2), {
       headers: { "content-type": "application/json; charset=utf-8", "content-disposition": 'attachment; filename="mis-datos-hiper-pozuelo.json"', "cache-control": "no-store" },

@@ -1,4 +1,5 @@
 "use client";
+import PointsNote from "@/components/points/PointsNote";
 import Reviews, { RatingLink } from "@/components/reviews/Reviews";
 import type { ReviewData } from "@/config/reviews";
 import Image from "next/image";
@@ -139,6 +140,7 @@ export default function PackDetail({ familyId, bundle, reviews }: { familyId: st
             </button>
             <PayRow total={total} />
             <ShippingBox />
+            <PointsNote goodsCents={Math.round(total * 100)} />
             <div className="pdp-acc">
               <Accordion title="Qué incluye" id="detalles" open>
                 {chosen.length ? (

@@ -1,5 +1,6 @@
 import "server-only";
 import Stripe from "stripe";
+import { pointsConfig } from "@/config/points";
 import { commerceConfig, paymentRules } from "@/config/commerce";
 
 export function stripeClient() {
@@ -35,6 +36,17 @@ export async function enabledMethods(stripe: Stripe) {
 export async function methodsFor(stripe: Stripe, totalCents: number) {
   const { list } = await enabledMethods(stripe);
   return list.filter((m) => m !== "klarna" || totalCents >= paymentRules.klarnaMin * 100);
+}
+
+// Canje de puntos: cupón de importe fijo, uno por importe y reutilizable. El canje se valida antes en servidor.
+export async function pointsCouponId(stripe: Stripe, cents: number): Promise<string> {
+  const id = `hp-puntos-${cents}`;
+  try {
+    return (await stripe.coupons.create({ id, name: pointsConfig.name, amount_off: cents, currency: "eur", duration: "once" })).id;
+  } catch (error) {
+    if ((error as { code?: string }).code === "resource_already_exists") return id;
+    throw error;
+  }
 }
 
 // Cupón de bienvenida: se crea una vez y se reutiliza. El descuento se valida siempre

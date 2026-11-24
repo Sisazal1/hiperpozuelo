@@ -19,7 +19,8 @@ export default function RouteProgress() {
       if (!a || a.target === "_blank" || a.hasAttribute("download")) return;
       const url = new URL(a.href, location.href);
       if (url.origin !== location.origin) return;
-      if (url.pathname === location.pathname && url.search === location.search) return;
+      // Solo se completa al cambiar el pathname: si solo cambian los filtros, no arranca.
+      if (url.pathname === location.pathname) return;
       window.clearTimeout(timer.current);
       setState("loading");
     };

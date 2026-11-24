@@ -1,5 +1,6 @@
 import { commerceConfig, ordersEnabled, paymentRules } from "@/config/commerce";
 import { subscriptionConfig } from "@/config/subscription";
+import { pointsConfig, pointsLabel } from "@/config/points";
 import { siteConfig } from "@/config/site";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
 
@@ -24,6 +25,9 @@ export const FAQ: { q: string; a: string; home?: boolean }[] = [
     : []),
   ...(ordersEnabled
     ? [{ q: "¿Cómo funciona la suscripción?", a: `Eliges artículos de reposición y cada cuánto los quieres: ${subscriptionConfig.weeksText} semanas, con un ${subscriptionConfig.discountRate * 100} % de descuento. Pagas con tarjeta en cada ciclo y la saltas, la pausas o la cancelas cuando quieras, sin cuenta.` }]
+    : []),
+  ...(ordersEnabled
+    ? [{ q: "¿Cómo funcionan los puntos?", a: `Con cuenta sumas ${pointsLabel(pointsConfig.perEuro)} por cada euro en productos. Con ${pointsConfig.reward.points} tienes ${formatEuroPrice(pointsConfig.reward.euros)} de descuento, en pedidos desde ${formatEuroPrice(pointsConfig.minSubtotal)}.` }]
     : []),
   { q: "¿Necesito una cuenta?", a: ordersEnabled ? "No. Compras como invitado y sigues el pedido con su código. Si creas una cuenta, tienes tus pedidos, direcciones y favoritos en cualquier dispositivo." : "No. Compras como invitado. Tu cesta y favoritos se guardan en este navegador." },
 ];

@@ -711,3 +711,20 @@
   font-weight: 400;
   resize: vertical;
 }
+
+.bo-adjust {
+  max-width: 520px;
+  margin: 16px 0 24px;
+}
+.bo-results {
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+.bo-results a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

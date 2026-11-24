@@ -49,9 +49,9 @@ export function cartSubtotal(lines: PricedLineInput[]) {
 }
 
 /** Resumen completo. El envío gratis se decide SIEMPRE sobre el subtotal ya descontado. */
-export function cartSummary(lines: PricedLineInput[], discountCode = "", delivery: DeliveryMethod = "delivery") {
+export function cartSummary(lines: PricedLineInput[], discountCode = "", delivery: DeliveryMethod = "delivery", pointsDiscount = 0) {
   const subtotal = cartSubtotal(lines);
-  const discount = calculateDiscount(subtotal, discountCode);
+  const discount = pointsDiscount || calculateDiscount(subtotal, discountCode);
   const totals = calculateOrderTotals(subtotal, delivery, discount);
   const threshold = commerceConfig.freeShippingThreshold;
   const remainingForFreeShipping = Math.max(0, cents(threshold - totals.discountedSubtotal));

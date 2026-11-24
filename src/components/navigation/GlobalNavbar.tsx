@@ -209,10 +209,12 @@ export default function GlobalNavbar() {
             <button
               className="nav-action cart-action"
               onClick={openCartDrawer}
-              aria-label={cartCount ? `Cesta, ${cartCount} ${cartCount === 1 ? "artículo" : "artículos"}` : "Cesta vacía"}
             >
+              <span className="sr-only">{cartCount ? `Cesta, ${cartCount} ${cartCount === 1 ? "artículo" : "artículos"}` : "Cesta vacía"}</span>
               <ShoppingBag aria-hidden="true" />
-              <span className="desktop-only">Cesta</span>
+              <span className="desktop-only" aria-hidden="true">
+                Cesta
+              </span>
               {cartCount > 0 && (
                 <b className={`nav-count ${cartPulse ? "is-pulsing" : ""}`} key={cartCount} aria-hidden="true">
                   {cartCount}

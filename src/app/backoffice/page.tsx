@@ -36,9 +36,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       aside={
         <div className="bo-seg" role="group" aria-label="Periodo">
           {[7, 30, 90].map((d) => (
-            <Link key={d} href={`/backoffice?dias=${d}`} aria-current={d === days ? "true" : undefined}>
+            <a key={d} href={`/backoffice?dias=${d}`} aria-current={d === days ? "true" : undefined}>
               {d} días
-            </Link>
+            </a>
           ))}
         </div>
       }

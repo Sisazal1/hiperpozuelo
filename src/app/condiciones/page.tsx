@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ordersEnabled, paymentRules } from "@/config/commerce";
 import { subscriptionConfig } from "@/config/subscription";
 import { reviewConfig } from "@/config/reviews";
+import { pointsConfig, pointsLabel } from "@/config/points";
 import { siteConfig } from "@/config/site";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
 
@@ -64,6 +65,22 @@ export default function TermsPage() {
 
         {ordersEnabled && (
           <>
+            <h2 id="puntos">Bases de {pointsConfig.name}</h2>
+            <p>
+              Programa gratuito y solo para quien tiene cuenta. Sumas {pointsLabel(pointsConfig.perEuro)} por cada euro pagado en productos, después de descuentos y sin contar el envío, redondeando hacia abajo en cada
+              pedido. También en cada ciclo de suscripción.
+            </p>
+            <p>
+              Los puntos quedan pendientes al pagar y se pueden usar {pointsConfig.maturityDays} días después de la entrega o recogida. {pointsConfig.reward.points} puntos son {formatEuroPrice(pointsConfig.reward.euros)} de
+              descuento en productos, un canje por pedido, desde {formatEuroPrice(pointsConfig.minSubtotal)} en productos. No se acumula con códigos de descuento. El envío gratis se calcula después de aplicar los puntos. No
+              se cambian por dinero ni se transfieren.
+            </p>
+            <p>
+              Si devuelves un pedido, entero o en parte, se restan en la misma proporción; si ya los habías usado, se descuentan de los siguientes. Si se cancela o se reembolsa entero, te devolvemos los que canjeaste. Caducan tras {pointsConfig.expiryMonths} meses sin compras: ves
+              la fecha en tu cuenta. Un pedido hecho sin cuenta suma si lo añades a la tuya en los {pointsConfig.linkDays} días siguientes a la compra, una sola vez por pedido. Al eliminar la cuenta se pierden. Los puntos de
+              pedidos de prueba no pasan a la tienda real.
+            </p>
+
             <h2 id="resenas">Reseñas</h2>
             <p>
               Solo puede opinar quien tiene en su cuenta un pedido entregado o recogido que contiene el artículo, hasta {reviewConfig.days} días naturales después. Lo comprobamos de forma automática antes de guardar cada

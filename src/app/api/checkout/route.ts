@@ -4,17 +4,23 @@ import { normalizePostalCode, paymentRules, zoneFor } from "@/config/commerce";
 import { siteConfig } from "@/config/site";
 import { dbAvailable, query } from "@/lib/server/db";
 import {
+  abandonOrder,
   attachSession,
   createOrder,
   markPaidOnline,
+  markSession,
   normalizePhone,
+  openRedemptions,
   openUnpaid,
   priceLines,
+  redeemProblem,
   shortages,
   totalsFor,
 } from "@/lib/server/orders";
 import { currentCustomer } from "@/lib/server/customers";
-import { methodsFor, stripeClient, stripeIsTest, welcomeCouponId } from "@/lib/server/stripe";
+import { PointsError } from "@/lib/server/points";
+import { pointsFor } from "@/config/points";
+import { methodsFor, pointsCouponId, stripeClient, stripeIsTest, welcomeCouponId } from "@/lib/server/stripe";
 import type { PaymentMode } from "@/lib/orders/status";
 
 export const runtime = "nodejs";
@@ -54,14 +60,33 @@ export async function POST(req: Request) {
   }
   if (Object.keys(fields).length) return fail("invalid_fields", 422, { fields });
 
-  const totals = totalsFor(lines, delivery, body.discountCode, mode);
-  if (totals.total < 50) return fail("invalid_request");
   const db = dbAvailable();
   const requestKey = text(body.requestKey, 64) || null;
   // Comprar nunca exige cuenta; si hay sesión, el pedido queda en ella.
   const customerId = (await currentCustomer().catch(() => null))?.id ?? null;
+  const redeem = body.usePoints === true;
+  if (redeem) {
+    const problem = customerId ? redeemProblem(lines.reduce((s, l) => s + l.unit * l.quantity, 0), body.discountCode) : "points_account";
+    if (problem) return fail(problem, 409);
+  }
+  const totals = totalsFor(lines, delivery, body.discountCode, mode, redeem);
+  if (totals.total < 50) return fail("invalid_request");
+  let opened: string | null = null;
 
   try {
+    // Si dejó otro pago a medias con puntos reservados, se cierra y se recuperan antes de empezar este.
+    if (redeem && customerId) {
+      const s = stripeClient();
+      for (const o of await openRedemptions(customerId)) {
+        // Sin sesión y reciente: otra pestaña lo está abriendo ahora mismo; ese canje se respeta.
+        if (!o.stripe_session_id) {
+          if (o.stale) await abandonOrder(o.id);
+        } else if (s) {
+          const closed = await s.checkout.sessions.expire(o.stripe_session_id).catch(() => s.checkout.sessions.retrieve(o.stripe_session_id));
+          if (closed.status === "expired") await markSession(o.stripe_session_id, "expired");
+        }
+      }
+    }
     if (db) {
       const missing = await shortages(lines);
       if (missing.length) return fail("out_of_stock", 409, { items: missing.map((m) => ({ name: m.name, available: m.available })) });
@@ -79,7 +104,7 @@ export async function POST(req: Request) {
       const order = await createOrder({
         channel: "web", mode, delivery, lines, totals, customer,
         address: delivery === "delivery" ? address : undefined,
-        requestKey, customerId, actor: "Cliente", test: siteConfig.prelaunch,
+        requestKey, customerId, redeem, actor: "Cliente", test: siteConfig.prelaunch,
       });
       return NextResponse.json({ order: order.token });
     }
@@ -91,11 +116,12 @@ export async function POST(req: Request) {
       ? await createOrder({
           channel: "web", mode, delivery, lines, totals, customer,
           address: delivery === "delivery" ? address : undefined,
-          requestKey: null, customerId, actor: "Cliente", test: stripeIsTest(),
+          requestKey: null, customerId, redeem, actor: "Cliente", test: stripeIsTest(),
         })
       : null;
+    opened = order?.id ?? null;
     const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
-    const couponId = totals.discount > 0 ? await welcomeCouponId(stripe) : null;
+    const couponId = totals.discount > 0 ? (redeem ? await pointsCouponId(stripe, totals.discount) : await welcomeCouponId(stripe)) : null;
     const methods = await methodsFor(stripe, totals.total);
     const meta = {
       order_code: order?.code ?? "",
@@ -154,8 +180,11 @@ export async function POST(req: Request) {
       requestKey ? { idempotencyKey: `hp-${requestKey}-${totals.total}-${order?.id ?? ""}` } : undefined,
     );
     if (order) await attachSession(order.id, session.id);
+    opened = null;
     return NextResponse.json({ url: session.url });
   } catch (e) {
+    if (opened) await abandonOrder(opened).catch(() => {});
+    if (e instanceof PointsError) return fail("points_balance", 409);
     console.error("checkout", (e as Error).message);
     return fail("payment_unavailable", 503);
   }
@@ -174,11 +203,13 @@ export async function GET(req: Request) {
     let token: string | null = null;
     let code: string | null = null;
     let owned = false;
+    let points = 0;
     if (dbAvailable() && pi) {
       const order = await markPaidOnline(session.id, pi.id, session.amount_total ?? 0);
       token = order?.token ?? null;
       code = order?.code ?? null;
       owned = Boolean(order?.customer_id);
+      points = order ? pointsFor(order.subtotal - order.discount) : 0;
     }
     const recent = Date.now() / 1000 - session.created < 3 * 3600;
     const ship = pi?.shipping?.address;
@@ -187,6 +218,7 @@ export async function GET(req: Request) {
       code,
       token,
       owned,
+      points,
       status: session.status,
       payment_status: session.payment_status,
       payment_reference: pi?.id ?? null,

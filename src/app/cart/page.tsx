@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Check, Lock, Minus, Plus, ShoppingBag, Store, Trash2, Truck } from "lucide-react";
+import PointsNote from "@/components/points/PointsNote";
 import { useStore, type CartLine } from "@/state/store";
 import { getProductById } from "@/lib/catalog/products";
 import { getBundleById, TIER_LABEL } from "@/lib/catalog/bundles";
@@ -126,6 +127,7 @@ export default function CartPage() {
                 <span>Total</span>
                 <strong>{formatEuroPrice(total)}</strong>
               </div>
+              <PointsNote goodsCents={Math.round(s.discountedSubtotal * 100)} />
               <Link className="btn btn-primary btn-block btn-lg" href="/checkout">
                 Tramitar pedido <ArrowRight size={18} />
               </Link>

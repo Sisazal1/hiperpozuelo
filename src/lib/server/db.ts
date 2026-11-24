@@ -128,6 +128,22 @@ create table if not exists reviews (
   unique (order_id, subject_type, subject_id)
 );
 create index if not exists reviews_subject on reviews (subject_type, subject_id);
+alter table orders add column if not exists points_redeemed int not null default 0;
+create table if not exists points_ledger (
+  id serial primary key,
+  customer_id text references customers(id) on delete set null,
+  order_id text references orders(id), type text not null check (type in ('earn','refund','redeem','release','expire','adjust')),
+  points int not null check (points <> 0), test boolean not null, reason text, actor text not null,
+  ref text unique not null, at timestamptz not null default now()
+);
+create index if not exists points_ledger_customer on points_ledger (customer_id);
+create index if not exists points_ledger_order on points_ledger (order_id);
+create or replace function points_ledger_immutable() returns trigger language plpgsql as $f$
+begin
+  if tg_op = 'UPDATE' and new.customer_id is null and (to_jsonb(new) - 'customer_id') = (to_jsonb(old) - 'customer_id') then return new; end if;
+  raise exception 'points_ledger es inmutable';
+end $f$;
+create or replace trigger points_ledger_immutable before update or delete on points_ledger for each row execute function points_ledger_immutable();
 create table if not exists login_attempts (ip text not null, at timestamptz not null default now());
 `;
 

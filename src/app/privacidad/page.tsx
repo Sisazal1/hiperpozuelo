@@ -59,6 +59,11 @@ export default function PrivacyPage() {
                     <td>Contrato y obligación legal de verificarlas</td>
                   </tr>
                   <tr>
+                    <th scope="row">Movimientos de puntos, si tienes cuenta</th>
+                    <td>Calcular tu saldo y aplicar los canjes</td>
+                    <td>Contrato</td>
+                  </tr>
+                  <tr>
                     <th scope="row">Email, si marcas que quieres ofertas</th>
                     <td>Enviarte ofertas y novedades</td>
                     <td>Consentimiento, que puedes retirar en tu cuenta</td>

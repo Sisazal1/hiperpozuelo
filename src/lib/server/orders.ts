@@ -1,6 +1,8 @@
 import "server-only";
 import { randomBytes, randomInt, randomUUID } from "node:crypto";
 import { query, tx, type Exec, type Row } from "./db";
+import { redeemFor, settlePoints } from "./points";
+import { pointsConfig, rewardCents, rewardCode } from "@/config/points";
 import { getBundleById, bundleDisplayName } from "@/lib/catalog/bundles";
 import { getProductById } from "@/lib/catalog/products";
 import { lineQuantity, lineUnitPrice, type PricedLineInput } from "@/lib/cart/totals";
@@ -54,9 +56,9 @@ export function priceLines(input: unknown): PricedLine[] | null {
   return out;
 }
 
-export function totalsFor(lines: PricedLine[], delivery: DeliveryMethod, discountCode: string | undefined, mode: PaymentMode) {
+export function totalsFor(lines: PricedLine[], delivery: DeliveryMethod, discountCode: string | undefined, mode: PaymentMode, usePoints = false) {
   const subtotal = lines.reduce((s, l) => s + l.unit * l.quantity, 0);
-  const t = calculateOrderTotals(subtotal / 100, delivery, calculateDiscount(subtotal / 100, discountCode));
+  const t = calculateOrderTotals(subtotal / 100, delivery, usePoints ? rewardCents / 100 : calculateDiscount(subtotal / 100, discountCode));
   const discount = Math.round(t.discount * 100);
   const shipping = Math.round(t.shippingCost * 100);
   const surcharge = mode === "cod" ? Math.round(paymentRules.codSurcharge * 100) : 0;
@@ -66,7 +68,7 @@ export function totalsFor(lines: PricedLine[], delivery: DeliveryMethod, discoun
     shipping,
     surcharge,
     total: subtotal - discount + shipping + surcharge,
-    discountCode: discount > 0 ? commerceConfig.welcomeDiscountCode : null,
+    discountCode: discount > 0 ? (usePoints ? rewardCode : commerceConfig.welcomeDiscountCode) : null,
   };
 }
 
@@ -111,12 +113,17 @@ export type NewOrder = {
   address?: { line?: string; postalCode?: string; city?: string; note?: string };
   requestKey?: string | null;
   customerId?: string | null;
+  /** Canjea una recompensa de puntos de esta cuenta. */
+  redeem?: boolean;
   actor: string;
   test: boolean;
 };
 
 export function createOrder(o: NewOrder): Promise<Row> {
-  return tx((q) => createOrderIn(q, o));
+  return tx((q) => {
+    if (!o.redeem || !o.customerId) return createOrderIn(q, o);
+    return redeemFor(q, o.customerId, o.test, o.requestKey, () => createOrderIn(q, o));
+  });
 }
 async function createOrderIn(q: Exec, o: NewOrder): Promise<Row> {
     if (o.requestKey) {
@@ -167,8 +174,26 @@ export async function createPaidCycle(
   await event(q, row.id, "paid", "Pedido de tu suscripción, pago confirmado", "Stripe", true);
   if (c.review) await event(q, row.id, "review", `Revisar antes de preparar: ${c.review}`, "Sistema");
   await moveStock(q, row.id, -1, "Stripe", "suscripción");
+  await settlePoints(q, row.id);
   return { row: u, fresh: true };
 }
+
+/** Canje válido para este pedido, o el motivo por el que no. El servidor decide; el cliente solo lo pide. */
+export function redeemProblem(subtotalCents: number, discountCode: string | undefined) {
+  if (subtotalCents < pointsConfig.minSubtotal * 100) return "points_min";
+  return calculateDiscount(subtotalCents / 100, discountCode) > 0 ? "points_coupon" : null;
+}
+
+/** Pedido creado sin llegar a abrir el pago: se cierra y se liberan sus puntos. */
+export async function abandonOrder(orderId: string) {
+  await tx(async (q) => {
+    const [o] = await q("update orders set status='abandoned', updated_at=now() where id=$1 and status='awaiting_payment' returning id", [orderId]);
+    if (o) await settlePoints(q, orderId);
+  });
+}
+/** Canjes reservados en pagos que el cliente dejó a medias. */
+export const openRedemptions = (customerId: string) =>
+  query("select id,stripe_session_id,created_at < now() - interval '2 minutes' as stale from orders where customer_id=$1 and status='awaiting_payment' and payment_status='pending' and points_redeemed > 0", [customerId]);
 
 export async function attachSession(orderId: string, sessionId: string) {
   await query("update orders set stripe_session_id=$2, updated_at=now() where id=$1", [orderId, sessionId]);
@@ -195,6 +220,7 @@ export async function markPaidOnline(sessionId: string, paymentIntent: string, a
     await event(q, o.id, "paid", "Pago confirmado", "Stripe", true);
     if (reason) await event(q, o.id, "review", `Revisar antes de preparar: ${reason}`, "Sistema");
     if (!o.stock_taken) await moveStock(q, o.id, -1, "Stripe", "venta");
+    await settlePoints(q, o.id);
     return u;
   });
 }
@@ -210,6 +236,7 @@ export async function markSession(sessionId: string, kind: "failed" | "expired")
       await q("update orders set status='abandoned', updated_at=now() where id=$1", [o.id]);
       await event(q, o.id, "abandoned", "El pago caducó sin completarse", "Stripe");
     }
+    await settlePoints(q, o.id);
   });
 }
 
@@ -235,6 +262,7 @@ export async function syncRefund(pi: string, refunded: number) {
     );
     await q("update orders set payment_status=$2, updated_at=now() where id=$1", [o.id, refunded >= o.total ? "refunded" : "partially_refunded"]);
     await event(q, o.id, "refunded", `Reembolso de ${euros(delta)} en tu método de pago`, "Stripe", true);
+    await settlePoints(q, o.id);
   });
 }
 
@@ -266,6 +294,7 @@ export async function setStatus(orderId: string, to: OrderStatus, actor: string)
     };
     await event(q, orderId, to, label[to] ?? STATUS_LABEL[to], actor, true);
     if ((to === "cancelled" || to === "returned") && o.stock_taken) await moveStock(q, orderId, 1, actor, to === "returned" ? "devolución" : "cancelación");
+    await settlePoints(q, orderId);
   });
 }
 
@@ -296,6 +325,7 @@ async function recordChargeIn(q: Exec, o: Row, tender: Tender, reference: string
   await q("insert into payments (order_id,kind,method,amount,reference,status,recorded_by) values ($1,'charge',$2,$3,$4,'collected',$5)", [o.id, tender, o.total, ref, actor]);
   await q("update orders set payment_status='collected', status=case when status='awaiting_payment' then 'received' else status end, updated_at=now() where id=$1", [o.id]);
   await event(q, o.id, "collected", `Pago recibido: ${TENDERS[tender]}`, actor, true);
+  await settlePoints(q, o.id);
 }
 
 export async function recordCharge(orderId: string, tender: Tender, reference: string, actor: string) {
@@ -325,6 +355,7 @@ export async function rejectPayment(paymentId: number, actor: string) {
     if (back) throw new OrderError("Ese cobro ya tiene un reembolso registrado.");
     await q("update payments set status='rejected', verified_by=$2, verified_at=now(), reference=case when reference is null then null else reference || ' (rechazado ' || id || ')' end where id=$1", [paymentId, actor]);
     await q("update orders set payment_status='pending', review_reason='Cobro rechazado en la verificación', updated_at=now() where id=$1", [p.order_id]);
+    await settlePoints(q, p.order_id);
     await event(q, p.order_id, "rejected", `Cobro rechazado: ${TENDERS[p.method as Tender]}${p.reference ? ` nº ${p.reference}` : ""}`, actor);
   });
 }
@@ -348,6 +379,7 @@ export async function recordRefund(orderId: string, cents: number, tender: Tende
     );
     await q("update orders set payment_status=$2, updated_at=now() where id=$1", [orderId, back + cents >= paid ? "refunded" : "partially_refunded"]);
     await event(q, orderId, "refunded", `Reembolso de ${euros(cents)}`, actor, true);
+    await settlePoints(q, orderId);
   });
 }
 

@@ -7,6 +7,8 @@ import { addresses, currentCustomer, customerOrders, favoriteIds, type Customer 
 import { SUB_LABEL, customerSubscriptions } from "@/lib/server/subscriptions";
 import { weeksLabel } from "@/config/subscription";
 import { pendingReviews } from "@/lib/server/reviews";
+import { pointsState } from "@/lib/server/points";
+import PointsPanel from "@/components/points/PointsPanel";
 import { googleEnabled } from "@/lib/server/google";
 import { getProductById } from "@/lib/catalog/products";
 import { STATUS_LABEL, courierById, euros, publicPaymentLabel, type OrderStatus, type PaymentMode, type PaymentStatus } from "@/lib/orders/status";
@@ -32,7 +34,7 @@ function Guest({ on, p }: { on: boolean; p: Params }) {
     <>
       <header className="acc-head">
         <h1>Tu cuenta es opcional.</h1>
-        <p>Compra sin cuenta cuando quieras. Con cuenta tienes tus pedidos, direcciones y favoritos en cualquier dispositivo.</p>
+        <p>Compra sin cuenta cuando quieras. Con cuenta tienes tus pedidos, direcciones y favoritos en cualquier dispositivo, y sumas puntos.</p>
         {p.eliminada && (
           <p className="acc-note" role="status">
             Tu cuenta está eliminada.
@@ -72,7 +74,7 @@ function Guest({ on, p }: { on: boolean; p: Params }) {
 }
 
 async function Home({ c, pending }: { c: Customer; pending: string | null }) {
-  const [orders, addr, favs, subs, toReview] = await Promise.all([customerOrders(c.id), addresses(c.id), favoriteIds(c.id), customerSubscriptions(c.id), pendingReviews(c.id)]);
+  const [orders, addr, favs, subs, toReview, points] = await Promise.all([customerOrders(c.id), addresses(c.id), favoriteIds(c.id), customerSubscriptions(c.id), pendingReviews(c.id), pointsState(c.id)]);
   const qrs = new Map<string, string>();
   for (const o of orders)
     if (o.delivery === "collect" && ["received", "preparing", "ready"].includes(o.status)) qrs.set(o.id, await QRCode.toString(o.code, { type: "svg", margin: 0, errorCorrectionLevel: "M" }));
@@ -140,6 +142,8 @@ async function Home({ c, pending }: { c: Customer; pending: string | null }) {
           <LinkOrder />
         </details>
       </section>
+
+      <PointsPanel s={points} />
 
       {subs.length > 0 && (
         <section className="acc-block" aria-labelledby="a-sub">
@@ -235,7 +239,7 @@ async function Home({ c, pending }: { c: Customer; pending: string | null }) {
           </p>
           <details className="acc-more">
             <summary>Eliminar la cuenta</summary>
-            <p>Se borran tu perfil, direcciones, favoritos y reseñas, y se cancelan tus suscripciones.{" "} Los pedidos que la ley obliga a conservar dejan de estar vinculados a ti en la tienda.</p>
+            <p>Se borran tu perfil, direcciones, favoritos y reseñas, pierdes tus puntos y se cancelan tus suscripciones.{" "} Los pedidos que la ley obliga a conservar dejan de estar vinculados a ti en la tienda.</p>
             <DeleteAccount has={c.has_password} />
           </details>
         </section>

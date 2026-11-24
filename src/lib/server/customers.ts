@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { dbAvailable, query, tx, type Row } from "./db";
 import { findForCustomer, normalizePhone } from "./orders";
 import { clientIp } from "./auth";
+import { ledgerOf, settlePoints } from "./points";
 import { getProductById } from "@/lib/catalog/products";
 import { normalizePostalCode, zoneFor } from "@/config/commerce";
 
@@ -159,8 +160,11 @@ export async function loginWithGoogle(g: { sub: string; email: string; name?: st
 
 // ---------- Pedidos: uno solo por cuenta, y siempre demostrando que es tuyo ----------
 async function linkOrderRow(orderId: string, customerId: string) {
-  const [o] = await query("update orders set customer_id=$2, linked_at=now(), updated_at=now() where id=$1 and customer_id is null returning id", [orderId, customerId]);
-  return Boolean(o);
+  return tx(async (q) => {
+    const [o] = await q("update orders set customer_id=$2, linked_at=now(), updated_at=now() where id=$1 and customer_id is null returning id", [orderId, customerId]);
+    if (o) await settlePoints(q, orderId);
+    return Boolean(o);
+  });
 }
 export async function linkByCode(c: Customer, code: unknown, contact: unknown) {
   const ip = await clientIp();
@@ -225,6 +229,7 @@ export async function exportData(c: Customer) {
     perfil: c,
     direcciones: await addresses(c.id),
     favoritos: await favoriteIds(c.id),
+    puntos: (await ledgerOf(c.id)).map((l) => ({ fecha: l.at, tipo: l.type, puntos: l.points, pedido: l.code, motivo: l.reason, prueba: l.test })),
     resenas: await (await import("./reviews")).exportReviews(c.id),
     suscripciones: (await query("select * from subscriptions where customer_id=$1 and status not in ('pending','expired') order by created_at", [c.id])).map((s) => ({
       estado: s.status, cada_semanas: s.weeks, proximo_cobro: s.next_cycle_at, entrega: s.delivery, nombre: s.customer_name, email: s.email, telefono: s.phone, direccion: s.address, codigo_postal: s.postal_code, alta: s.created_at,

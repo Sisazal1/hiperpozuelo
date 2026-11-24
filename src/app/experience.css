@@ -2497,6 +2497,8 @@ html[data-intro="play"] .hp-hero-eyebrow {
   font-size: 0.875rem;
 }
 .cart-coupon form {
+  flex: 1;
+  min-width: 0;
   display: grid;
   gap: 6px;
 }
@@ -2509,6 +2511,7 @@ html[data-intro="play"] .hp-hero-eyebrow {
   gap: 8px;
 }
 .cart-coupon-row input {
+  min-width: 0;
   flex: 1;
   min-height: 48px;
   border-radius: 12px;

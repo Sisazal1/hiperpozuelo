@@ -15,6 +15,8 @@ import PaymentMarks, { methodNames, usePaymentMethods } from "@/components/order
 import { siteConfig } from "@/config/site";
 import { saveLocalOrder } from "@/lib/orders";
 import { track } from "@/lib/track";
+import { pointsConfig, pointsLabel } from "@/config/points";
+import PointsNote from "@/components/points/PointsNote";
 import { hasAccountFlag } from "@/lib/account-client";
 import { ClaimOrder } from "@/components/account/forms";
 import "../account/account.css";
@@ -27,6 +29,7 @@ type PaidOrder = {
   code: string | null;
   token: string | null;
   owned?: boolean;
+  points?: number;
   payment_reference: string | null;
   amount_total: number | null;
   customer_email: string | null;
@@ -57,7 +60,12 @@ export default function CheckoutPage() {
   const requestKey = useRef("");
   const counted = useRef(false);
   const methods = usePaymentMethods();
-  const totals = cartSummary(store.cart, store.discountCode, delivery);
+  const [points, setPoints] = useState<number | null>(null);
+  const [usePoints, setUsePoints] = useState(false);
+  const cartSub = cartSummary(store.cart).subtotal;
+  const canRedeem = points !== null && points >= pointsConfig.reward.points && cartSub >= pointsConfig.minSubtotal && !store.discountCode;
+  const redeeming = usePoints && canRedeem;
+  const totals = cartSummary(store.cart, store.discountCode, delivery, redeeming ? pointsConfig.reward.euros : 0);
   const surcharge = payment === "later" && delivery === "delivery" ? paymentRules.codSurcharge : 0;
   const total = totals.finalTotal + surcharge;
   const animatedTotal = useTweenedNumber(total);
@@ -75,8 +83,9 @@ export default function CheckoutPage() {
     if (!hasAccountFlag()) return;
     fetch("/api/account/me")
       .then((r) => r.json())
-      .then(({ customer: c, addresses }) => {
+      .then(({ customer: c, addresses, points: p }) => {
         if (!c) return;
+        setPoints(typeof p === "number" ? p : null);
         const a = addresses?.[0];
         setForm((f) => ({
           name: f.name || c.name || "",
@@ -156,6 +165,7 @@ export default function CheckoutPage() {
           delivery,
           payment,
           discountCode: store.discountCode,
+          usePoints: redeeming,
           customer: { name: form.name, email: form.email, phone: form.phone },
           address: { line: form.line, postalCode: form.postalCode, note: form.note },
           requestKey: requestKey.current,
@@ -194,6 +204,10 @@ export default function CheckoutPage() {
         payment_unavailable: "El pago online no está disponible ahora mismo. Tu cesta se ha conservado.",
         later_unavailable: "El pago al recibir no está disponible ahora mismo. Puedes pagar online.",
         cod_limit: `El contra reembolso llega hasta ${formatEuroPrice(paymentRules.codMax)}. Paga online o recoge en tienda.`,
+        points_balance: "Ya no tienes puntos suficientes. Desmarca el canje para continuar.",
+        points_min: `Los puntos se usan desde ${formatEuroPrice(pointsConfig.minSubtotal)} en productos.`,
+        points_coupon: "Los puntos no se acumulan con un código de descuento.",
+        points_account: "Entra en tu cuenta para usar tus puntos.",
         too_many_open: "Ya tienes pedidos por pagar con este teléfono. Recógelos o paga este online.",
         out_of_stock: `No quedan unidades suficientes: ${(d.items || []).map((i: { name: string; available: number }) => `${i.name} (${i.available})`).join(", ")}. Ajusta la cesta para continuar.`,
       };
@@ -255,7 +269,7 @@ export default function CheckoutPage() {
     </div>
   );
 
-  const shippingPrice = cartSummary(store.cart, store.discountCode, "delivery").shippingCost;
+  const shippingPrice = cartSummary(store.cart, store.discountCode, "delivery", redeeming ? pointsConfig.reward.euros : 0).shippingCost;
   return (
     <div className="checkout-page">
       <header className="checkout-header">
@@ -392,7 +406,7 @@ export default function CheckoutPage() {
             </div>
             {totals.discount > 0 && (
               <div>
-                <span>Descuento {store.discountCode}</span>
+                <span>{redeeming ? `Descuento ${pointsLabel(pointsConfig.reward.points)}` : `Descuento ${store.discountCode}`}</span>
                 <strong>-{formatEuroPrice(totals.discount)}</strong>
               </div>
             )}
@@ -411,6 +425,22 @@ export default function CheckoutPage() {
               <strong>{formatEuroPrice(animatedTotal)}</strong>
             </div>
           </div>
+          {points !== null && points >= pointsConfig.reward.points && (
+            <label className="pts-redeem">
+              <input type="checkbox" checked={redeeming} disabled={!canRedeem} onChange={(e) => setUsePoints(e.target.checked)} />
+              <span>
+                Usar {pointsLabel(pointsConfig.reward.points)}: {formatEuroPrice(pointsConfig.reward.euros)} menos
+                <small>
+                  {store.discountCode
+                    ? `No se acumula con ${store.discountCode}. Quítalo en la cesta para usar tus puntos.`
+                    : cartSub < pointsConfig.minSubtotal
+                      ? `Desde ${formatEuroPrice(pointsConfig.minSubtotal)} en productos.`
+                      : `Tienes ${pointsLabel(points)}.`}
+                </small>
+              </span>
+            </label>
+          )}
+          <PointsNote goodsCents={Math.round(totals.discountedSubtotal * 100)} />
           {error && (
             <div className="checkout-error" role="alert">
               {error}
@@ -525,7 +555,7 @@ function Confirmation({ order }: { order: PaidOrder }) {
           Seguir comprando
         </Link>
       </div>
-      {order.token && !order.owned && <ClaimOrder token={order.token} email={order.customer_email} />}
+      {order.token && !order.owned && <ClaimOrder token={order.token} email={order.customer_email} points={order.points} />}
     </div>
   );
 }

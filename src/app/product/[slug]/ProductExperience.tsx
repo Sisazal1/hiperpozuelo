@@ -11,6 +11,7 @@ import type { Product } from "@/types/catalog";
 import ProductVisual from "@/components/catalog/ProductVisual";
 import Gallery from "@/components/pdp/Gallery";
 import { Accordion, BuyBar, CompleteProducts, FactsBand, FamilyTiles, PayRow, PdpFaq, ReturnsAccordion, ShippingBox, Stepper, stickyColumn, useAvailability } from "@/components/pdp/parts";
+import PointsNote from "@/components/points/PointsNote";
 import Reviews, { RatingLink } from "@/components/reviews/Reviews";
 import type { ReviewData } from "@/config/reviews";
 import { isEligible, subscriptionConfig } from "@/config/subscription";
@@ -132,6 +133,7 @@ export default function ProductExperience({ product, reviews }: { product: Produ
             )}
             <PayRow total={total} />
             <ShippingBox />
+            <PointsNote goodsCents={Math.round(total * 100)} />
             <div className="pdp-acc">
               <Accordion title="Qué incluye" id="detalles" open>
                 <p>

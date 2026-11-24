@@ -10,6 +10,7 @@ import { currentCustomer } from "@/lib/server/customers";
 import { ClaimOrder, LinkToken } from "@/components/account/forms";
 import "../../account/account.css";
 import WithdrawButton from "@/components/orders/WithdrawButton";
+import { pointsConfig, pointsFor } from "@/config/points";
 import { siteConfig } from "@/config/site";
 
 export const dynamic = "force-dynamic";
@@ -200,7 +201,7 @@ export default async function OrderPage({
             </p>
           )}
         </section>
-        {!o.customer_id && o.channel === "web" && (customer ? <LinkToken token={token} /> : isNew && o.email ? <ClaimOrder token={token} /> : null)}
+        {!o.customer_id && o.channel === "web" && (customer ? <LinkToken token={token} /> : isNew && o.email ? <ClaimOrder token={token} points={Date.now() - new Date(o.created_at).getTime() < pointsConfig.linkDays * 86400_000 ? pointsFor(o.subtotal - o.discount) : 0} /> : null)}
         {siteConfig.prelaunch && o.test && <p className="order-hint">Pedido de preapertura: no se cobra ni se envía.</p>}
       </div>
     </div>

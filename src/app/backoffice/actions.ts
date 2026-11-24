@@ -16,6 +16,7 @@ import {
   verifyPayment,
 } from "@/lib/server/orders";
 import { query } from "@/lib/server/db";
+import { PointsError, adjustPoints } from "@/lib/server/points";
 import { removeReview, replyReview, restoreReview } from "@/lib/server/reviews";
 import { COURIERS, TENDERS, courierById, type OrderStatus, type Tender } from "@/lib/orders/status";
 
@@ -33,7 +34,7 @@ async function run(fn: (staff: string) => Promise<string | void>): Promise<Actio
     const ok = await fn(staff);
     return { ok: ok || "Guardado" };
   } catch (e) {
-    if (e instanceof OrderError) return { error: e.message };
+    if (e instanceof OrderError || e instanceof PointsError) return { error: e.message };
     console.error("backoffice", (e as Error).message);
     return { error: "No se ha podido guardar. Vuelve a intentarlo." };
   }
@@ -113,6 +114,10 @@ export async function posAction(input: {
     sale = { id: o.id, code: o.code };
   });
   return { ...r, ...(sale ?? {}) };
+}
+
+export async function adjustPointsAction(_: ActionState, f: FormData) {
+  return run((s) => adjustPoints(str(f, "customer"), Number(str(f, "points").trim().replace("−", "-")), str(f, "reason"), s));
 }
 
 // ---------- Reseñas ----------
