@@ -3505,3 +3505,12 @@ body:has(.sticky-buy.is-visible) footer:last-of-type {
     min-height: 44px;
   }
 }
+.info-page .commerce-container > ul:not(.pay-marks) {
+  list-style: disc;
+}
+.info-page .commerce-container > ol {
+  list-style: decimal;
+}
+.info-page .commerce-container > :is(p, ul, ol, .info-table) + :is(p, ul, ol) {
+  margin-top: 14px;
+}
