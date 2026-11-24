@@ -2,7 +2,7 @@
 // endpoint de Stripe: si un importe cambia aquí, cambia igual en todas partes.
 import { getProductById } from "@/lib/catalog/products";
 import { getBundleById, calculateBundleTotal } from "@/lib/catalog/bundles";
-import { calculateDiscount, calculateOrderTotals, commerceConfig, type DeliveryMethod } from "@/config/commerce";
+import { calculateDiscount, calculateOrderTotals, commerceConfig, paymentRules, type DeliveryMethod } from "@/config/commerce";
 
 export type PricedLineInput = {
   type: "product" | "bundle" | "custom_bundle";
@@ -36,7 +36,8 @@ export function lineUnitPrice(line: PricedLineInput): number | null {
   return sum > 0 ? cents(sum) : null;
 }
 
-export const lineQuantity = (line: PricedLineInput) => Math.max(1, Math.floor(Number(line.quantity) || 1));
+export const lineQuantity = (line: PricedLineInput) => 
+  Math.min(paymentRules.maxLineQuantity, Math.max(1, Math.floor(Number(line.quantity) || 1)));
 
 export function lineTotal(line: PricedLineInput) {
   const unit = lineUnitPrice(line);

@@ -27,3 +27,5 @@ outputs/
 
 # local de Claude (rutas de esta máquina)
 /.claude/launch.json
+
+.data

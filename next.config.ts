@@ -9,6 +9,10 @@ export default function config(phase: string): NextConfig {
   const nextConfig: NextConfig = {
     reactStrictMode: true,
     poweredByHeader: false,
+    // Pedidos propios (seguimiento, pago al recibir, backoffice): necesitan base de datos. Se fija al
+    // compilar para que las páginas no prometan lo que este entorno no puede cumplir.
+    env: { NEXT_PUBLIC_ORDERS: process.env.DATABASE_URL || !process.env.VERCEL ? "1" : "" },
+    serverExternalPackages: ["@electric-sql/pglite", "pg"],
     ...(phase === PHASE_DEVELOPMENT_SERVER ? { distDir: ".next-dev" } : {}),
     // Sin esto Next elige C:\Users\simon como raíz del workspace por el package-lock.json
     // suelto de la carpeta de usuario y avisa en cada build.

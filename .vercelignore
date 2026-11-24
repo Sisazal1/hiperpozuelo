@@ -8,3 +8,11 @@ tsconfig.tsbuildinfo
 *.zip
 .env*.local
 .env
+
+tests
+test-results
+playwright-report
+assets-src
+.claude
+.next-dev
+.data

@@ -9,6 +9,7 @@ import { getCategoryById } from "@/lib/catalog/categories";
 import { commerceConfig } from "@/config/commerce";
 import type { Product } from "@/types/catalog";
 import ProductVisual from "@/components/catalog/ProductVisual";
+import { track } from "@/lib/track";
 import { useAddedFeedback, useFocusTrap, useScrolledPast, useTweenedNumber } from "@/components/motion/hooks";
 
 function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void }) {
@@ -111,6 +112,7 @@ function Stepper({ value, onChange, label }: { value: number; onChange: (n: numb
 }
 
 export default function ProductExperience({ product }: { product: Product }) {
+  useEffect(() => track("product_view"), [product.id]);
   const { favorites, toggleFavorite, addProduct } = useStore();
   const [quantity, setQuantity] = useState(1);
   const [quick, setQuick] = useState<Product | null>(null);

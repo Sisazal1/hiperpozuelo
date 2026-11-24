@@ -12,9 +12,9 @@ export const ROUTES = [
   "/checkout",
   "/favorites",
   "/account",
-  
-  
-  
+  "/pedido",
+  "/pago-seguro",
+  "/backoffice/entrar",
   "/faq",
   "/contacto",
   "/envios-y-devoluciones",

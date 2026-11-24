@@ -9,7 +9,7 @@ export default function CookieBanner() {
   if (!visible) return null;
   return (
     <aside className="cookie-banner" role="region" aria-label="Información de almacenamiento">
-      <p>Usamos solo almacenamiento técnico para cesta y favoritos. No utilizamos analítica.</p>
+      <p>Solo guardamos en tu navegador lo necesario para la cesta, los favoritos y tus pedidos. Sin rastreo.</p>
       <Link href="/cookies">Más información</Link>
       <button
         onClick={() => {

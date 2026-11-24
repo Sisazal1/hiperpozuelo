@@ -7,8 +7,9 @@ Contexto para agentes de código (OpenCode, Codex, Claude Code). Léelo antes de
 Tienda online de **Hiper Pozuelo S.L.** (bazar de barrio en C/ Sevilla 5, Pozuelo de Alarcón,
 Madrid) en **preapertura**, con pago de Stripe en modo test. El objetivo es una experiencia
 premium y lista para lanzar, no un escaparate de demostración. Hay rutas de servidor
-(`/api/checkout`, webhook de Stripe). No hay base de datos propia: el pedido vive en Stripe y en
-su metadata, salvo que el usuario apruebe otra cosa.
+(`/api/checkout`, webhook de Stripe, pedidos) y un backoffice en `/backoffice` con TPV e inventario.
+Los pedidos viven en Postgres (`src/lib/server`, aprobado por el usuario); sin `DATABASE_URL` en
+Vercel esas funciones se apagan solas. Ver `DEPLOY.md`.
 
 ## Reglas de contenido y confianza (prevalecen sobre cualquier brief antiguo)
 

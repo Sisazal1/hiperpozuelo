@@ -103,16 +103,20 @@ test("checkout: delivery/recogida son controles accesibles con estado", async ({
   await seedCart(page, [{ lineId: "p", type: "product", productId: "HP-KIT-001", quantity: 1, quantities: {} }]);
   await page.goto("/checkout");
   const opt = page.getByRole("radio", { name: /recogida/i });
-  await opt.click();
+  await opt.check();
   await expect(opt).toBeChecked();
 });
 
 test("checkout: pagar redirige a Stripe o muestra error recuperable", async ({ page }) => {
   await seedCart(page, [{ lineId: "p", type: "product", productId: "HP-KIT-001", quantity: 1, quantities: {} }]);
   await page.goto("/checkout");
+  await page.getByRole("radio", { name: /recogida/i }).check();
+  await page.getByLabel("Nombre y apellidos").fill("Cliente Prueba");
+  await page.getByLabel("Teléfono").fill("612345678");
+  await page.getByLabel("Email").fill("cliente@example.com");
   const [resp] = await Promise.all([
     page.waitForResponse((r) => r.url().includes("/api/checkout") && r.request().method() === "POST"),
-    page.getByRole("button", { name: /pagar/i }).click(),
+    page.locator(".checkout-pay").click(),
   ]);
   if (resp.status() === 200) await expect(page).toHaveURL(/checkout\.stripe\.com/, { timeout: 15000 });
   else await expect(page.locator(".checkout-error")).toBeVisible();

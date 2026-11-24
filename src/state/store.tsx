@@ -4,6 +4,10 @@ import { getProductById } from "@/lib/catalog/products";
 import { cartSubtotal } from "@/lib/cart/totals";
 import { toast } from "@/components/motion/Toaster";
 import type { Product } from "@/types/catalog";
+import { paymentRules } from "@/config/commerce";
+import { track } from "@/lib/track";
+
+const MAX = paymentRules.maxLineQuantity;
 
 export type ProductLine = {
   lineId: string;
@@ -69,7 +73,7 @@ const normalize = (raw: unknown): CartLine[] =>
                 lineId: x.lineId || x.productId,
                 type: "product",
                 productId: x.productId,
-                quantity: Math.max(1, x.quantity || 1),
+                quantity: Math.min(MAX, Math.max(1, x.quantity || 1)),
                 quantities: {},
               },
             ]
@@ -78,12 +82,12 @@ const normalize = (raw: unknown): CartLine[] =>
                 {
                   ...x,
                   lineId: x.lineId || x.bundleId,
-                  quantity: Math.max(1, x.quantity || 1),
+                  quantity: Math.min(MAX, Math.max(1, x.quantity || 1)),
                   quantities: x.quantities || {},
                 },
               ]
             : x?.type === "custom_bundle" && Array.isArray(x.productIds)
-              ? [{ ...x, quantity: Math.max(1, x.quantity || 1), quantities: x.quantities || {} }]
+              ? [{ ...x, quantity: Math.min(MAX, Math.max(1, x.quantity || 1)), quantities: x.quantities || {} }]
               : [],
       )
     : [];
@@ -137,10 +141,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         toast(saved ? `${name} ya no está en favoritos` : `${name} guardado en favoritos`, saved ? "unheart" : "heart");
       },
       addProduct: (id) => {
+        if (!cart.length) track("add_to_cart");
         setCart((x) => {
           const line = x.find((i) => i.type === "product" && i.productId === id);
           return line
-            ? x.map((i) => (i === line ? { ...i, quantity: i.quantity + 1 } : i))
+            ? x.map((i) => (i === line ? { ...i, quantity: Math.min(MAX, i.quantity + 1) } : i))
             : [
                 ...x,
                 { lineId: `product-${id}`, type: "product", productId: id, quantity: 1, quantities: {} },
@@ -150,10 +155,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setCartDrawerOpen(true);
       },
       addBundle: (bundleId, tier) => {
+        if (!cart.length) track("add_to_cart");
         setCart((x) => {
           const line = x.find((i) => i.type === "bundle" && i.bundleId === bundleId && i.tier === tier);
           return line
-            ? x.map((i) => (i === line ? { ...i, quantity: i.quantity + 1 } : i))
+            ? x.map((i) => (i === line ? { ...i, quantity: Math.min(MAX, i.quantity + 1) } : i))
             : [
                 ...x,
                 {
@@ -170,6 +176,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setCartDrawerOpen(true);
       },
       addCustomBundle: (productIds, quantities, categoryId) => {
+        if (!cart.length) track("add_to_cart");
         const lineId = `custom-${Date.now()}`;
         markAdded(lineId);
         setCart((x) => [
@@ -195,7 +202,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         ),
       updateQuantity: (lineId, delta) =>
         setCart((x) =>
-          x.map((i) => (i.lineId === lineId ? { ...i, quantity: Math.max(1, i.quantity + delta) } : i)),
+          x.map((i) => (i.lineId === lineId ? { ...i, quantity: Math.min(MAX, Math.max(1, i.quantity + delta)) } : i)),
         ),
       removeLine: (lineId) => setCart((x) => x.filter((i) => i.lineId !== lineId)),
       clearCart: () => setCart([]),

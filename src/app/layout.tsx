@@ -11,6 +11,8 @@ import AnnouncementTicker from "@/components/site/AnnouncementTicker";
 import IntroSplash from "@/components/motion/IntroSplash";
 import RouteProgress from "@/components/motion/RouteProgress";
 import Toaster from "@/components/motion/Toaster";
+import StoreChrome from "@/components/site/StoreChrome";
+import VisitCounter from "@/components/site/VisitCounter";
 import ScrollReveal from "@/components/motion/ScrollReveal";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
 
@@ -35,20 +37,27 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a className="skip-link" href="#main-content">
           Saltar al contenido
         </a>
-        <IntroSplash />
+        <StoreChrome>
+          <IntroSplash />
+        </StoreChrome>
         <StoreProvider>
           <RouteProgress />
           <ScrollReveal />
-          <AnnouncementTicker />
-          <GlobalNavbar />
+          <StoreChrome>
+            <AnnouncementTicker />
+            <GlobalNavbar />
+          </StoreChrome>
           <main id="main-content" tabIndex={-1}>
             {children}
           </main>
-          <SiteFooter />
-          <CartDrawer />
+          <StoreChrome>
+            <SiteFooter />
+            <CartDrawer />
+            <CookieBanner />
+            <WelcomeScratch />
+            <VisitCounter />
+          </StoreChrome>
           <Toaster />
-          <CookieBanner />
-          <WelcomeScratch />
         </StoreProvider>
       </body>
     </html>

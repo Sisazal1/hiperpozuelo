@@ -1,5 +1,13 @@
-// Registro local (solo este navegador) de pedidos ya pagados y confirmados por Stripe.
-export type LocalOrder = { id: string; createdAt: string; amount: number; items: number; delivery: "delivery" | "collect" };
+// Accesos directos a pedidos hechos desde este navegador. El estado real vive en el servidor (/pedido/[token]).
+export type LocalOrder = {
+  id: string;
+  code?: string;
+  token?: string;
+  createdAt: string;
+  amount: number;
+  items: number;
+  delivery: "delivery" | "collect";
+};
 const KEY = "hp-orders";
 
 export function readLocalOrders(): LocalOrder[] {
