@@ -700,3 +700,14 @@
     display: block;
   }
 }
+.bo textarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 12px;
+  border: 1px solid #8b8680;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-weight: 400;
+  resize: vertical;
+}

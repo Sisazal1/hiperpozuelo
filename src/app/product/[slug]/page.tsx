@@ -1,16 +1,23 @@
 import { notFound } from "next/navigation";
-import { getAllProducts, getProductBySlug } from "@/lib/catalog/products";
+import { getProductBySlug } from "@/lib/catalog/products";
 import ProductExperience from "./ProductExperience";
+import { reviewData } from "@/lib/server/reviews";
+
+// Se genera al pedirla y se renueva al publicarse o retirarse una reseña.
+export const revalidate = 600;
+
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const product = getProductBySlug(slug);
   if (!product) notFound();
+  const reviews = await reviewData("product", product.id);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name_es,
     description: product.description_es,
     sku: product.id,
+    ...(reviews.count ? { aggregateRating: { "@type": "AggregateRating", ratingValue: reviews.average, reviewCount: reviews.count, bestRating: 5, worstRating: 1 } } : {}),
     offers: {
       "@type": "Offer",
       price: product.proposed_price_eur,
@@ -21,7 +28,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   return (
     <div className="product-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <ProductExperience product={product} />
+      <ProductExperience product={product} reviews={reviews} />
     </div>
   );
 }
@@ -35,5 +42,5 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 export function generateStaticParams() {
-  return getAllProducts().map((p) => ({ slug: p.slug }));
+  return [] as { slug: string }[];
 }

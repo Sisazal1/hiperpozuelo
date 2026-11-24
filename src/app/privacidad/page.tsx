@@ -54,6 +54,11 @@ export default function PrivacyPage() {
                     <td>Contrato</td>
                   </tr>
                   <tr>
+                    <th scope="row">Reseñas, si las escribes: estrellas, texto y el nombre público que elijas</th>
+                    <td>Publicarlas y comprobar que vienen de una compra</td>
+                    <td>Contrato y obligación legal de verificarlas</td>
+                  </tr>
+                  <tr>
                     <th scope="row">Email, si marcas que quieres ofertas</th>
                     <td>Enviarte ofertas y novedades</td>
                     <td>Consentimiento, que puedes retirar en tu cuenta</td>
@@ -77,7 +82,7 @@ export default function PrivacyPage() {
 
         {ordersEnabled && (
           <p>
-            En <Link href="/account">tu cuenta</Link> puedes descargar tus datos o eliminarla. Al eliminarla borramos el perfil; los pedidos que la ley obliga a conservar quedan sin vínculo con él.
+            En <Link href="/account">tu cuenta</Link> puedes descargar tus datos o eliminarla. Al eliminarla borramos el perfil y tus reseñas; los pedidos que la ley obliga a conservar quedan sin vínculo con él.
           </p>
         )}
 

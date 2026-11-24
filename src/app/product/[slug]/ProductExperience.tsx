@@ -11,12 +11,14 @@ import type { Product } from "@/types/catalog";
 import ProductVisual from "@/components/catalog/ProductVisual";
 import Gallery from "@/components/pdp/Gallery";
 import { Accordion, BuyBar, CompleteProducts, FactsBand, FamilyTiles, PayRow, PdpFaq, ReturnsAccordion, ShippingBox, Stepper, stickyColumn, useAvailability } from "@/components/pdp/parts";
+import Reviews, { RatingLink } from "@/components/reviews/Reviews";
+import type { ReviewData } from "@/config/reviews";
 import { isEligible, subscriptionConfig } from "@/config/subscription";
 import { useBuyBar } from "@/components/pdp/useBuyBar";
 import { track } from "@/lib/track";
 import { useAddedFeedback, useTweenedNumber } from "@/components/motion/hooks";
 
-export default function ProductExperience({ product }: { product: Product }) {
+export default function ProductExperience({ product, reviews }: { product: Product; reviews: ReviewData }) {
   useEffect(() => track("product_view"), [product.id]);
   const { favorites, toggleFavorite, addProduct } = useStore();
   const [quantity, setQuantity] = useState(1);
@@ -70,6 +72,7 @@ export default function ProductExperience({ product }: { product: Product }) {
         </div>
         <div className="pdp-col pdp-panel" ref={panel}>
           <div className="pdp-inner" ref={stickyColumn}>
+            <RatingLink data={reviews} />
             <div className="pdp-head">
               <div>
                 <h1>{product.name_es}</h1>
@@ -142,6 +145,7 @@ export default function ProductExperience({ product }: { product: Product }) {
         </div>
       </div>
       <CompleteProducts products={related} soldOut={soldOut} />
+      <Reviews type="product" id={product.id} data={reviews} />
       <FamilyTiles />
       <FactsBand />
       <PdpFaq />

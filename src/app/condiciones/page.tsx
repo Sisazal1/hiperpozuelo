@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ordersEnabled, paymentRules } from "@/config/commerce";
 import { subscriptionConfig } from "@/config/subscription";
+import { reviewConfig } from "@/config/reviews";
 import { siteConfig } from "@/config/site";
 import { formatEuroPrice } from "@/lib/catalog/pricing";
 
@@ -60,6 +61,20 @@ export default function TermsPage() {
         <p>
           Las zonas, los costes, el derecho de desistimiento de 14 días y la garantía legal están en <Link href="/envios-y-devoluciones">envíos y devoluciones</Link>.
         </p>
+
+        {ordersEnabled && (
+          <>
+            <h2 id="resenas">Reseñas</h2>
+            <p>
+              Solo puede opinar quien tiene en su cuenta un pedido entregado o recogido que contiene el artículo, hasta {reviewConfig.days} días naturales después. Lo comprobamos de forma automática antes de guardar cada
+              reseña. Hay una por artículo y pedido, y su autor puede editarla o borrarla.
+            </p>
+            <p>
+              Publicamos todas, positivas y negativas, y la media cuenta todas las publicadas. No pagamos ni premiamos opiniones. Solo retiramos las que son spam, insultan, muestran datos personales o son ilegales; el motivo queda
+              registrado y su autor lo ve. La tienda puede responder en público. Las de pedidos de prueba no se publican ni cuentan.
+            </p>
+          </>
+        )}
 
         <h2>Reclamaciones</h2>
         <p>

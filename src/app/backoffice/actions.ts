@@ -16,6 +16,7 @@ import {
   verifyPayment,
 } from "@/lib/server/orders";
 import { query } from "@/lib/server/db";
+import { removeReview, replyReview, restoreReview } from "@/lib/server/reviews";
 import { COURIERS, TENDERS, courierById, type OrderStatus, type Tender } from "@/lib/orders/status";
 
 export type ActionState = { error?: string; ok?: string };
@@ -112,6 +113,21 @@ export async function posAction(input: {
     sale = { id: o.id, code: o.code };
   });
   return { ...r, ...(sale ?? {}) };
+}
+
+// ---------- Reseñas ----------
+const orThrow = async (p: Promise<string | null>) => {
+  const error = await p;
+  if (error) throw new OrderError(error);
+};
+export async function removeReviewAction(_: ActionState, f: FormData) {
+  return run((s) => orThrow(removeReview(Number(str(f, "id")), str(f, "reason"), str(f, "detail"), s)));
+}
+export async function restoreReviewAction(_: ActionState, f: FormData) {
+  return run((s) => orThrow(restoreReview(Number(str(f, "id")), s)));
+}
+export async function replyReviewAction(_: ActionState, f: FormData) {
+  return run((s) => orThrow(replyReview(Number(str(f, "id")), str(f, "reply"), s)));
 }
 
 /** Buscador de mostrador: código leído del QR → ficha del pedido. */

@@ -1,13 +1,31 @@
 import { notFound } from "next/navigation";
 import PackDetail from "@/components/packs/PackDetail";
 import { families } from "@/lib/catalog/families";
-import { getAllBundles, TIER_LABEL } from "@/lib/catalog/bundles";
+import { calculateBundleTotal, getAllBundles, TIER_LABEL } from "@/lib/catalog/bundles";
+import { reviewData } from "@/lib/server/reviews";
+
+export const revalidate = 600;
 
 export default async function PackDetailPage({ params }: { params: Promise<{ family: string; tier: string }> }) {
   const { family, tier } = await params;
   const bundle = getAllBundles().find((b) => b.category_id === family && b.tier === tier);
   if (!bundle) notFound();
-  return <PackDetail key={bundle.id} familyId={family} bundle={bundle} />;
+  const reviews = await reviewData("bundle", bundle.id);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: bundle.name_es,
+    description: bundle.description_es,
+    sku: bundle.id,
+    ...(reviews.count ? { aggregateRating: { "@type": "AggregateRating", ratingValue: reviews.average, reviewCount: reviews.count, bestRating: 5, worstRating: 1 } } : {}),
+    offers: { "@type": "Offer", price: calculateBundleTotal(bundle), priceCurrency: "EUR", availability: "https://schema.org/PreOrder" },
+  };
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <PackDetail key={bundle.id} familyId={family} bundle={bundle} reviews={reviews} />
+    </>
+  );
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ family: string; tier: string }> }) {
@@ -22,5 +40,5 @@ export async function generateMetadata({ params }: { params: Promise<{ family: s
 }
 
 export function generateStaticParams() {
-  return getAllBundles().map((b) => ({ family: b.category_id, tier: b.tier }));
+  return [] as { family: string; tier: string }[];
 }

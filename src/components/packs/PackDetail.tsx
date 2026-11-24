@@ -1,4 +1,6 @@
 "use client";
+import Reviews, { RatingLink } from "@/components/reviews/Reviews";
+import type { ReviewData } from "@/config/reviews";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
@@ -18,7 +20,7 @@ import { useAddedFeedback, useTweenedNumber } from "@/components/motion/hooks";
 
 const tiers: BundleTier[] = ["small", "medium", "large"];
 
-export default function PackDetail({ familyId, bundle }: { familyId: string; bundle: Bundle }) {
+export default function PackDetail({ familyId, bundle, reviews }: { familyId: string; bundle: Bundle; reviews: ReviewData }) {
   const { addBundle, addCustomBundle } = useStore();
   const family = families.find((f) => f.id === familyId)!;
   const siblings = getAllBundles().filter((b) => b.category_id === familyId);
@@ -62,6 +64,7 @@ export default function PackDetail({ familyId, bundle }: { familyId: string; bun
         </div>
         <div className="pdp-col pdp-panel" ref={panel}>
           <div className="pdp-inner" ref={stickyColumn}>
+            <RatingLink data={reviews} />
             <div className="pdp-head">
               <div>
                 <h1>{bundle.name_es}</h1>
@@ -156,6 +159,7 @@ export default function PackDetail({ familyId, bundle }: { familyId: string; bun
         </div>
       </div>
       <CompletePacks familyId={familyId} soldOut={soldOut} />
+      <Reviews type="bundle" id={bundle.id} data={reviews} />
       <FamilyTiles />
       <FactsBand />
       <PdpFaq />

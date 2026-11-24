@@ -116,6 +116,18 @@ create table if not exists subscription_events (
   label text not null, actor text not null, at timestamptz not null default now()
 );
 alter table orders add column if not exists subscription_id text references subscriptions(id) on delete set null;
+create table if not exists reviews (
+  id serial primary key, subject_type text not null, subject_id text not null,
+  customer_id text not null references customers(id) on delete cascade,
+  order_id text not null references orders(id) on delete cascade,
+  rating int not null check (rating between 1 and 5), body text not null default '', public_name text not null,
+  test boolean not null default false, status text not null default 'published',
+  removed_reason text, removed_detail text, removed_by text, removed_at timestamptz,
+  reply text, reply_by text, reply_at timestamptz,
+  created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
+  unique (order_id, subject_type, subject_id)
+);
+create index if not exists reviews_subject on reviews (subject_type, subject_id);
 create table if not exists login_attempts (ip text not null, at timestamptz not null default now());
 `;
 
