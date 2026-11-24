@@ -126,6 +126,24 @@ try {
   rows = await ledger("bea@example.com");
   check("Reembolso total con canje: devuelve los 50", (await me(bea)).points === 60 && sum(rows) === 60, JSON.stringify(rows.map((r) => [r.type, r.points])));
 
+  // ---------- Ciclo de suscripción ----------
+  const sus = await new Client().signup("sus@example.com", undefined, "Sus");
+  const st = await sus.req("POST", "/api/subscription/start", {
+    items: ["HP-CLE-001", "HP-CLE-003", "HP-CLE-004", "HP-CLE-006"].map((id) => ({ id, n: 1 })), weeks: 4, delivery: "collect", consent: true,
+    customer: { name: "Cliente Prueba", email: "sus@example.com", phone: "600000002" },
+  });
+  const subSession = st.json.url.match(/cs_test_[A-Za-z0-9_]+/)[0];
+  opened.push(subSession);
+  const { metadata } = await stripe.checkout.sessions.retrieve(subSession);
+  const cus = await stripe.customers.create({ name: "Cliente Prueba", payment_method: "pm_card_visa", invoice_settings: { default_payment_method: "pm_card_visa" } });
+  const goods = await stripe.products.create({ name: "Reposición Hiper Pozuelo", metadata: { kind: "goods" } });
+  const sub = await stripe.subscriptions.create({ customer: cus.id, items: [{ price_data: { currency: "eur", product: goods.id, unit_amount: 671, recurring: { interval: "week", interval_count: 4 } } }], metadata: { hp_subscription: metadata.hp_subscription } });
+  for (let i = 0; i < 2; i++) await hook("invoice.paid", { id: sub.latest_invoice, object: "invoice" });
+  rows = await ledger("sus@example.com");
+  check("Ciclo de suscripción de 6,71 €: 6 puntos, una vez", rows.length === 1 && rows[0].points === 6, JSON.stringify(rows.map((r) => [r.type, r.points])));
+  await stripe.subscriptions.cancel(sub.id);
+  await stripe.customers.del(cus.id);
+
   // ---------- Invitado que se vincula ----------
   const guest = async (days) => {
     const c = new Client();

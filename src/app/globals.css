@@ -968,7 +968,7 @@ small {
 .nav-action svg {
   width: 20px;
 }
-.nav-action span {
+.nav-action span:not(.sr-only) {
   font-size: 0.78rem;
 }
 .cart-action b {
