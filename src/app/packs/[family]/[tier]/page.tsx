@@ -1,16 +1,13 @@
 import { notFound } from "next/navigation";
-import PacksExperience from "@/components/packs/PacksExperience";
+import PackDetail from "@/components/packs/PackDetail";
 import { families } from "@/lib/catalog/families";
 import { getAllBundles, TIER_LABEL } from "@/lib/catalog/bundles";
-import type { BundleTier } from "@/types/catalog";
-
-const valid = (family: string, tier: string) =>
-  getAllBundles().some((b) => b.category_id === family && b.tier === tier);
 
 export default async function PackDetailPage({ params }: { params: Promise<{ family: string; tier: string }> }) {
   const { family, tier } = await params;
-  if (!valid(family, tier)) notFound();
-  return <PacksExperience initialFamily={family} initialTier={tier as BundleTier} />;
+  const bundle = getAllBundles().find((b) => b.category_id === family && b.tier === tier);
+  if (!bundle) notFound();
+  return <PackDetail key={bundle.id} familyId={family} bundle={bundle} />;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ family: string; tier: string }> }) {

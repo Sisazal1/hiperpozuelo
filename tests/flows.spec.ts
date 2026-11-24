@@ -93,7 +93,7 @@ test("tienda: filtro por categoría y orden por precio", async ({ page }) => {
 test("pack deep link → añadir → la cesta tiene el pack con su precio", async ({ page }) => {
   await page.goto("/packs/kitchen/small");
   await expect(page.locator(".pack-summary-price")).toContainText("7,95");
-  await page.locator(".pack-detail-summary .add-main").click();
+  await page.locator(".pdp-panel .add-main").click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page.getByRole("dialog")).toContainText("7,95");
   await expect(page.getByRole("dialog"), "el tier no debe salir en inglés").not.toContainText(/\bsmall\b/);

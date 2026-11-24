@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./experience.css";
+import "./pdp.css";
 import { StoreProvider } from "@/state/store";
 import GlobalNavbar from "@/components/navigation/GlobalNavbar";
 import SiteFooter from "@/components/site/SiteFooter";

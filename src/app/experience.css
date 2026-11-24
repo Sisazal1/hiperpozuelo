@@ -424,7 +424,7 @@ html[data-intro="play"] .hp-hero-eyebrow {
 
 /* ---------- Transición de entrada de página ---------- */
 .page-transition {
-  animation: page-in 0.55s var(--ease-out-expo) both;
+  animation: page-in 0.55s var(--ease-out-expo) backwards; /* con «both» el transform final rompía position: fixed */
 }
 @keyframes page-in {
   from { opacity: 0; transform: translateY(14px); }
