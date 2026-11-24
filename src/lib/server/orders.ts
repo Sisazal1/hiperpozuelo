@@ -110,6 +110,7 @@ export type NewOrder = {
   customer?: { name?: string; email?: string; phone?: string };
   address?: { line?: string; postalCode?: string; city?: string; note?: string };
   requestKey?: string | null;
+  customerId?: string | null;
   actor: string;
   test: boolean;
 };
@@ -125,14 +126,14 @@ async function createOrderIn(q: Exec, o: NewOrder): Promise<Row> {
     const status: OrderStatus = o.mode === "online" ? "awaiting_payment" : o.channel === "pos" ? "delivered" : "received";
     const [row] = await q(
       `insert into orders (id,code,token,channel,status,payment_mode,payment_status,delivery,customer_name,email,phone,address,postal_code,city,delivery_note,
-         subtotal,discount,shipping,surcharge,total,discount_code,request_key,test,delivered_at)
-       values ($1,$2,$3,$4,$5,$6,'pending',$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23) returning *`,
+         subtotal,discount,shipping,surcharge,total,discount_code,request_key,test,delivered_at,customer_id,linked_at)
+       values ($1,$2,$3,$4,$5,$6,'pending',$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,case when $24::text is null then null else now() end) returning *`,
       [
         randomUUID(), newCode(), randomBytes(18).toString("base64url"), o.channel, status, o.mode, o.delivery,
         o.customer?.name || null, o.customer?.email || null, o.customer?.phone || null,
         o.address?.line || null, o.address?.postalCode || null, o.address?.city || null, o.address?.note || null,
         o.totals.subtotal, o.totals.discount, o.totals.shipping, o.totals.surcharge, o.totals.total, o.totals.discountCode,
-        o.requestKey || null, o.test, status === "delivered" ? new Date().toISOString() : null,
+        o.requestKey || null, o.test, status === "delivered" ? new Date().toISOString() : null, o.customerId ?? null,
       ],
     );
     for (const l of o.lines)

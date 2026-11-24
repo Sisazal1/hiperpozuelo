@@ -13,6 +13,7 @@ import {
   shortages,
   totalsFor,
 } from "@/lib/server/orders";
+import { currentCustomer } from "@/lib/server/customers";
 import { methodsFor, stripeClient, stripeIsTest, welcomeCouponId } from "@/lib/server/stripe";
 import type { PaymentMode } from "@/lib/orders/status";
 
@@ -57,6 +58,8 @@ export async function POST(req: Request) {
   if (totals.total < 50) return fail("invalid_request");
   const db = dbAvailable();
   const requestKey = text(body.requestKey, 64) || null;
+  // Comprar nunca exige cuenta; si hay sesión, el pedido queda en ella.
+  const customerId = (await currentCustomer().catch(() => null))?.id ?? null;
 
   try {
     if (db) {
@@ -76,7 +79,7 @@ export async function POST(req: Request) {
       const order = await createOrder({
         channel: "web", mode, delivery, lines, totals, customer,
         address: delivery === "delivery" ? address : undefined,
-        requestKey, actor: "Cliente", test: siteConfig.prelaunch,
+        requestKey, customerId, actor: "Cliente", test: siteConfig.prelaunch,
       });
       return NextResponse.json({ order: order.token });
     }
@@ -88,7 +91,7 @@ export async function POST(req: Request) {
       ? await createOrder({
           channel: "web", mode, delivery, lines, totals, customer,
           address: delivery === "delivery" ? address : undefined,
-          requestKey: null, actor: "Cliente", test: stripeIsTest(),
+          requestKey: null, customerId, actor: "Cliente", test: stripeIsTest(),
         })
       : null;
     const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
@@ -170,10 +173,12 @@ export async function GET(req: Request) {
     const charge = pi?.latest_charge as Stripe.Charge | null | undefined;
     let token: string | null = null;
     let code: string | null = null;
+    let owned = false;
     if (dbAvailable() && pi) {
       const order = await markPaidOnline(session.id, pi.id, session.amount_total ?? 0);
       token = order?.token ?? null;
       code = order?.code ?? null;
+      owned = Boolean(order?.customer_id);
     }
     const recent = Date.now() / 1000 - session.created < 3 * 3600;
     const ship = pi?.shipping?.address;
@@ -181,6 +186,7 @@ export async function GET(req: Request) {
       id: session.id,
       code,
       token,
+      owned,
       status: session.status,
       payment_status: session.payment_status,
       payment_reference: pi?.id ?? null,

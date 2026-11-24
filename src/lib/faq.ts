@@ -16,10 +16,10 @@ export const FAQ: { q: string; a: string; home?: boolean }[] = [
     ? [{ q: "¿Puedo pagar al recibirlo?", a: `Sí: al recoger en tienda, o contra reembolso en pedidos a domicilio de hasta ${formatEuroPrice(paymentRules.codMax)}.` }]
     : []),
   { q: "¿Qué lleva cada pack?", a: "Lo ves producto a producto antes de comprar. El precio del pack es la suma de lo que incluye: sin letra pequeña.", home: true },
-  { q: "¿Cómo se paga?", a: `Online con tarjeta y los demás métodos que ves al pagar, a través de Stripe${ordersEnabled ? "; al recoger en tienda; o contra reembolso al recibirlo" : ""}. Sin crear cuenta.`, home: true },
+  { q: "¿Cómo se paga?", a: `Online con tarjeta y los demás métodos que ves al pagar, a través de Stripe${ordersEnabled ? "; al recoger en tienda; o contra reembolso al recibirlo" : ""}. Sin necesidad de cuenta.`, home: true },
   { q: "¿Puedo devolver un producto?", a: "Tienes 14 días naturales para desistir de la compra, con las excepciones que marca la ley.", home: true },
   ...(siteConfig.deliveryTime || ordersEnabled
     ? [{ q: "¿Cuándo recibiré mi pedido?", a: siteConfig.deliveryTime ?? "Puedes ver en qué punto está en «Seguir mi pedido», con tu código y el email o teléfono de la compra." }]
     : []),
-  { q: "¿Necesito una cuenta?", a: ordersEnabled ? "No. Compras como invitado y sigues el pedido con su código. Tu cesta y favoritos se guardan en este navegador." : "No. Compras como invitado. Tu cesta y favoritos se guardan en este navegador." },
+  { q: "¿Necesito una cuenta?", a: ordersEnabled ? "No. Compras como invitado y sigues el pedido con su código. Si creas una cuenta, tienes tus pedidos, direcciones y favoritos en cualquier dispositivo." : "No. Compras como invitado. Tu cesta y favoritos se guardan en este navegador." },
 ];

@@ -54,6 +54,8 @@ test.describe("móvil: objetivos táctiles y tipografía", () => {
             const r = el.getBoundingClientRect();
             // Enlaces en línea dentro de párrafos están exentos (WCAG 2.5.8 excepción "inline").
             if (el.tagName === "A" && el.closest("p, li") && getComputedStyle(el).display === "inline") return false;
+            // Una casilla dentro de su <label> se toca en toda la etiqueta.
+            if (el instanceof HTMLInputElement && /checkbox|radio/.test(el.type) && el.closest("label")) return el.closest("label")!.getBoundingClientRect().height < 44;
             return r.height < 44 || r.width < 24;
           })
           .map((el) => {

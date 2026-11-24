@@ -6,6 +6,9 @@ import { Check, PackageCheck } from "lucide-react";
 import { dbAvailable } from "@/lib/server/db";
 import { canWithdraw, getOrderByToken, withdrawalDeadline } from "@/lib/server/orders";
 import { MODE_LABEL, STATUS_LABEL, STEPS, courierById, euros, publicPaymentLabel, type Delivery, type OrderStatus, type PaymentMode, type PaymentStatus } from "@/lib/orders/status";
+import { currentCustomer } from "@/lib/server/customers";
+import { ClaimOrder, LinkToken } from "@/components/account/forms";
+import "../../account/account.css";
 import WithdrawButton from "@/components/orders/WithdrawButton";
 import { siteConfig } from "@/config/site";
 
@@ -35,6 +38,7 @@ export default async function OrderPage({
   const data = await getOrderByToken(token);
   if (!data || ["awaiting_payment", "abandoned"].includes(data.order.status)) notFound();
   const { order: o, items, payments, events } = data;
+  const customer = await currentCustomer();
   const isNew = (await searchParams).nuevo === "1";
   const delivery = o.delivery as Delivery;
   const steps = STEPS[delivery];
@@ -196,6 +200,7 @@ export default async function OrderPage({
             </p>
           )}
         </section>
+        {!o.customer_id && o.channel === "web" && (customer ? <LinkToken token={token} /> : isNew && o.email ? <ClaimOrder token={token} /> : null)}
         {siteConfig.prelaunch && o.test && <p className="order-hint">Pedido de preapertura: no se cobra ni se envía.</p>}
       </div>
     </div>

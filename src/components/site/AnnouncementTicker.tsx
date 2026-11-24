@@ -11,7 +11,7 @@ export default function AnnouncementTicker() {
     () => [
       `Envío gratis desde ${commerceConfig.freeShippingThreshold} €`,
       `Recogida en tienda gratis`,
-      `Compra sin crear cuenta`,
+      `Compra sin cuenta`,
       ...(commerceConfig.welcomeDiscountRate > 0 ? ["−10% en tu primera compra"] : []),
       ...(siteConfig.prelaunch ? ["Preapertura: aún no se cobra ni se envía ningún pedido"] : []),
     ],

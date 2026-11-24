@@ -1,78 +1,202 @@
-"use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { ArrowRight, Heart, Package, PackageSearch, ShieldCheck } from "lucide-react";
-import { formatEuroPrice } from "@/lib/catalog/pricing";
+import QRCode from "qrcode";
+import { PackageSearch } from "lucide-react";
 import { ordersEnabled } from "@/config/commerce";
-import { readLocalOrders, type LocalOrder } from "@/lib/orders";
+import { dbAvailable } from "@/lib/server/db";
+import { addresses, currentCustomer, customerOrders, favoriteIds, type Customer } from "@/lib/server/customers";
+import { googleEnabled } from "@/lib/server/google";
+import { getProductById } from "@/lib/catalog/products";
+import { STATUS_LABEL, courierById, euros, publicPaymentLabel, type OrderStatus, type PaymentMode, type PaymentStatus } from "@/lib/orders/status";
+import LocalOrders from "@/components/account/LocalOrders";
+import { AccountSync, DeleteAccount, LinkOrder, LinkToken, NewAddress, Password, Profile, RemoveAddress, SignIn, SignOut, SignOutAll, SignUp } from "@/components/account/forms";
+import "./account.css";
 
-// No hay cuentas de cliente: la compra es como invitado y el pedido se sigue con su código.
-// Antes había un login "demo" que pedía contraseña sin backend; se ha retirado por honestidad.
-export default function AccountPage() {
-  const [orders, setOrders] = useState<LocalOrder[] | null>(null);
-  useEffect(() => setOrders(readLocalOrders()), []);
+export const dynamic = "force-dynamic";
+type Params = { pedido?: string; google?: string; eliminada?: string };
+
+const day = (iso: string) => new Date(iso).toLocaleDateString("es-ES", { timeZone: "Europe/Madrid", day: "numeric", month: "long", year: "numeric" });
+
+export default async function AccountPage({ searchParams }: { searchParams: Promise<Params> }) {
+  const p = await searchParams;
+  const on = ordersEnabled && dbAvailable();
+  const customer = on ? await currentCustomer() : null;
+  const pending = typeof p.pedido === "string" && /^[\w-]{20,40}$/.test(p.pedido) ? p.pedido : null;
+  return <div className="acc">{customer ? <Home c={customer} pending={pending} /> : <Guest on={on} p={p} />}</div>;
+}
+
+function Guest({ on, p }: { on: boolean; p: Params }) {
   return (
-    <div className="account-page">
-      <div className="account-container">
-        <header className="account-hero" data-reveal>
-          <span className="eyebrow">Tu cuenta</span>
-          <h1>Aquí no hace falta contraseña.</h1>
-          <p>Compras como invitado, sin registrarte.{ordersEnabled ? " Cada pedido tiene un código para seguirlo cuando quieras." : ""}</p>
-        </header>
-        <div className="account-cards" data-reveal-stagger>
-          <Link href="/favorites" className="account-card" data-reveal>
-            <Heart aria-hidden="true" />
-            <strong>Favoritos</strong>
-            <span>Lo que has guardado en este dispositivo.</span>
-          </Link>
-          {ordersEnabled && (
-            <Link href="/pedido" className="account-card" data-reveal>
-              <PackageSearch aria-hidden="true" />
-              <strong>Seguir un pedido</strong>
-              <span>Con su código y tu email o teléfono.</span>
+    <>
+      <header className="acc-head">
+        <h1>Tu cuenta es opcional.</h1>
+        <p>Compra sin cuenta cuando quieras. Con cuenta tienes tus pedidos, direcciones y favoritos en cualquier dispositivo.</p>
+        {p.eliminada && (
+          <p className="acc-note" role="status">
+            Tu cuenta está eliminada.
+          </p>
+        )}
+        {p.google && (
+          <p className="field-error" role="alert">
+            {p.google === "existe" ? "Ya hay una cuenta con ese email. Entra con tu contraseña." : "No se ha podido entrar con Google."}
+          </p>
+        )}
+      </header>
+      {on && (
+        <div className="acc-cols">
+          <section aria-labelledby="a-in">
+            <h2 id="a-in">Entrar</h2>
+            <SignIn google={googleEnabled()} />
+          </section>
+          <section aria-labelledby="a-up">
+            <h2 id="a-up">Crear cuenta</h2>
+            <SignUp />
+          </section>
+        </div>
+      )}
+      <section className="acc-block" aria-labelledby="a-loc">
+        <div className="acc-block-head">
+          <h2 id="a-loc">Pedidos en este dispositivo</h2>
+          {on && (
+            <Link className="text-link" href="/pedido">
+              <PackageSearch size={18} aria-hidden="true" /> Seguir un pedido sin cuenta
             </Link>
           )}
-          <Link href="/pago-seguro" className="account-card" data-reveal>
-            <ShieldCheck aria-hidden="true" />
-            <strong>Pago seguro</strong>
-            <span>Tus datos de tarjeta los gestiona Stripe, nunca nosotros.</span>
-          </Link>
         </div>
-        <section className="account-orders" aria-labelledby="orders-title" data-reveal>
-          <h2 id="orders-title">
-            <Package size={20} aria-hidden="true" /> Pedidos en este dispositivo
-          </h2>
-          {orders === null ? (
-            <div className="skeleton-block" style={{ height: 96 }} aria-hidden="true" />
-          ) : orders.length ? (
-            <ul className="local-orders">
-              {orders.map((o) => (
+        <LocalOrders />
+      </section>
+    </>
+  );
+}
+
+async function Home({ c, pending }: { c: Customer; pending: string | null }) {
+  const [orders, addr, favs] = await Promise.all([customerOrders(c.id), addresses(c.id), favoriteIds(c.id)]);
+  const qrs = new Map<string, string>();
+  for (const o of orders)
+    if (o.delivery === "collect" && ["received", "preparing", "ready"].includes(o.status)) qrs.set(o.id, await QRCode.toString(o.code, { type: "svg", margin: 0, errorCorrectionLevel: "M" }));
+  return (
+    <>
+      <AccountSync />
+      <header className="acc-head acc-head-row">
+        <div>
+          <h1>{c.name ? `Hola, ${c.name.split(" ")[0]}` : "Tu cuenta"}</h1>
+          <p>{c.email}</p>
+        </div>
+        <SignOut />
+      </header>
+
+      {pending && (
+        <section className="acc-block" aria-labelledby="a-pend">
+          <h2 id="a-pend">Añade tu último pedido</h2>
+          <p>Lo has abierto desde su enlace de seguimiento, así que puedes guardarlo aquí.</p>
+          <LinkToken token={pending} />
+        </section>
+      )}
+
+      <section className="acc-block" aria-labelledby="a-ord">
+        <h2 id="a-ord">Pedidos</h2>
+        {orders.length ? (
+          <ul className="acc-orders">
+            {orders.map((o) => {
+              const courier = courierById(o.courier);
+              return (
                 <li key={o.id}>
-                  <span>
-                    <strong>{new Date(o.createdAt).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}</strong>
-                    <small>
-                      {o.items} {o.items === 1 ? "artículo" : "artículos"} · {o.delivery === "collect" ? "Recogida" : "Envío"} · {o.code ?? `ref. ${o.id.slice(-8)}`}
-                    </small>
-                  </span>
-                  <b>{formatEuroPrice(o.amount)}</b>
-                  {o.token && (
-                    <Link href={`/pedido/${o.token}`} className="btn btn-secondary">
-                      Ver estado
+                  <div>
+                    <strong>
+                      {o.code} · {STATUS_LABEL[o.status as OrderStatus]}
+                    </strong>
+                    <p>
+                      {day(o.created_at)} · {euros(o.total)} · {publicPaymentLabel(o.payment_status as PaymentStatus, o.payment_mode as PaymentMode)}
+                    </p>
+                    {o.tracking_number && (
+                      <p>
+                        {courier?.name} <span className="mono">{o.tracking_number}</span>
+                      </p>
+                    )}
+                    <Link className="text-link" href={`/pedido/${o.token}`}>
+                      Ver seguimiento
                     </Link>
+                  </div>
+                  {qrs.has(o.id) && (
+                    <figure className="order-qr">
+                      <div dangerouslySetInnerHTML={{ __html: qrs.get(o.id)! }} role="img" aria-label={`Código QR del pedido ${o.code}`} />
+                      <figcaption>Para recogerlo</figcaption>
+                    </figure>
                   )}
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="acc-empty">
+            Todavía no hay pedidos en tu cuenta. <Link href="/packs">Ver los packs</Link>
+          </p>
+        )}
+        <details className="acc-more">
+          <summary>Añadir un pedido hecho sin cuenta</summary>
+          <p>Escribe el código y el email o teléfono que usaste. También puedes abrir su enlace de seguimiento y guardarlo desde allí.</p>
+          <LinkOrder />
+        </details>
+      </section>
+
+      <section className="acc-block" aria-labelledby="a-fav">
+        <h2 id="a-fav">Favoritos</h2>
+        {favs.length ? (
+          <ul className="acc-favs">
+            {favs.map((id) => {
+              const prod = getProductById(id);
+              return prod ? (
+                <li key={id}>
+                  <Link href={`/product/${prod.slug}`}>{prod.name_es}</Link>
+                </li>
+              ) : null;
+            })}
+          </ul>
+        ) : (
+          <p className="acc-empty">Lo que marques con el corazón se guarda aquí.</p>
+        )}
+      </section>
+
+      <div className="acc-cols">
+        <section aria-labelledby="a-dir">
+          <h2 id="a-dir">Direcciones</h2>
+          {addr.length > 0 && (
+            <ul className="acc-addr">
+              {addr.map((a) => (
+                <li key={a.id}>
+                  <span>
+                    {a.line}, {a.postal_code} {a.city}
+                    {a.note && <small>{a.note}</small>}
+                  </span>
+                  <RemoveAddress id={a.id} label={a.line} />
                 </li>
               ))}
             </ul>
-          ) : (
-            <p className="account-empty">
-              Aún no has hecho pedidos desde este dispositivo.{" "}
-              <Link href="/packs">
-                Empieza por un pack <ArrowRight size={14} />
-              </Link>
-            </p>
           )}
+          <NewAddress />
+        </section>
+        <section aria-labelledby="a-dat">
+          <h2 id="a-dat">Tus datos</h2>
+          <Profile name={c.name} phone={c.phone} marketing={c.marketing} />
+        </section>
+        <section aria-labelledby="a-seg">
+          <h2 id="a-seg">Seguridad</h2>
+          <Password has={c.has_password} />
+          <SignOutAll />
+        </section>
+        <section aria-labelledby="a-priv">
+          <h2 id="a-priv">Privacidad</h2>
+          <p>
+            <a className="text-link" href="/api/account/export" download>
+              Descargar mis datos
+            </a>
+          </p>
+          <details className="acc-more">
+            <summary>Eliminar la cuenta</summary>
+            <p>Se borran tu perfil, direcciones y favoritos. Los pedidos que la ley obliga a conservar dejan de estar vinculados a ti en la tienda.</p>
+            <DeleteAccount has={c.has_password} />
+          </details>
         </section>
       </div>
-    </div>
+    </>
   );
 }

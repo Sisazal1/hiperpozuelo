@@ -74,6 +74,29 @@ create table if not exists stock_moves (
 create table if not exists funnel (
   day date not null, name text not null, n integer not null default 0, primary key (day, name)
 );
+create table if not exists customers (
+  id text primary key, email text unique not null, password_hash text, google_sub text unique,
+  name text, phone text,
+  marketing boolean not null default false, marketing_at timestamptz, terms_at timestamptz not null,
+  email_verified_at timestamptz,
+  created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+);
+create table if not exists customer_sessions (
+  token_hash text primary key, customer_id text not null references customers(id) on delete cascade,
+  created_at timestamptz not null default now(), expires_at timestamptz not null
+);
+create index if not exists customer_sessions_customer on customer_sessions (customer_id);
+create table if not exists customer_addresses (
+  id serial primary key, customer_id text not null references customers(id) on delete cascade,
+  line text not null, postal_code text not null, city text not null, note text
+);
+create table if not exists customer_favorites (
+  customer_id text not null references customers(id) on delete cascade, product_id text not null,
+  at timestamptz not null default now(), primary key (customer_id, product_id)
+);
+alter table orders add column if not exists customer_id text references customers(id) on delete set null;
+alter table orders add column if not exists linked_at timestamptz;
+create index if not exists orders_customer on orders (customer_id);
 create table if not exists login_attempts (ip text not null, at timestamptz not null default now());
 `;
 

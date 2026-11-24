@@ -130,7 +130,7 @@ export default function CartPage() {
                 Tramitar pedido <ArrowRight size={18} />
               </Link>
               <p className="summary-secure">
-                <Lock size={13} /> Pago seguro con Stripe · sin crear cuenta
+                <Lock size={13} /> Pago seguro con Stripe · compra sin cuenta
               </p>
             </aside>
           </div>

@@ -28,7 +28,7 @@ export default function config(phase: string): NextConfig {
     async redirects() {
       return [
         { source: "/product/paño-cocina", destination: "/product/pano-cocina", permanent: true },
-        // El área de cliente "demo" (login sin backend) se retiró: la compra es como invitado.
+        // Toda la cuenta de cliente vive en /account.
         { source: "/account/:path+", destination: "/account", permanent: false },
       ];
     },

@@ -6,6 +6,7 @@ import { toast } from "@/components/motion/Toaster";
 import type { Product } from "@/types/catalog";
 import { paymentRules } from "@/config/commerce";
 import { track } from "@/lib/track";
+import { accountPost, hasAccountFlag } from "@/lib/account-client";
 
 const MAX = paymentRules.maxLineQuantity;
 
@@ -137,6 +138,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       toggleFavorite: (id) => {
         const saved = favorites.includes(id);
         setFavorites((x) => (x.includes(id) ? x.filter((i) => i !== id) : [...x, id]));
+        if (hasAccountFlag()) void accountPost("favorite", { id, on: !saved });
         const name = getProductById(id)?.name_es ?? "Producto";
         toast(saved ? `${name} ya no está en favoritos` : `${name} guardado en favoritos`, saved ? "unheart" : "heart");
       },

@@ -1,0 +1,245 @@
+/* Cuenta de cliente, opcional */
+.acc {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 40px var(--gutter) 72px;
+  display: grid;
+  gap: 48px;
+}
+.acc h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.acc h2,
+.acc-claim h2 {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+.acc p {
+  line-height: 1.6;
+}
+.acc-head p {
+  max-width: 60ch;
+  margin: 8px 0 0;
+  color: var(--hp-muted);
+}
+.acc-head-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+.acc-note {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--hp-sage);
+  color: var(--hp-ink) !important;
+}
+.acc-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 48px clamp(24px, 6vw, 72px);
+}
+.acc-cols > section {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--hp-line);
+}
+.acc-block {
+  padding-top: 24px;
+  border-top: 1px solid var(--hp-line);
+}
+.acc-block-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+}
+.acc-form {
+  display: grid;
+  gap: 16px;
+  justify-items: start;
+}
+.acc-field {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+.acc-field label {
+  font-weight: 600;
+}
+.acc-field input,
+.acc-field select,
+.acc-field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid #8b8680;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--hp-ink);
+  font: inherit;
+  font-size: 1rem;
+}
+.acc-field small {
+  color: var(--hp-muted);
+}
+.acc-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.acc-check input {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 1px 0 0;
+  accent-color: var(--hp-ink);
+}
+.acc-legal a,
+.acc-claim a,
+.acc-empty a {
+  color: var(--hp-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.acc-link {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--hp-ink);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.acc-orders,
+.acc-addr,
+.acc-favs {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.acc-orders > li,
+.acc-addr > li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--hp-line);
+}
+.acc-orders > li:first-child,
+.acc-addr > li:first-child {
+  padding-top: 0;
+}
+.acc-orders p {
+  margin: 4px 0 0;
+  color: var(--hp-muted);
+}
+.acc-addr small {
+  display: block;
+  color: var(--hp-muted);
+}
+.acc-favs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.acc-favs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--hp-line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--hp-ink);
+  text-decoration: none;
+}
+.acc-favs a:hover {
+  border-color: var(--hp-ink);
+}
+.acc-more summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.acc-more[open] summary {
+  margin-bottom: 4px;
+}
+.acc-more .acc-form {
+  max-width: 460px;
+}
+.acc-claim {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px 40px;
+  margin-top: 32px;
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--hp-sage);
+  text-align: left;
+}
+.acc-claim p {
+  margin: 0 0 12px;
+  line-height: 1.6;
+  color: var(--hp-ink);
+}
+.acc-claim .acc-field small {
+  color: var(--hp-ink);
+}
+@media (max-width: 760px) {
+  .acc {
+    padding-top: 24px;
+    gap: 40px;
+  }
+  .acc-cols,
+  .acc-claim {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .acc-claim {
+    gap: 16px;
+    padding: 20px 16px;
+  }
+  .acc-form .btn {
+    width: 100%;
+  }
+  .acc-form .btn {
+    white-space: normal;
+  }
+}
+.acc .btn-ink {
+  background: var(--hp-ink);
+  border-color: var(--hp-ink);
+  color: #fff;
+}
+.acc-more > p {
+  margin: 0 0 16px;
+}
+.acc-legal,
+.acc-claim .acc-legal {
+  margin: -8px 0 0;
+  padding-left: 34px;
+}
+.acc-legal a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}

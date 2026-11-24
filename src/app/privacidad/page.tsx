@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ordersEnabled } from "@/config/commerce";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = { title: "Privacidad" };
@@ -40,6 +41,20 @@ export default function PrivacyPage() {
                 <td>Verificar el cobro, reembolsar y atender reclamaciones</td>
                 <td>Contrato y obligación legal</td>
               </tr>
+              {ordersEnabled && (
+                <>
+                  <tr>
+                    <th scope="row">Cuenta, si la creas: email, contraseña cifrada, nombre, teléfono, direcciones y favoritos</th>
+                    <td>Darte acceso a tus pedidos y datos desde cualquier dispositivo</td>
+                    <td>Contrato</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Email, si marcas que quieres ofertas</th>
+                    <td>Enviarte ofertas y novedades</td>
+                    <td>Consentimiento, que puedes retirar en tu cuenta</td>
+                  </tr>
+                </>
+              )}
               <tr>
                 <th scope="row">Dirección IP del intento de acceso</th>
                 <td>Frenar intentos repetidos de adivinar pedidos o contraseñas</td>
@@ -54,6 +69,12 @@ export default function PrivacyPage() {
         <p>
           Stripe, para cobrar online; el transportista, si pides envío; y los proveedores que alojan la web y sus datos. Conservamos los pedidos durante los plazos que exige la normativa fiscal y mercantil.
         </p>
+
+        {ordersEnabled && (
+          <p>
+            En <Link href="/account">tu cuenta</Link> puedes descargar tus datos o eliminarla. Al eliminarla borramos el perfil; los pedidos que la ley obliga a conservar quedan sin vínculo con él.
+          </p>
+        )}
 
         <h2>Tus derechos</h2>
         <p>

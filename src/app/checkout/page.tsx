@@ -15,6 +15,9 @@ import PaymentMarks, { methodNames, usePaymentMethods } from "@/components/order
 import { siteConfig } from "@/config/site";
 import { saveLocalOrder } from "@/lib/orders";
 import { track } from "@/lib/track";
+import { hasAccountFlag } from "@/lib/account-client";
+import { ClaimOrder } from "@/components/account/forms";
+import "../account/account.css";
 
 type Delivery = "delivery" | "collect";
 type Payment = "online" | "later";
@@ -23,6 +26,7 @@ type PaidOrder = {
   id: string;
   code: string | null;
   token: string | null;
+  owned?: boolean;
   payment_reference: string | null;
   amount_total: number | null;
   customer_email: string | null;
@@ -67,6 +71,23 @@ export default function CheckoutPage() {
       if (d?.form) setForm({ ...EMPTY, ...d.form });
       if (d?.delivery === "collect") setDelivery("collect");
     } catch {}
+    // Con sesión, rellena lo que esté vacío. Sin sesión no se pregunta nada.
+    if (!hasAccountFlag()) return;
+    fetch("/api/account/me")
+      .then((r) => r.json())
+      .then(({ customer: c, addresses }) => {
+        if (!c) return;
+        const a = addresses?.[0];
+        setForm((f) => ({
+          name: f.name || c.name || "",
+          email: f.email || c.email || "",
+          phone: f.phone || c.phone || "",
+          line: f.line || a?.line || "",
+          postalCode: f.postalCode || a?.postal_code || "",
+          note: f.note || a?.note || "",
+        }));
+      })
+      .catch(() => {});
   }, []);
   useEffect(() => {
     try {
@@ -239,7 +260,7 @@ export default function CheckoutPage() {
     <div className="checkout-page">
       <header className="checkout-header">
         <span>
-          <ShieldCheck size={16} aria-hidden="true" /> Pago seguro · sin crear cuenta
+          <ShieldCheck size={16} aria-hidden="true" /> Pago seguro · compra sin cuenta
         </span>
         <Link href="/cart">Volver a la cesta</Link>
       </header>
@@ -504,6 +525,7 @@ function Confirmation({ order }: { order: PaidOrder }) {
           Seguir comprando
         </Link>
       </div>
+      {order.token && !order.owned && <ClaimOrder token={order.token} email={order.customer_email} />}
     </div>
   );
 }
