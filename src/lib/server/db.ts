@@ -1,4 +1,5 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import path from "node:path";
 
 // Un solo SQL (Postgres) con dos motores:
@@ -154,7 +155,18 @@ const iso = (rows: Row[]) =>
 async function pgEngine(url: string): Promise<Engine> {
   const { Pool } = await import("pg");
   const pool = new Pool({ connectionString: url, max: 3, idleTimeoutMillis: 10_000 });
-  await pool.query(SCHEMA);
+  // El esquema se aplica una vez por versión y con bloqueo: dos arranques en frío a la vez no chocan ni bloquean tablas en uso.
+  const version = createHash("sha256").update(SCHEMA).digest("hex");
+  const applied = await pool.query("select 1 from schema_applied where version=$1", [version]).catch((e) => {
+    if (e.code !== "42P01") throw e;
+    return { rowCount: 0 };
+  });
+  if (!applied.rowCount)
+    await pool.query(
+      `select pg_advisory_xact_lock(732101);${SCHEMA};
+create table if not exists schema_applied (version text primary key, at timestamptz not null default now());
+insert into schema_applied (version) values ('${version}') on conflict do nothing;`,
+    );
   return {
     query: async (sql, params = []) => iso((await pool.query(sql, params as any[])).rows),
     tx: async (fn) => {
