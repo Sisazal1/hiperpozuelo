@@ -5,7 +5,9 @@ import { redirect } from "next/navigation";
 import { dbAvailable, query } from "./db";
 
 const COOKIE = "hp_staff";
+/** Sin recordar, una jornada. Recordado en el equipo, un mes: solo en dispositivos propios. */
 const HOURS = 10;
+const REMEMBER_HOURS = 30 * 24;
 const secret = () => {
   const s = process.env.BACKOFFICE_SECRET;
   return s && s.length >= 24 ? s : null;
@@ -20,7 +22,7 @@ export async function clientIp() {
   return (h.get("x-forwarded-for") || "local").split(",")[0].trim().slice(0, 64);
 }
 
-export async function login(name: string, password: string): Promise<"ok" | "bad" | "blocked" | "off"> {
+export async function login(name: string, password: string, remember = false): Promise<"ok" | "bad" | "blocked" | "off"> {
   if (!backofficeConfigured()) return "off";
   const ip = await clientIp();
   const [{ n }] = await query(
@@ -34,13 +36,14 @@ export async function login(name: string, password: string): Promise<"ok" | "bad
   }
   await query("delete from login_attempts where ip=$1 or at < now() - interval '1 day'", [ip]);
   const staff = name.trim().replace(/[^\p{L}\p{N} .-]/gu, "").slice(0, 40) || "Equipo";
-  const payload = Buffer.from(JSON.stringify({ staff, exp: Date.now() + HOURS * 3600_000 })).toString("base64url");
+  const hours = remember ? REMEMBER_HOURS : HOURS;
+  const payload = Buffer.from(JSON.stringify({ staff, exp: Date.now() + hours * 3600_000 })).toString("base64url");
   (await cookies()).set(COOKIE, `${payload}.${sign(payload)}`, {
     httpOnly: true,
     sameSite: "strict",
     secure: Boolean(process.env.VERCEL),
     path: "/backoffice",
-    maxAge: HOURS * 3600,
+    maxAge: hours * 3600,
   });
   return "ok";
 }

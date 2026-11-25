@@ -41,7 +41,7 @@ async function run(fn: (staff: string) => Promise<string | void>): Promise<Actio
 }
 
 export async function loginAction(_: ActionState, f: FormData): Promise<ActionState> {
-  const r = await login(str(f, "name"), str(f, "password"));
+  const r = await login(str(f, "name"), str(f, "password"), f.get("remember") === "on");
   if (r === "ok") redirect("/backoffice");
   return {
     error: {

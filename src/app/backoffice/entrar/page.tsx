@@ -17,6 +17,10 @@ export default async function LoginPage() {
           Contraseña del equipo
           <input name="password" type="password" autoComplete="current-password" required />
         </label>
+        <label className="bo-check">
+          <input name="remember" type="checkbox" />
+          <span>Recordarme 30 días en este equipo</span>
+        </label>
       </ActionForm>
       <p>Tu nombre queda registrado en cada cobro y cambio de estado.</p>
     </div>
