@@ -2,7 +2,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { commerceConfig } from "@/config/commerce";
-import { siteConfig } from "@/config/site";
 export default function AnnouncementTicker() {
   const [paused, setPaused] = useState(false);
   const [reduced, setReduced] = useState(false);
@@ -13,7 +12,6 @@ export default function AnnouncementTicker() {
       `Recogida en tienda gratis`,
       `Compra sin cuenta`,
       ...(commerceConfig.welcomeDiscountRate > 0 ? ["−10% en tu primera compra"] : []),
-      ...(siteConfig.prelaunch ? ["Preapertura: aún no se cobra ni se envía ningún pedido"] : []),
     ],
     [],
   );

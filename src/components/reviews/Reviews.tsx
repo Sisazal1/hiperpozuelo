@@ -236,11 +236,7 @@ export default function Reviews({ type, id, data }: { type: SubjectType; id: str
                   </li>
                 ) : (
                   <Item key={r.id} r={r}>
-                    {r.status === "removed" ? (
-                      <p className="rv-own">Retirada por la tienda. Motivo: {r.reason}.</p>
-                    ) : (
-                      r.test && <p className="rv-own">Es de un pedido de preapertura: solo la ves tú.</p>
-                    )}
+                    {r.status === "removed" && <p className="rv-own">Retirada por la tienda. Motivo: {r.reason}.</p>}
                     <div className="rv-actions">
                       {r.status === "published" && (
                         <button type="button" className="rv-text-btn" onClick={() => setEdit(r.id)}>

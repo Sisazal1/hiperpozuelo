@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { normalizePostalCode, paymentRules, zoneFor } from "@/config/commerce";
-import { siteConfig } from "@/config/site";
 import { dbAvailable, query } from "@/lib/server/db";
 import {
   abandonOrder,
@@ -104,7 +103,7 @@ export async function POST(req: Request) {
       const order = await createOrder({
         channel: "web", mode, delivery, lines, totals, customer,
         address: delivery === "delivery" ? address : undefined,
-        requestKey, customerId, redeem, actor: "Cliente", test: siteConfig.prelaunch,
+        requestKey, customerId, redeem, actor: "Cliente", test: stripeIsTest(),
       });
       return NextResponse.json({ order: order.token });
     }

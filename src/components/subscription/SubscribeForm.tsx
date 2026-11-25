@@ -3,7 +3,6 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Check, ShieldCheck, Store, Truck } from "lucide-react";
 import { zoneFor, type DeliveryMethod } from "@/config/commerce";
-import { siteConfig } from "@/config/site";
 import { pricedItems, subscriptionConfig, subscriptionQuote, weeksLabel } from "@/config/subscription";
 import { hasAccountFlag } from "@/lib/account-client";
 import { readDraft, saveDraft, type Draft } from "@/lib/subscription-draft";
@@ -220,7 +219,6 @@ export default function SubscribeForm() {
         <p className="co-legal">
           Al continuar aceptas las <Link href="/condiciones#suscripcion">condiciones de la suscripción</Link> y la <Link href="/privacidad">privacidad</Link>. Tienes 14 días para <Link href="/envios-y-devoluciones">desistir</Link> de cada pedido.
         </p>
-        {siteConfig.prelaunch && <p className="checkout-test-note">Preapertura: no se cobra ni se envía nada todavía. Tarjeta de prueba 4242 4242 4242 4242.</p>}
       </aside>
     </form>
   );

@@ -29,7 +29,7 @@ try {
   const o7 = await guest.order([product(KIT)]);
   const o8 = await ana.order([product("HP-CLE-006")]);
   await L.sql(async (q) => {
-    const set = (o, status, days, test) => q(`update orders set status=$2, payment_status='verified', test=$4, delivered_at=case when $3::int is null then null else ((now() at time zone 'Europe/Madrid')::date - $3::int + time '12:00') at time zone 'Europe/Madrid' end where code=$1`, [o.code, status, days, test]);
+    const set = (o, status, days, test) => q(`update orders set status=$2, payment_status='verified', test=$4, delivered_at=case when $3::int is null then null else ((now() at time zone 'Europe/Madrid')::date - $3::int + time '12:00') at time zone 'Europe/Madrid' end where code=$1`, [o.code, status, days, !test]);
     await set(o1, "delivered", 2, false);
     await set(o2, "ready", null, false);
     await set(o3, "delivered", 31, false);
@@ -66,15 +66,15 @@ try {
   check("Pack: reseña del pack", (await post(ana, { type: "bundle", id: bundle.id, rating: 4, name: "Ana G." })).status === 200);
   check("Producto comprado dentro del pack", (await post(ana, { id: inPack, rating: 4 })).status === 200);
   check("Dos a la vez: solo entra una", (await Promise.all([post(dan, { id: KIT, rating: 2, name: "Dan", text: "Se dobla." }), post(dan, { id: KIT, rating: 2, name: "Dan" })])).filter((r) => r.status === 200).length === 1);
-  check("Pedido de prueba: se guarda", (await post(bea, { id: KIT, rating: 1, name: "Bea L.", text: "Reseña de prueba" })).status === 200);
+  check("Pedido del otro modo de pago: se guarda", (await post(bea, { id: KIT, rating: 1, name: "Bea L.", text: "Reseña de prueba" })).status === 200);
   html = await page(KIT);
   const ld = JSON.parse(html.match(/<script type="application\/ld\+json">(\{"@context":"https:\/\/schema.org","@type":"Product".*?)<\/script>/)[1]);
-  check("Media 3,5 con 2 reseñas (la de prueba no cuenta)", ld.aggregateRating?.ratingValue === 3.5 && ld.aggregateRating.reviewCount === 2, JSON.stringify(ld.aggregateRating));
-  check("La de prueba no es pública", !html.includes("Reseña de prueba") && !html.includes("Bea L."));
+  check("Media 3,5 con 2 reseñas (la del otro modo no cuenta)", ld.aggregateRating?.ratingValue === 3.5 && ld.aggregateRating.reviewCount === 2, JSON.stringify(ld.aggregateRating));
+  check("La del otro modo no es pública", !html.includes("Reseña de prueba") && !html.includes("Bea L."));
   check("Texto escapado y sin enlaces activos", !html.includes("<script>alert(1)") && !html.includes('href="https://enlace.example'));
   check("Sale «Compra verificada»", text(html).includes("Compra verificada"));
   const own = (await bea.req("GET", `/api/reviews?type=product&id=${KIT}`)).json;
-  check("Su autora sí la ve", own.mine.length === 1 && own.mine[0].test === true);
+  check("Su autora sí la ve", own.mine.length === 1);
   check("Otra cuenta no la ve", (await eva.req("GET", `/api/reviews?type=product&id=${KIT}`)).json.mine.length === 0);
   const packPage = (await new Client().req("GET", `/packs/kitchen/small`)).text;
   check("Pack con aggregateRating propio", /"aggregateRating".*"ratingValue":4/.test(packPage));
@@ -139,7 +139,7 @@ try {
     await p.context().close();
     p = await open(width, bea.jar);
     await p.goto(`${BASE}/product/${slug(KIT)}`);
-    await p.getByText("solo la ves tú").waitFor();
+    await p.getByRole("button", { name: "Editar mi reseña" }).first().waitFor();
     await look(p, "ficha-autora-prueba", width);
     await p.context().close();
     p = await open(width, dan.jar);
@@ -170,7 +170,7 @@ try {
   await bo.waitForURL(`${BASE}/backoffice`);
   await bo.goto(`${BASE}/backoffice/resenas`);
   const row = bo.locator("tr", { hasText: "Se dobla." });
-  check("Backoffice ve también las de prueba", (await bo.locator("tr", { hasText: "Pedido de prueba" }).count()) === 1);
+  check("Backoffice las ve todas", (await bo.locator("tr", { hasText: "Bea L." }).count()) === 1);
   await row.getByRole("button", { name: "Retirar" }).click();
   check("Retirar sin motivo: no deja", await row.getByText("Elige uno de los motivos permitidos.").waitFor({ timeout: 8000 }).then(() => true, () => false));
   check("Motivos permitidos: solo cuatro", (await row.locator("select option:not([disabled])").allInnerTexts()).join() === "Spam,Insultos,Datos personales,Contenido ilegal");

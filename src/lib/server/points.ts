@@ -1,15 +1,15 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { pointsConfig, pointsFor } from "@/config/points";
-import { siteConfig } from "@/config/site";
+import { stripeIsTest } from "./stripe";
 import { query, tx, type Exec, type Row } from "./db";
 
 // Libro de movimientos: solo se añaden filas. El saldo se calcula sumándolas, nunca se edita.
 // earn/refund dependen del pedido (pendientes hasta 14 días tras la entrega); el resto cuenta al momento.
 export class PointsError extends Error {}
 
-/** En preapertura o con Stripe en test se ven y se usan solo puntos de prueba; con pagos reales, solo los reales. */
-export const pointsTestMode = () => siteConfig.prelaunch || !process.env.STRIPE_SECRET_KEY?.startsWith("sk_live");
+/** Lo hecho con Stripe en test y lo hecho con cobros reales no se mezclan: se ve y se usa solo lo del modo actual. */
+export const pointsTestMode = stripeIsTest;
 
 const MATURE = `(o.delivered_at is not null and o.delivered_at + interval '${pointsConfig.maturityDays} days' <= now())`;
 async function balances(q: Exec, customerId: string, test = pointsTestMode()) {

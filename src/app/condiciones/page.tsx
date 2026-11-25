@@ -15,7 +15,6 @@ export default function TermsPage() {
       <div className="commerce-container">
         <span className="eyebrow">Información legal</span>
         <h1>Condiciones de compra</h1>
-        {siteConfig.prelaunch && <p>Estamos en preapertura: el pago está en modo de prueba, así que no se cobra ni se envía ningún pedido.</p>}
 
         <h2>Quién vende</h2>
         <p>
@@ -77,8 +76,7 @@ export default function TermsPage() {
             </p>
             <p>
               Si devuelves un pedido, entero o en parte, se restan en la misma proporción; si ya los habías usado, se descuentan de los siguientes. Si se cancela o se reembolsa entero, te devolvemos los que canjeaste. Caducan tras {pointsConfig.expiryMonths} meses sin compras: ves
-              la fecha en tu cuenta. Un pedido hecho sin cuenta suma si lo añades a la tuya en los {pointsConfig.linkDays} días siguientes a la compra, una sola vez por pedido. Al eliminar la cuenta se pierden. Los puntos de
-              pedidos de prueba no pasan a la tienda real.
+              la fecha en tu cuenta. Un pedido hecho sin cuenta suma si lo añades a la tuya en los {pointsConfig.linkDays} días siguientes a la compra, una sola vez por pedido. Al eliminar la cuenta se pierden.
             </p>
 
             <h2 id="resenas">Reseñas</h2>
@@ -88,7 +86,7 @@ export default function TermsPage() {
             </p>
             <p>
               Publicamos todas, positivas y negativas, y la media cuenta todas las publicadas. No pagamos ni premiamos opiniones. Solo retiramos las que son spam, insultan, muestran datos personales o son ilegales; el motivo queda
-              registrado y su autor lo ve. La tienda puede responder en público. Las de pedidos de prueba no se publican ni cuentan.
+              registrado y su autor lo ve. La tienda puede responder en público.
             </p>
           </>
         )}

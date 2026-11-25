@@ -1,11 +1,11 @@
-# AGENTS.md — Hiper Pozuelo (tienda en preapertura)
+# AGENTS.md — Hiper Pozuelo (tienda online)
 
 Contexto para agentes de código (OpenCode, Codex, Claude Code). Léelo antes de tocar nada.
 
 ## Qué es esto
 
 Tienda online de **Hiper Pozuelo S.L.** (bazar de barrio en C/ Sevilla 5, Pozuelo de Alarcón,
-Madrid) en **preapertura**, con pago de Stripe en modo test. El objetivo es una experiencia
+Madrid), con pago de Stripe en modo test. La web se muestra como tienda real: ningún aviso de prueba ni de preapertura en la interfaz (decisión de Simón, 2026-11-25). El objetivo es una experiencia
 premium y lista para lanzar, no un escaparate de demostración. Hay rutas de servidor
 (`/api/checkout`, webhook de Stripe, pedidos) y un backoffice en `/backoffice` con TPV e inventario.
 Los pedidos viven en Postgres (`src/lib/server`, aprobado por el usuario); sin `DATABASE_URL` en

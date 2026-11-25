@@ -43,7 +43,6 @@ export default async function ReviewsPage() {
                     <span className="bo-pill" data-s={r.status === "published" ? "ready" : "cancelled"}>
                       {r.status === "published" ? "Publicada" : "Retirada"}
                     </span>
-                    {r.test && <small>Pedido de prueba: no es pública</small>}
                     {r.status === "removed" && (
                       <small>
                         {r.removed_reason}: {r.removed_detail} ({r.removed_by}, {day(r.removed_at)})

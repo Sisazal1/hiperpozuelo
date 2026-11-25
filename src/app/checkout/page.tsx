@@ -472,11 +472,6 @@ export default function CheckoutPage() {
             Al continuar aceptas las <Link href="/condiciones">condiciones</Link> y la <Link href="/privacidad">privacidad</Link>. Tienes 14 días para{" "}
             <Link href="/envios-y-devoluciones">devolverlo</Link>.
           </p>
-          {siteConfig.prelaunch && (
-            <p className="checkout-test-note">
-              Preapertura: no se cobra ni se envía nada todavía. Tarjeta de prueba 4242 4242 4242 4242.
-            </p>
-          )}
         </aside>
       </form>
     </div>

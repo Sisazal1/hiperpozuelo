@@ -5,6 +5,7 @@ import { NO_REVIEWS, reviewConfig, type OwnState, type PublicReview, type Review
 import { getProductById } from "@/lib/catalog/products";
 import { bundleDisplayName, getBundleById } from "@/lib/catalog/bundles";
 import { dbAvailable, query, tx, type Row } from "./db";
+import { stripeIsTest } from "./stripe";
 import { AccountError, type Customer } from "./customers";
 
 // Reseñas: solo de quien compró y recibió. Nada se siembra ni se importa.
@@ -31,16 +32,16 @@ const toPublic = (r: Row): PublicReview => ({
   id: r.id, rating: r.rating, body: r.body ?? "", name: r.public_name, at: r.created_at, edited: r.updated_at !== r.created_at, reply: r.reply, replyAt: r.reply_at,
 });
 
-/** Lo que ve cualquiera: publicadas y de pedidos reales. Nunca las de pedidos de prueba. */
+/** Lo que ve cualquiera: publicadas y del modo de pago actual. Al activar los cobros reales, las anteriores dejan de verse. */
 export async function reviewData(type: SubjectType, id: string): Promise<ReviewData> {
   // En la compilación no se abre la base de datos: la página se genera al pedirla por primera vez.
   if (!reviewsEnabled() || process.env.NEXT_PHASE === "phase-production-build") return { ...NO_REVIEWS, enabled: reviewsEnabled() };
   try {
-    const rows = await query("select * from reviews where subject_type=$1 and subject_id=$2 and status='published' and not test order by created_at desc limit 200", [type, id]);
+    const rows = await query("select * from reviews where subject_type=$1 and subject_id=$2 and status='published' and test=$3 order by created_at desc limit 200", [type, id, stripeIsTest()]);
     const [s] = await query(
       `select count(*)::int as n, coalesce(sum(rating),0)::int as total, ${[1, 2, 3, 4, 5].map((k) => `count(*) filter (where rating=${k})::int as r${k}`).join(", ")}
-       from reviews where subject_type=$1 and subject_id=$2 and status='published' and not test`,
-      [type, id],
+       from reviews where subject_type=$1 and subject_id=$2 and status='published' and test=$3`,
+      [type, id, stripeIsTest()],
     );
     return { enabled: true, count: s.n, average: s.n ? Math.round((s.total / s.n) * 10) / 10 : 0, dist: [s.r1, s.r2, s.r3, s.r4, s.r5], list: rows.map(toPublic) };
   } catch (e) {
@@ -72,7 +73,7 @@ export async function ownState(c: Customer | null, type: SubjectType, id: string
     signedIn: true,
     canReview: o ? { code: o.code, until: until(o.delivered_at) } : null,
     name: defaultName(c),
-    mine: mine.map((r) => ({ ...toPublic(r), test: r.test, status: r.status, reason: r.removed_reason, code: r.code })),
+    mine: mine.map((r) => ({ ...toPublic(r), status: r.status, reason: r.removed_reason, code: r.code })),
   };
 }
 

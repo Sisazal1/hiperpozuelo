@@ -67,7 +67,6 @@ export default async function PointsPage({ searchParams }: { searchParams: Promi
                     <td>{when(l.at)}</td>
                     <td>
                       {LABEL[l.type]} {l.code}
-                      {l.test && <small>Prueba</small>}
                     </td>
                     <td>{l.reason}</td>
                     <td>{l.actor}</td>

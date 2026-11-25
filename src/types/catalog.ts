@@ -1,7 +1,6 @@
 export type Locale = "es" | "en";
 export type PriceConfidence = "low" | "medium" | "high";
 export type CatalogStatus = "proposed_not_verified";
-export type CatalogMode = "demo";
 export type BundleTier = "small" | "medium" | "large";
 export type ProductRelationship = "cross_sell" | "bundle_member";
 export type Product = {
